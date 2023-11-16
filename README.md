@@ -9,9 +9,11 @@ or 2 hosts running OAI nrUE and gNB respectively, connected to SDRs.
 
 Usage:  ./oaitest [OPTION]... [+VALUE] 
 
-  -c, --check              check UE registration status to 5G Network  
+  -c, --check              check UE registration status to 5G Network 
+  
   -u, --uplink [value]     create traffic to uplink. Value needs to be in bps
-                           example for 30Mbps: -u 30M   
+                           example for 30Mbps: -u 30M
+                           
   -d, --downlink [value]   create traffic to downlink. Value needs to be in bps
                            example for 30Mbps: -d 30M
                            
