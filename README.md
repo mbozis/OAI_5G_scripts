@@ -2,9 +2,10 @@
 Scripts and configuration files for Open Air Interface
 
 ./oaitest
+
 Testing tool for E2E 5G SA system using Open Air Interface with RFsimulator
-or 2 hosts running OAI nrUE and nrgNB respectively, connected to SDRs.
-SDR link can be OTA or with RF cables
+or 2 hosts running OAI nrUE and gNB respectively, connected to SDRs.
+
 
 Usage:  ./oaitest [OPTION]... [+VALUE] 
 
