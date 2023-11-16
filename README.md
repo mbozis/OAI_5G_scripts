@@ -28,3 +28,24 @@ Usage:  ./oaitest [OPTION]... [+VALUE]
   --dmax                   get downlink throughput
   
   --umax                   get uplink trhoughput 
+
+./startgnb
+
+Tool to start gnb softmodem for a particular scenorio using USRP N310 SDR device
+or 2 hosts running OAI nrUE and nrgNB respectively.
+the ethernet link between the host and SDR needs to be at least 10Gbps 
+
+Usage:  ./startgnb [OPTION]... [+VALUE] 
+
+  -s, --scenario [value]   start gnb softmodem executing scenario number [value]
+                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
+                           value is from the following table
+                           
+                           -----------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 51prb                         |
+                          | 2 | standalone mode band 78 with 106prb                        |
+                          ------------------------------------------------------------------
+                          
+  -i, --info               show Open Air Interface version
+  
+  -h, --help               print this help message
