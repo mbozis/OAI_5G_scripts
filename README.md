@@ -97,3 +97,30 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
   -i, --info               show Open Air Interface version
   
   -h, --help               print this help message
+
+  **./startuesim**
+
+Tool to start UE softmodem for a particular scenorio using Open Air Interface with RFsimulator
+or 2 hosts running OAI nrUE and nrgNB respectively.
+the ethernet link between the 2 hosts  needs to be at least 10Gbps 
+
+Usage:  ./startuesim [OPTION]... [+VALUE] 
+
+  -s, --scenario [value]   start UE softmodem executing scenario number [value]
+                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
+                           value is from the following table
+                           
+                           -----------------------------------------------------------------
+                          | 1 | physical layer test with one slot assigned for downlink    |
+                          | 2 | extended phy layer test with parameters changed            |
+                          |   | (parameters need to be changed directly to script code)    |
+                          | 3 | do-ra mode                                                 |
+                          | 4 | standalone mode band 66                                    |
+                          | 5 | standalone mode band 78 with 106prb                        |
+                          | 6 | standalone mode band 78 with 51prb                         |
+                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)             |
+                          ------------------------------------------------------------------
+                          
+  -i, --info               show Open Air Interface version
+  
+  -h, --help               print this help message
