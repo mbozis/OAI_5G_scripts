@@ -1,0 +1,162 @@
+#!/bin/bash
+# oai 5G testbed with USRP N310
+# 
+# DCS LAB Nov 2023
+# Manolis Bozis
+# scripts MUST run with root privillages
+#---------COLOR CODES --------------------
+R='\033[0;31m'   #'0;31' is Red's ANSI color code
+G='\033[0;32m'   #'0;32' is Green's ANSI color code
+NOCOLOR='\033[0m'
+###############################
+# the followin variable needs to be updated when new scenarios are added
+USERFOLDER="/home/manolis"
+SCENARIOS=( "sa_51prb" "sa_106prb" )
+######### FUCTIONS ############
+#### FUNCTION 1 Exit Script ###
+exitScript(){
+echo -e "exiting....\n"
+sleep 2
+exit 1
+}
+###############################
+
+###########################################################################
+#### FUNCTION 2 print help message  ############
+print_help(){
+cat <<EOF
+UOP - DCS LAB author Manolis Bozis 2023
+Tool to start UE softmodem for a particular scenorio using Open Air Interface with RFsimulator
+or 2 hosts running OAI nrUE and nrgNB respectively.
+the ethernet link between the 2 hosts  needs to be at least 10Gbps 
+
+Usage:  $0 [OPTION]... [+VALUE] 
+  -s, --scenario [value]   start UE softmodem executing scenario number [value]
+                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
+                           value is from the following table
+                           -----------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 51prb                         |
+                          | 2 | standalone mode band 78 with 106prb                        |
+                          ------------------------------------------------------------------
+  -i, --info               show Open Air Interface version
+  -h, --help               print this help message
+EOF
+}
+######### Function 3 51 prb SA #############################################
+############## SCENARIO 1 ##################################################-
+sa_51prb(){
+#################  51 PRB ######################################################
+./nr-uesoftmodem \
+-r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 --ue-txgain 0 --ue-rxgain 70 \
+--sa --uicc0.imsi 001010000000001 --usrp-args "mgmt_addr=192.168.20.2,addr=192.168.20.2,clock_source=internal,time_source=internal" \
+# -d
+#################################################################################
+}
+######### Function 4 106 prb SA #############################################
+############## SCENARIO 2 ##################################################-
+sa_106prb(){
+#################  106 PRB ######################################################
+./nr-uesoftmodem \
+-r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 --ue-txgain 0 --ue-rxgain 70 \
+--sa --uicc0.imsi 001010000000001 --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" \
+# --ue-fo-compensation --log_config.global_log_options level,nocolor,time
+# -O ~/scripts/configuration/ue.conf 
+# the above are other parameters you may need
+#  --continuous-tx --d
+# " --MACRLCs.[0].ul_max_mcs 14 " reduces heavy UL traffic by setting max MCS in UPLINK, "-d" starts the scope utility
+# There is noise on the DC carriers on N300 and especially the X300 in UL.
+#  To avoid their use or shift them away from the center to use more UL spectrum,
+#  use the --tune-offset <Hz> command line switch, where <Hz> is ideally half 
+# the bandwidth, or possibly less.
+
+# uncomment the following line to mitigate uplink issues rellated to noise 
+# on the DC carriers
+#--tune-offset <Hz>
+################################################################################
+
+}
+
+######################## MAIN FUNCTION #####################################
+function main() {
+
+if [ "$*" == "" ]; then
+    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
+    print_help
+    exit 1
+fi
+###########################################################
+
+# check arguments
+
+  until [ -z "$1" ]
+  do
+    case "$1" in
+       -i | --info)
+            echo "getting the version of OAI software..."
+            sleep 1
+            cd ${USERFOLDER}/openairinterface5g/
+            echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
+            shift;;
+       -s | --scenario)
+            # check if scenario value is valid
+            SELECTED_SCENARIO=$2
+            if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${#SCENARIOS[@]} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
+               echo -e "${R}selected senario is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+
+	    # check if script is run with sudo privilages
+            SCRIPTUSER=$(whoami)
+            if [[ $SCRIPTUSER != "root" ]] ; then 
+               echo -e "${R}script must be run with sudo privilages\n${NOCOLOR}"
+            exit 1
+            fi
+            ###########################################################
+
+            # check if core network is up, executing a ping to AMF ####
+            echo -e "checking connection to AMF...\n"
+            ping amf -c 1
+            if [ $? -ne 0 ]; then
+            echo -e "${R} No connection to AMF\n"
+            echo -e "start 5G core network prior to executing RAN\n"
+            echo -e "or check your network settings ${NOCOLOR}\n"
+            exit 1
+            fi 
+            ###########################################################
+
+            # check cpu state #########################################
+            cpufreq-info | awk '/analyzing CPU/ || /current CPU frequency is/ {print}'
+            ###########################################################
+            # switch to softmodem binary file folder ##################
+            cd ${USERFOLDER}/openairinterface5g
+            source oaienv
+            cd cmake_targets/ran_build/build
+            ###########################################################
+            ${SCENARIOS["$SELECTED_SCENARIO"-1]}
+            shift 2;;
+	-h | --help)
+            print_help
+            exit 0;;
+        *) 
+            exit
+            ;;    
+    esac
+  done
+# end of script
+  }
+ 
+  main "$@"
+
+
+
+
+
+
+
+
+
+ 
+
+

@@ -1,0 +1,198 @@
+#!/bin/bash
+# oai 5G testbed with USRP N310
+# UOP
+# DCS LAB Oct 2023
+# Manolis Bozis
+# scripts MUST run with root privillages
+# 
+#---------COLOR CODES --------------------
+R='\033[0;31m'   #'0;31' is Red's ANSI color code
+G='\033[0;32m'   #'0;32' is Green's ANSI color code
+NOCOLOR='\033[0m'
+###############################
+# the followin variable needs to be updated when new scenarios are added
+USERFOLDER="/home/manolis"
+SCENARIOS=( "phytest" "phytestextended" "dora" "sa_band66" "sa_band78_106prb" "sa_band78_51prb" "sa_band77_273prb" )
+re='^[0-9]+$'    # integer value for selected scenatio to be checked
+
+
+######### FUCTIONS ############
+#### FUNCTION 1 Exit Script ###
+exitScript(){
+echo -e "exiting....\n"
+sleep 2
+exit 1
+}
+###############################
+
+###########################################################################
+#### FUNCTION 2 print help message  ############
+print_help(){
+cat <<EOF
+UOP - DCS LAB author Manolis Bozis 2023
+Tool to start gnb softmodem for a particular scenorio using Open Air Interface with RFsimulator
+or 2 hosts running OAI nrUE and nrgNB respectively.
+the ethernet link between the 2 hosts  needs to be at least 10Gbps 
+
+Usage:  $0 [OPTION]... [+VALUE] 
+  -s, --scenario [value]   start gnb softmodem executing scenario number [value]
+                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
+                           value is from the following table
+                           -----------------------------------------------------------------
+                          | 1 | physical layer test with one slot assigned for downlink    |
+                          | 2 | extended phy layer test with parameters changed            |
+                          |   | (parameters need to be changed directly to script code)    |
+                          | 3 | do-ra mode                                                 |
+                          | 4 | standalone mode band 66                                    |
+                          | 5 | standalone mode band 78 with 106prb                        |
+                          | 6 | standalone mode band 78 with 51prb                         |
+                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)             |
+                          ------------------------------------------------------------------
+  -i, --info               show Open Air Interface version
+  -h, --help               print this help message
+EOF
+}
+######### Function 3 Physical layer test ###################################
+############## SCENARIO 1 ##################################################-
+phytest(){
+# only 1 slot assigned for downlink
+RFSIMULATOR=server LD_LIBRARY_PATH=. ./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.tm1.106PRB.usrpn300.conf \
+--parallel-config PARALLEL_SINGLE_THREAD --rfsim --phy-test --gNBs.[0].min_rxtxtime 6
+}
+
+############################################################################
+
+######### Function 4 Physical layer test with parameters  ##################
+############## SCENARIO 2 ##################################################-
+phytestextended(){
+#  new parameters added
+# -m     MCS (Modulation Coding Scheme)
+# -M     number of resource blocks asigned
+# -D     Bitmap of slots in downlink
+# Selections are MCS=27 PRBs=106  
+# and Bitmap of slots = 126 decimal = 01111110 binary that coresponds to slots 1,2,3,4,5 and 6
+# at the UE side we see the number of HACKs are 6 times greater than in 1st scenario
+RFSIMULATOR=server LD_LIBRARY_PATH=. ./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.tm1.106PRB.usrpn300.conf \
+--parallel-config PARALLEL_SINGLE_THREAD --rfsim --phy-test -m 27 -M 106 -D 126 --gNBs.[0].min_rxtxtime 6
+}
+############################################################################
+
+######### Function 5 Physical do-ra mode ###################################
+################## SCENARIO 3 ######### ####################################
+dora(){
+ RFSIMULATOR=server LD_LIBRARY_PATH=. ./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.tm1.106PRB.usrpn300.conf \
+--parallel-config PARALLEL_SINGLE_THREAD --rfsim --do-ra --gNBs.[0].min_rxtxtime 6
+}
+############################################################################
+
+######### Function 6 SA mode band 66 #######################################
+################## SCENARIO 4 ##############################################
+sa_band66(){
+RFSIMULATOR=server LD_LIBRARY_PATH=. ./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band66.fr1.106PRB.usrpn300.conf \
+--parallel-config PARALLEL_SINGLE_THREAD --rfsim --sa \
+# --rfsimulator.options chanmod --rfsimulator.modelname AWGN \
+# uncomment previous line to define a channel model
+# --telnetsrv 
+#uncomment previous  line for telnet server
+}
+############################################################################
+
+######### Function 7 SA mode band 78 106prb  ###############################
+################## SCENARIO 5 ##############################################
+# 106 PRB - usrp n310 ######################################################
+# configuration file used also for OTA transmittion with USRP N310 SDR #####
+sa_band78_106prb(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa -d \
+--conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043
+# add --telnetsrv \ # for telnet server in gnb
+# add --MACRLCs.[0].ul_max_mcs # to select maximum mcs in uplink
+}
+############################################################################
+
+######### Function 8 SA mode band 78 51prb  ################################
+################## SCENARIO 6 ##############################################
+# 51 PRB - usrp n310 #######################################################
+sa_band78_51prb(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51prb.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa -d \
+--conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043
+}
+############################################################################
+
+######### Function 9 SA mode band 77 273prb  ###############################
+################## SCENARIO 7 ##############################################
+# 51 PRB - usrp n310 #######################################################
+sa_band77_273prb(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa -d \
+--conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043
+}
+############################################################################
+
+
+######################## MAIN FUNCTION #####################################
+function main() {
+
+if [ "$*" == "" ]; then
+    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
+    print_help
+    exit 1
+fi
+###########################################################
+
+# check arguments
+
+  until [ -z "$1" ]
+  do
+    case "$1" in
+       -i | --info)
+            echo "getting the version of OAI software..."
+            sleep 1
+            cd ${USERFOLDER}/openairinterface5g/
+            echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
+            shift;;
+       -s | --scenario)
+	    # check if scenario value is valid
+            SELECTED_SCENARIO=$2
+            if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${#SCENARIOS[@]} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
+               echo -e "${R}selected senario is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+
+	    # check if script is run with sudo privilages
+            SCRIPTUSER=$(whoami)
+            if [[ $SCRIPTUSER != "root" ]] ; then 
+               echo -e "${R}script must be run with sudo privilages\n${NOCOLOR}"
+            exit 1
+            fi
+	    # check if core network is up, executing a ping to AMF ####
+            echo -e "checking connection to AMF...\n"
+            ping amf -c 1
+            if [ $? -ne 0 ]; then
+            echo -e "${R} No connection to AMF\n"
+            echo -e "start 5G core network prior to executing RAN ${NOCOLOR}\n"
+            exit 1
+            fi 
+            ###########################################################
+            # check cpu state #########################################
+            cpufreq-info | awk '/analyzing CPU/ || /current CPU frequency is/ {print}'
+            ###########################################################
+            # switch to softmodem binary file folder ##################
+            cd ${USERFOLDER}/openairinterface5g
+            source oaienv
+            cd cmake_targets/ran_build/build
+            ###########################################################
+            ${SCENARIOS["$SELECTED_SCENARIO"-1]}
+            shift 2;;
+	-h | --help)
+            print_help
+            exit 0;;
+        *) 
+            exit
+            ;;
+    esac
+  done
+# end of script
+  }
+
+main "$@"

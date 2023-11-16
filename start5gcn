@@ -1,0 +1,7 @@
+#!/bin/bash
+# uop dcs lab
+# Manolis Bozis 
+# Jul 2023
+#
+cd ~/oai-cn5g
+docker compose up -d
