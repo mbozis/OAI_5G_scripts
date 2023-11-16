@@ -15,7 +15,7 @@ Usage:  ./oaitest [OPTION]... [+VALUE]
   -d, --downlink [value]   create traffic to downlink. Value needs to be in bps
                            example for 30Mbps: -d 30M
                            
-  -t  --time [value[       time to execute downlink and uplink tests (used with '-d' and '-u' arguments) 
+  -t  --time [value]       time to execute downlink and uplink tests (used with '-d' and '-u' arguments) 
                            [value] is in seconds. If not defined default value is 10
                            
   -r, --rtt                measure rtt executing ping commands in both uplink and
