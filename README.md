@@ -49,3 +49,24 @@ Usage:  ./startgnb [OPTION]... [+VALUE]
   -i, --info               show Open Air Interface version
   
   -h, --help               print this help message
+
+  **./startue**
+
+Tool to start UE softmodem for a particular scenorio using Open Air Interface with RFsimulator
+or 2 hosts running OAI nrUE and nrgNB respectively.
+the ethernet link between the 2 hosts  needs to be at least 10Gbps 
+
+Usage:  ./startue [OPTION]... [+VALUE] 
+
+  -s, --scenario [value]   start UE softmodem executing scenario number [value]
+                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
+                           value is from the following table
+                           
+                           -----------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 51prb                         |
+                          | 2 | standalone mode band 78 with 106prb                        |
+                          ------------------------------------------------------------------
+                          
+  -i, --info               show Open Air Interface version
+  
+  -h, --help               print this help message
