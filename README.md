@@ -100,7 +100,7 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
 
   **./startuesim**
 
-Tool to start UE softmodem for a particular scenorio using Open Air Interface with RFsimulator
+Tool to start UE softmodem for a particular scenario using Open Air Interface with RFsimulator
 or 2 hosts running OAI nrUE and nrgNB respectively.
 the ethernet link between the 2 hosts  needs to be at least 10Gbps 
 
