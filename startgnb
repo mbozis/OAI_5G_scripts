@@ -12,8 +12,9 @@ NOCOLOR='\033[0m'
 ###############################
 # the followin variable needs to be updated when new scenarios are added
 USERFOLDER="/home/manolis"
-SCENARIOS=( "sa_51prb" "sa_106prb" )
-re='^[0-9]+$'    # integer value for selected scenatio to be checked
+SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
+ "sa_band78_133prb" "sa_band78_162prb" )
+re='^[0-9]+$'    # integer value for selected scenario to be checked
 
 
 
@@ -29,10 +30,20 @@ Usage:  $0 [OPTION]... [+VALUE]
   -s, --scenario [value]   start gnb softmodem executing scenario number [value]
                            YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
                            value is from the following table
-                           -----------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb                         |
-                          | 2 | standalone mode band 78 with 106prb                        |
-                          ------------------------------------------------------------------
+                           ------------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 51prb (SISO)                    |
+                          | 2 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 3 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots (SISO)     |
+                          | 4 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots  (SISO)     |
+                          | 5 | standalone mode band 78 with 106prb and radio packets        |
+                          |   | capture with T Tracer  (SISO)                                |
+                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)               |
+                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)               |
+                          | 8 | standalone mode band 78 with 133prb (SISO)                   |
+                          | 9 | standalone mode band 78 with 162prb (SISO)                   |
+                          -------------------------------------------------------------------
   -i, --info               show Open Air Interface version
   -h, --help               print this help message
 EOF
@@ -42,8 +53,9 @@ EOF
 ######### Function 2 51 PRB SA           ###################################
 ############## SCENARIO 1 ##################################################-
 sa_51prb(){
-./nr-softmodem -O ~manolis/scripts/configuration/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---MACRLCs.[0].ul_max_mcs 16 --gNBs.[0].min_rxtxtime 6 
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 -A 45 \
+#--MACRLCs.[0].ul_max_mcs 16 
 # --continuous-tx --MACRLCs.[0].ul_max_mcs 25 
 # -d  # uncomment the line to use scope
 #--tune-offset 20000000
@@ -71,13 +83,71 @@ sa_51prb(){
 ######### Function 3 106 PRB SA           ###################################
 ############## SCENARIO 2 ##################################################-
 sa_106prb(){
-./nr-softmodem -O ~manolis/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---MACRLCs.[0].ul_max_mcs 16 --gNBs.[0].min_rxtxtime 6 
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 -A 45 \
+#--MACRLCs.[0].ul_max_mcs 16 
 }
 
 ############################################################################
 
+######### Function 4 SA mode band 78 106prb TDD 1  ########################
+############## SCENARIO 3 ##################################################-
+sa_106prb_TDD_1(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 -A 45 \
+#--MACRLCs.[0].ul_max_mcs 16 
+}
+############################################################################
 
+######### Function 5 SA mode band 78 106prb TDD 2  ########################
+############## SCENARIO 4 ##################################################-
+sa_106prb_TDD_2(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 -A 45 \
+#--MACRLCs.[0].ul_max_mcs 16 
+}
+############################################################################
+
+############## SCENARIO 5 ##################################################-
+sa_106prb_tracer(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 -A 45 \
+--T_stdout 2 \ 
+#> ~/gnb.log 2>&1
+# Tracer util usage with:--T_stdout 2
+#--MACRLCs.[0].ul_max_mcs 16 
+}
+
+############################################################################
+
+######### Scenario 6 SA mode band 78 106 prb (2x2 MIMO) ###################
+sa_106prb_mimo(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
+--sa --usrp-tx-thread-config 1  --gNBs.[0].min_rxtxtime 6 -A 45
+}
+############################################################################
+
+######### Scenario 7 SA mode band 78 133 prb (2x2 MIMO)  ###################
+sa_133prb_mimo(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/gNB_SA_n78_133PRB.2x2_usrpn310.conf \
+--sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45  
+}
+
+######## Scenario 8 SA mode band 78 133 prb SISO #########################
+sa_band78_133prb(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gNB_SA_n78_133PRB.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 \
+#-d
+}
+############################################################################
+
+############################################################################
+######### Scenario 9 SA mode band 78 162 prb  SISO ########################
+sa_band78_162prb(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 
+}
+############################################################################
 
 
 ######################## MAIN FUNCTION #####################################
@@ -119,7 +189,7 @@ fi
             fi
 	    # check if core network is up, executing a ping to AMF ####
             echo -e "checking connection to AMF...\n"
-            ping amf -c 1
+            ping amf -c 1 > /dev/null
             if [ $? -ne 0 ]; then
             echo -e "${R} No connection to AMF\n"
             echo -e "start 5G core network prior to executing RAN ${NOCOLOR}\n"
