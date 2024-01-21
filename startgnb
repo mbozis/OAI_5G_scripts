@@ -123,7 +123,7 @@ sa_106prb_tracer(){
 ######### Scenario 6 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_106prb_mimo(){
 ./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
---sa --usrp-tx-thread-config 1  --gNBs.[0].min_rxtxtime 6 -A 45
+--sa  --usrp-tx-thread-config 1 --thread-pool 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 --gNBs.[0].min_rxtxtime 6 -A 45 
 }
 ############################################################################
 
