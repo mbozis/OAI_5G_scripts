@@ -41,9 +41,19 @@ Usage:  ./startgnb [OPTION]... [+VALUE]
                            YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
                            value is from the following table
                            
-                           -----------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb                         |
-                          | 2 | standalone mode band 78 with 106prb                        |
+                            ------------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 51prb (SISO)                    |
+                          | 2 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 3 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots (SISO)     |
+                          | 4 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots  (SISO)     |
+                          | 5 | standalone mode band 78 with 106prb and radio packets        |
+                          |   | capture with T Tracer  (SISO)                                |
+                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)               |
+                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)               |
+                          | 8 | standalone mode band 78 with 133prb (SISO)                   |
+                          | 9 | standalone mode band 78 with 162prb (SISO)                   |
                           ------------------------------------------------------------------
                           
   -i, --info               show Open Air Interface version
@@ -63,8 +73,18 @@ Usage:  ./startue [OPTION]... [+VALUE]
                            value is from the following table
                            
                            -----------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb                         |
-                          | 2 | standalone mode band 78 with 106prb                        |
+                          | 1 | standalone mode band 78 with 51prb (SISO)                     |
+                          | 2 | standalone mode band 78 with 106prb  (SISO)                   |
+                          | 3 | standalone mode band 78 with 106 prb TDD slot configuration 1 |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 slots             |
+                          | 4 | standalone mode band 78 with 106 prb TDD slot configuration 2 |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 slots              |
+                          | 5 | standalone mode band 78 with 106prb and radio packets         |
+                          |   | capture with T Tracer                                         |
+                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)                |
+                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)                |
+                          | 8 | standalone mode band 78 with 133prb (SISO)                    |
+                          | 9 | standalone mode band 78 with 162prb (SISO)                    |
                           ------------------------------------------------------------------
                           
   -i, --info               show Open Air Interface version
@@ -84,14 +104,26 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
                            value is from the following table
                            
                            -----------------------------------------------------------------
-                          | 1 | physical layer test with one slot assigned for downlink    |
-                          | 2 | extended phy layer test with parameters changed            |
-                          |   | (parameters need to be changed directly to script code)    |
-                          | 3 | do-ra mode                                                 |
-                          | 4 | standalone mode band 66                                    |
-                          | 5 | standalone mode band 78 with 106prb                        |
-                          | 6 | standalone mode band 78 with 51prb                         |
-                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)             |
+                          | 1 | physical layer test with one slot assigned for downlink      |
+                          | 2 | extended phy layer test with parameters changed              |
+                          |   | (parameters need to be changed directly to script code)      |
+                          | 3 | do-ra mode                                                   |
+                          | 4 | standalone mode band 66                                      |
+                          | 5 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 6 | standalone mode band 78 with 51prb  (SISO)                   |
+                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |
+                          | 10| standalone mode band 78 with 106prb and radio packets        |
+                          |   | capture with T Tracer                                        |
+                          | 11| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 12| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 13| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 14| standalone mode band 78 with 217prb (2x2 MIMO)               |                      
+                          | 15| standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 16| standalone mode band 78 with 162prb (SISO)                   |       
                           ------------------------------------------------------------------
                           
   -i, --info               show Open Air Interface version
@@ -111,14 +143,26 @@ Usage:  ./startuesim [OPTION]... [+VALUE]
                            value is from the following table
                            
                            -----------------------------------------------------------------
-                          | 1 | physical layer test with one slot assigned for downlink    |
-                          | 2 | extended phy layer test with parameters changed            |
-                          |   | (parameters need to be changed directly to script code)    |
-                          | 3 | do-ra mode                                                 |
-                          | 4 | standalone mode band 66                                    |
-                          | 5 | standalone mode band 78 with 106prb                        |
-                          | 6 | standalone mode band 78 with 51prb                         |
-                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)             |
+                         | 1 | physical layer test with one slot assigned for downlink      |
+                          | 2 | extended phy layer test with parameters changed              |
+                          |   | (parameters need to be changed directly to script code)      |
+                          | 3 | do-ra mode                                                   |
+                          | 4 | standalone mode band 66                                      |
+                          | 5 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 6 | standalone mode band 78 with 51prb  (SISO)                   |
+                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |
+                          | 10| standalone mode band 78 with 106prb and radio packets        |
+                          |   | capture with T Tracer                                        |
+                          | 11| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 12| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 13| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 14| standalone mode band 78 with 217prb (2x2 MIMO)               |                      
+                          | 15| standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 16| standalone mode band 78 with 162prb (SISO)                   |       
                           ------------------------------------------------------------------
                           
   -i, --info               show Open Air Interface version
