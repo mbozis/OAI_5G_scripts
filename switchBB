@@ -1,0 +1,3 @@
+#!/bin/bash
+route del default gw 12.1.1.1
+

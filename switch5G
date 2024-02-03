@@ -1,0 +1,3 @@
+#!/bin/bash
+route add default gw 12.1.1.1
+
