@@ -1,0 +1,351 @@
+#!/bin/bash
+# oai 5G testbed with USRP N310
+# UOP
+# DCS LAB Oct 2023
+# Manolis Bozis
+# scripts MUST run with root privillages
+# 
+#---------COLOR CODES --------------------
+R='\033[0;31m'   #'0;31' is Red's ANSI color code
+G='\033[0;32m'   #'0;32' is Green's ANSI color code
+NOCOLOR='\033[0m'
+###############################
+# the followin variable needs to be updated when new scenarios are added
+USERFOLDER="/home/manolis"
+# scenarios 8 and 9 are the same with 5, so the same function is executed,
+# given that TDD slot configuration is in the gNB side
+SCENARIOS=( "phytest" "phytestextended" "dora" "sa_band66" "sa_band78_106prb" "sa_band78_51prb" "sa_band77_273prb" \
+ "sa_band78_106prb" "sa_band78_106prb" "sa_band78_106prb" "sa_band78_106prb_mimo" "sa_band78_133prb_mimo" "sa_band78_162prb_mimo" \
+ "sa_band78_217prb_mimo" "sa_band78_133prb" "sa_band78_162prb" "sa_band78_217prb" )
+######### FUCTIONS ############
+#### FUNCTION 1 Exit Script ###
+exitScript(){
+echo -e "exiting....\n"
+sleep 2
+exit 1
+}
+###############################
+
+###########################################################################
+#### FUNCTION 2 print help message  ############
+print_help(){
+cat <<EOF
+UOP - DCS LAB author Manolis Bozis 2023
+Tool to start UE softmodem for a particular scenorio using Open Air Interface with RFsimulator
+or 2 hosts running OAI nrUE and nrgNB respectively.
+the ethernet link between the 2 hosts  needs to be at least 10Gbps 
+
+Usage:  $0 [OPTION]... [+VALUE] 
+  -s, --scenario [value]   start UE softmodem executing scenario number [value]
+                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
+                           value is from the following table
+                           -------------------------------------------------------------------
+                          | 1 | physical layer test with one slot assigned for downlink       |
+                          | 2 | extended phy layer test with parameters changed               |
+                          |   | (parameters need to be changed directly to script code)       |
+                          | 3 | do-ra mode                                                    |
+                          | 4 | standalone mode band 66                                       |
+                          | 5 | standalone mode band 78 with 106prb (SISO)                    |
+                          | 6 | standalone mode band 78 with 51prb (SISO)                     |
+                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)                |
+                          | 8 | standalone mode band 78 with 106 prb TDD slot configuration 1 |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 slots             |
+                          | 9 | standalone mode band 78 with 106 prb TDD slot configuration 2 |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 slots              |
+                          | 10| standalone mode band 78 with 106prb and radio packets         |
+                          |   | capture with T Tracer                                         |
+                          | 11| standalone mode band 78 with 106prb (2x2 MIMO)                |
+                          | 12| standalone mode band 78 with 133prb (2x2 MIMO)                |
+                          | 13| standalone mode band 78 with 162prb (2x2 MIMO)                |
+                          | 14| standalone mode band 78 with 217prb (2x2 MIMO)                |
+                          | 15| standalone mode band 78 with 133prb (SISO)                    |
+                          | 16| standalone mode band 78 with 162prb (SISO)                    |
+                          | 17| standalone mode band 78 with 217prb (SISO)                    |
+                          --------------------------------------------------------------------
+  -i, --info               show Open Air Interface version
+  -h, --help               print this help message
+EOF
+}
+
+
+
+############## SCENARIO 1 ##################################################-
+#################### Physical layer test ###################################
+phytest(){
+# only 1 slot assigned for downlink
+RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test 
+}
+
+############################################################################
+
+
+############## SCENARIO 2 ##################################################-
+#################### Physical layer test with parameters  ##################
+phytestextended(){
+#  new parameters added on gNB side scripts (startuesim)
+# -m     MCS (Modulation Coding Scheme)
+# -M     number of resource blocks asigned
+# -D     Bitmap of slots in downlink
+# Selections are MCS=27 PRBs=106  
+# and Bitmap of slots = 126 decimal = 01111110 binary that coresponds to slots 1,2,3,4,5 and 6
+# at the UE side we see the number of HACKs are 6 times greater than in 1st scenario
+RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test 
+}
+############################################################################
+
+
+################## SCENARIO 3 ######### ####################################
+#################### Physical do-ra mode ###################################
+dora(){
+RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --do-ra
+}
+############################################################################
+
+
+################## SCENARIO 4 ##############################################
+#################### SA mode band 66 #######################################
+sa_band66(){
+# band 66 
+# FDD
+# --numerology 1   (that means 30Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 2169080000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+
+# --------------------------- BAND 66 ---------------------------------------------------------------------------------------------
+FSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem -r 106 --numerology 1 --band 66 -C 2169080000 --CO -400000000 --ssb 396 \
+-rfsim --sa --telnetsrv -O ~/scripts/ue.conf
+}
+############################################################################
+
+
+################## SCENARIO 5 ##############################################
+#########  SA mode band 78 106prb  ###############################
+# 106 PRB - usrp n310 ######################################################
+sa_band78_106prb(){
+# -------------------------- BAND 78 (gNB and UE on the same host) ----------------------------------------------------------------
+# RFSIMULATOR=127.0.0.1 ./nr-uesoftmodem -O ~/scripts/ue.conf -r 106 --numerology 1 --band 78 -C 3619200000 \
+# --nokrnmod --rfsim --sa --uicc0.imsi 001010000000001 --uicc0.nssai_sd 1 \
+# -d --telnetsrv --rfsimulator.options chanmod --rfsimulator.modelname rfsimu_channel_gnb0 
+
+# -------------------------- BAND 78 (gNB and ue on different host) ---------------------------------------------------------------
+#################  106 PRB #####################################################
+./nr-uesoftmodem \
+-r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 \
+--rfsim --sa --uicc0.imsi 208950000000032 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml -d
+# --rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
+
+################################################################################
+}
+############################################################################
+
+
+################## SCENARIO 6 ##############################################
+#################### SA mode band 78 51prb  ################################
+# 51 PRB - usrp n310 #######################################################
+sa_band78_51prb(){
+./nr-uesoftmodem \
+-r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 \
+--rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml -d
+}
+############################################################################
+
+
+################## SCENARIO 7 ##############################################
+#################### SA mode band 77 273prb  ###############################
+sa_band77_273prb(){
+./nr-uesoftmodem \
+-r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports2.xml \
+#-d
+}
+############################################################################
+
+################## SCENARIO 11 #############################################
+sa_band78_106prb_mimo(){
+./nr-uesoftmodem \
+-r 106 --numerology 1 --band 78 -C 3319680000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --uicc0.imsi 001010000000002 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports2.xml -d
+# --uicc0.nssai_sd 0xFFFFFF
+}
+
+################## SCENARIO 12 #############################################
+sa_band78_133prb_mimo(){
+./nr-uesoftmodem \
+-r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports2.xml
+#-d
+}
+
+############################################################################
+################## SCENARIO 13 #############################################
+sa_band78_162prb_mimo(){
+./nr-uesoftmodem \
+-r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports2.xml
+#-d
+}
+
+############################################################################
+################## SCENARIO 14 #############################################
+sa_band78_217prb_mimo(){
+./nr-uesoftmodem \
+-r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --uicc0.imsi 001010000000002 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports2.xml
+#-d
+}
+
+############################################################################
+
+################## SCENARIO 15 #############################################
+sa_band78_133prb(){
+./nr-uesoftmodem \
+-r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml \
+-d
+}
+
+############################################################################
+
+################## SCENARIO 16 #############################################
+sa_band78_162prb(){
+./nr-uesoftmodem \
+-r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml \
+-d
+}
+
+############################################################################
+
+################## SCENARIO 17 #############################################
+sa_band78_217prb(){
+./nr-uesoftmodem \
+-r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--rfsim --sa --uicc0.imsi 001010000000002 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml
+#-d
+}
+
+############################################################################
+
+######################## MAIN FUNCTION #####################################
+function main() {
+
+if [ "$*" == "" ]; then
+    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
+    print_help
+    exit 1
+fi
+###########################################################
+
+# check arguments
+
+  until [ -z "$1" ]
+  do
+    case "$1" in
+       -i | --info)
+            echo "getting the version of OAI software..."
+            sleep 1
+            cd ${USERFOLDER}/openairinterface5g/
+            echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
+            shift;;
+       -s | --scenario)
+            # check if scenario value is valid
+            SELECTED_SCENARIO=$2
+            if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${#SCENARIOS[@]} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
+               echo -e "${R}selected senario is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+
+	    # check if script is run with sudo privilages
+            SCRIPTUSER=$(whoami)
+            if [[ $SCRIPTUSER != "root" ]] ; then 
+               echo -e "${R}script must be run with sudo privilages\n${NOCOLOR}"
+            exit 1
+            fi
+            ###########################################################
+
+            # check if core network is up, executing a ping to AMF ####
+            #echo -e "checking connection to AMF...\n"
+            #ping amf -c 1
+            #if [ $? -ne 0 ]; then
+            #echo -e "${R} No connection to AMF\n"
+            #echo -e "start 5G core network prior to executing RAN\n"
+            #echo -e "or check your network settings ${NOCOLOR}\n"
+            #exit 1
+            #fi 
+            ###########################################################
+
+            # check cpu state #########################################
+            cpufreq-info | awk '/analyzing CPU/ || /current CPU frequency is/ {print}'
+            ###########################################################
+            # switch to softmodem binary file folder ##################
+            cd ${USERFOLDER}/openairinterface5g
+            source oaienv
+            cd cmake_targets/ran_build/build
+            ###########################################################
+            echo -e "Selected scenario is ${SELECTED_SCENARIO}\n"
+            ${SCENARIOS["$SELECTED_SCENARIO"-1]}
+            shift 2;;
+	-h | --help)
+            print_help
+            exit 0;;
+        *) 
+            exit
+            ;;    
+    esac
+  done
+# end of script
+  }
+ 
+  main "$@"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
