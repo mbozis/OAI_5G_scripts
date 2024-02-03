@@ -1,7 +1,7 @@
 #!/bin/bash
 # DCS LAB
 # UOP
-# Manolis Bozis Mar 2023
+# Manolis Bozis Feb 2024
 # Open Air Interface 5g NR SA E2E testbed
 # Script to check different scenarios on 5G SA E2E link 
 # ---!!! run it without root privilages !!!----
@@ -16,14 +16,17 @@
 # 5gcn VM or actual host needs to have ssh HOST keys installed
 # so that to accept password less ssh connections
 # ----------------------------
-#---------COLOR CODES --------------------
+##########COLOR CODES #############################
 R='\033[0;31m'   #'0;31' is Red's ANSI color code
 G='\033[0;32m'   #'0;32' is Green's ANSI color code
 NOCOLOR='\033[0m'
-#ROUTER_IP="195.251.38.129"
+###################################################
 ROUTER_IP="195.251.38.129" # router ip for DCS LAB
-
-PING_COUNT=40
+EXT_DN_IP="192.168.70.135" # Ip of oai-ext-dn container
+PING_COUNT=40 # number of PING command iterations
+TCP_WINDOW_SIZE=119MB   # 119MB is the max
+TEST_TIME=10
+# use -w ${TCP_WINDOW_SIZE} in iperf
 ###############################
 ######### FUCTIONS ############
 #### FUNCTION 1 Exit Script ###
@@ -36,17 +39,17 @@ exit 1
 checkUERegistration(){
 # check if oai_tun interface is UP
 # check first if 5gcn is reachable
-ping -c 1 5gcn >/dev/null
+ping -c 1 5gcn > /dev/null
 CNHOST=$?
 if [ $CNHOST -eq 0 ]
   then
-   ssh 5gcn "docker logs oai-amf | tail -n 5 | grep 5GMM-REGISTERED"
+   ssh 5gcn "docker logs oai-amf --since 20s | grep '5GMM-REGISTERED' -A 5 -B 12" 2>/dev/null
    REGISTERED=$?
 #   clear (removed not to lose screen buffer data)
    if [ $REGISTERED -eq 0 ]
      then
        echo -e "${G} UE has been registered successfully${NOCOLOR}\n"
-       UE_REGISTERED_FLAG=1 # fla195.251.38.129g to report successful registration to other functions
+       UE_REGISTERED_FLAG=1 # flag to report successful registration to other functions
      else
        echo -e "${R}UE has not been registered to Core Network${NOCOLOR}\n"
        exitScript
@@ -58,6 +61,7 @@ fi
 # FIND UE IP ASSIGNED ADDRESS
 ping -c 1 ue > /dev/null
 NRUEHOST=$?
+#NRUEHOST=0  # set to skip connectivity test from lab network
 if [ "${NRUEHOST}" -eq '0' ]
    then
    UE_INET=$(ssh ue "ip a  | grep 12.1.1")
@@ -111,7 +115,7 @@ then
  ssh ue "pkill iperf"
  sleep 2
 fi
- ssh ue "iperf -s -D -u -B $UE_IP"
+ ssh ue "iperf -s -D -u -i1 -B ${UE_IP}"
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -127,7 +131,7 @@ fi
 # 
 echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
 echo -e "${G}Sending DOWNLINK traffic at ${DOWNLINK_SPEED_TEST}bps${NOCOLOR}"
-ssh 5gcn "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -i 1 -fk -B 192.168.70.135 -b ${DOWNLINK_SPEED_TEST} -c $UE_IP"
+ssh 5gcn "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -B ${EXT_DN_IP} -i1 -b ${DOWNLINK_SPEED_TEST} -c ${UE_IP} -fm"
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
 ssh ue "pkill iperf"
@@ -147,7 +151,7 @@ then
  ssh 5gcn "docker exec oai-ext-dn pkill -KILL iperf"
  sleep 2
 fi
- ssh 5gcn "docker exec oai-ext-dn iperf -s -D -u -B 192.168.70.135"
+ ssh 5gcn "docker exec oai-ext-dn iperf -s -D -u -i1 -B 192.168.70.135"
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -162,7 +166,7 @@ fi
 # 
 echo -e "${G}Starting transmitting data on 5G UPLINK${NOCOLOR}"
 echo -e "${G}Sending UPLINK traffic at ${UPLINK_SPEED_TEST}bps${NOCOLOR}"
-ssh ue "iperf -u -t ${TEST_TIME} -i 1 -fk -B ${UE_IP} -b ${UPLINK_SPEED_TEST} -c 192.168.70.135"
+ssh ue "iperf -u -t ${TEST_TIME} -i1 -fm -B ${UE_IP} -b ${UPLINK_SPEED_TEST} -c ${EXT_DN_IP}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
 ssh 5gcn "docker exec oai-ext-dn pkill -KILL iperf"
@@ -183,7 +187,7 @@ cat <<EOF
 UOP - DCS LAB author Manolis Bozis 2023
 Testing tool for E2E 5G SA system using Open Air Interface with RFsimulator
 or 2 hosts running OAI nrUE and nrgNB respectively, connected to SDRs.
-SDR link can be OTA or with RF cables
+SDR link can be OTA or with RF cablesmaximum 
 Usage:  $0 [OPTION]... [+VALUE] 
   -c, --check              check UE registration status to 5G Network  
   -u, --uplink [value]     create traffic to uplink. Value needs to be in bps
@@ -199,7 +203,7 @@ Usage:  $0 [OPTION]... [+VALUE]
   --umax                   get uplink trhoughput 
 EOF
 }
-######### Function 8 Downlink throughput ###################################
+######### Function 8 Max Downlink throughput ###################################
 checkDownlinkThroughput(){
 # start iperf server deamon on UE side
 ssh ue "pgrep iperf >/dev/null"
@@ -226,8 +230,7 @@ fi
 # ssh to 5gcn VM and create traffic from ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
-echo -e "${G}Sending DOWNLINK traffic at ${DOWNLINK_SPEED_TEST}bps${NOCOLOR}"
-ssh 5gcn "docker exec oai-ext-dn iperf -B 192.168.70.135 -c $UE_IP"
+ssh 5gcn "docker exec oai-ext-dn iperf -B ${EXT_DN_IP} -c ${UE_IP} -t ${TEST_TIME}"
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
 ssh ue "pkill iperf"
@@ -263,7 +266,7 @@ fi
 # ssh to UE host and create traffic from UE to oai-ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G UPLINK${NOCOLOR}"
-ssh ue "iperf -B ${UE_IP} -c 192.168.70.135"
+ssh ue "iperf -B ${UE_IP} -c ${EXT_DN_IP} -t ${TEST_TIME}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
 ssh 5gcn "docker exec oai-ext-dn pkill -KILL iperf"
@@ -274,10 +277,9 @@ sleep 2
 
 function main() {
   UE_REGISTERED_FLAG=0 # set the initial value of the flag
-  TEST_TIME=10
   DOIPERFTESTUL=0
   DOIPERFTESTDL=0
-
+  TEST_TIME=5
 if [ "$*" == "" ]; then
     >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
     print_help

@@ -1,7 +1,7 @@
 #!/bin/bash
 # oai 5G testbed with USRP N310
 # UOP
-# DCS LAB Oct 2023
+# DCS LAB Feb 2024
 # Manolis Bozis
 # scripts MUST run with root privillages
 # 
@@ -14,7 +14,7 @@ NOCOLOR='\033[0m'
 USERFOLDER="/home/manolis"
 SCENARIOS=( "phytest" "phytestextended" "dora" "sa_band66" "sa_band78_106prb" "sa_band78_51prb" \
  "sa_band77_273prb" "sa_band78_106prb_TDD_1" "sa_band78_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" \
- "sa_mimo_band78_133prb" "sa_mimo_band78_162prb" "sa_mimo_band78_217prb" "sa_band78_133prb" "sa_band78_162prb" )
+ "sa_mimo_band78_133prb" "sa_mimo_band78_162prb" "sa_mimo_band78_217prb" "sa_band78_133prb" "sa_band78_162prb" "sa_band78_217prb" )
 re='^[0-9]+$'    # integer value for selected scenatio to be checked
 
 
@@ -60,7 +60,8 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 13| standalone mode band 78 with 162prb (2x2 MIMO)               |     
                           | 14| standalone mode band 78 with 217prb (2x2 MIMO)               |                      
                           | 15| standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 16| standalone mode band 78 with 162prb (SISO)                   |                      
+                          | 16| standalone mode band 78 with 162prb (SISO)                   |      
+                          | 17| standalone mode band 78 with 217prb (SISO)                   |                  
                           -------------------------------------------------------------------
   -i, --info               show Open Air Interface version
   -h, --help               print this help message
@@ -211,7 +212,13 @@ sa_band78_162prb(){
 --conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043
 }
 ############################################################################
-
+############################################################################
+######### Scenarion 17 SA mode band 78 217 prb SISO ########################
+sa_band78_217prb(){
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.fr1.217PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043
+}
+############################################################################
 ######################## MAIN FUNCTION #####################################
 function main() {
 
