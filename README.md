@@ -10,30 +10,42 @@ Testing tool for E2E 5G SA system using Open Air Interface with RFsimulator
 or 2 hosts running OAI nrUE and gNB respectively, connected to USRP N310 SDR devices.
 
 Usage:  $0 [OPTION]... [+VALUE] 
-  -c, --checkue            check UE registration status to 5G Network  
+
+  -c, --checkue            check UE registration status to 5G Network
+    
   -C, --checkngi           check RAN connection to core network
+  
   -u, --uplink [value]     create traffic to uplink. Value needs to be in bps
-                           example for 30Mbps: -u 30M   
+                           example for 30Mbps: -u 30M 
+                             
   -d, --downlink [value]   create traffic to downlink. Value needs to be in bps
                            example for 30Mbps: -d 30M
+                           
   -t  --time [value[       time to execute downlink and uplink tests (used with '-d' and '-u' arguments) 
                            [value] is in seconds. If not defined default value is 10
+                           
   -r, --rtt                measure rtt executing ping commands in both uplink and
                            downlink
+                           
   -h, --help               print this help message
+  
   --dmax                   get downlink throughput
+  
   --umax                   get uplink trhoughput 
   
 **./startgnb**
 
 Tool to start gnb softmodem for a particular scenorio using USRP N310 SDR device
 or 2 hosts running OAI nrUE and nrgNB respectively.
-the ethernet link between the host and SDR needs to be at least 10Gbps 
+
+The ethernet link between the host and SDR needs to be at least 10Gbps 
 
 Usage:  $0 [OPTION]... [+VALUE] 
+
   -s, --scenario [value]   start gnb softmodem executing scenario number [value]
                            YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
                            value is from the following table
+                           
                            ------------------------------------------------------------------
                           | 1 | standalone mode band 78 with 51prb (SISO)                    |
                           | 2 | standalone mode band 78 with 106prb (SISO)                   |
@@ -48,7 +60,9 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 8 | standalone mode band 78 with 133prb (SISO)                   |
                           | 9 | standalone mode band 78 with 162prb (SISO)                   |
                           -------------------------------------------------------------------
+                          
   -i, --info               show Open Air Interface version
+  
   -h, --help               print this help message
 
 **./startgnbsim**
@@ -58,9 +72,11 @@ or 2 hosts running OAI nrUE and nrgNB respectively.
 the ethernet link between the 2 hosts  needs to be at least 10Gbps 
 
 Usage:  $0 [OPTION]... [+VALUE] 
+
   -s, --scenario [value]   start gnb softmodem executing scenario number [value]
                            YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
                            value is from the following table
+                           
                            -----------------------------------------------------------------
                           | 1 | physical layer test with one slot assigned for downlink      |
                           | 2 | extended phy layer test with parameters changed              |
@@ -84,6 +100,8 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 16| standalone mode band 78 with 162prb (SISO)                   |      
                           | 17| standalone mode band 78 with 217prb (SISO)                   |                  
                           -------------------------------------------------------------------
+                          
   -i, --info               show Open Air Interface version
+  
   -h, --help               print this help message
 
