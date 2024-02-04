@@ -20,12 +20,18 @@
 R='\033[0;31m'   #'0;31' is Red's ANSI color code
 G='\033[0;32m'   #'0;32' is Green's ANSI color code
 NOCOLOR='\033[0m'
-###################################################
+######################## VARIABLES SECTION ###############################
+#
 ROUTER_IP="195.251.38.129" # router ip for DCS LAB
 EXT_DN_IP="192.168.70.135" # Ip of oai-ext-dn container
 PING_COUNT=40 # number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
-TEST_TIME=10
+TEST_TIME=10            # time interval to perform iperf test
+AMF_APP_TIME="20s"      # AMF APP reporting period for connected gNBs and UEs
+
+#
+##########################################################################
+# If you want to use TCP window size
 # use -w ${TCP_WINDOW_SIZE} in iperf
 ###############################
 ######### FUCTIONS ############
@@ -35,15 +41,14 @@ echo -e "exiting....\n"
 sleep 2
 exit 1
 }
-#### FUNCTION 2 Check UE Registration to 5G Network #####
+############################### FUNCTION 2 Check UE Registration to 5G Network #####
 checkUERegistration(){
-# check if oai_tun interface is UP
-# check first if 5gcn is reachable
-ping -c 1 5gcn > /dev/null
+# check first if 5gcn is reachable 
+ping -c 1 5gcn > /dev/null 2>&1
 CNHOST=$?
 if [ $CNHOST -eq 0 ]
   then
-   ssh 5gcn "docker logs oai-amf --since 20s | grep '5GMM-REGISTERED' -A 5 -B 12" 2>/dev/null
+   ssh 5gcn "docker logs oai-amf --since ${AMF_APP_TIME} | grep '5GMM-REGISTERED' -A 5 -B 12" 2>/dev/null
    REGISTERED=$?
 #   clear (removed not to lose screen buffer data)
    if [ $REGISTERED -eq 0 ]
@@ -58,12 +63,13 @@ if [ $CNHOST -eq 0 ]
        echo -e "${R}5G core network host is down or unreachable${NOCOLOR}\n"
        exitScript
 fi
-# FIND UE IP ASSIGNED ADDRESS
+# check UE IP assigned address
 ping -c 1 ue > /dev/null
 NRUEHOST=$?
 #NRUEHOST=0  # set to skip connectivity test from lab network
 if [ "${NRUEHOST}" -eq '0' ]
    then
+   # check if oai_tun interface is UP
    UE_INET=$(ssh ue "ip a  | grep 12.1.1")
    if [ "${UE_INET}" == "" ]
      then 
@@ -72,21 +78,10 @@ if [ "${NRUEHOST}" -eq '0' ]
      else
        UE_IP=$(echo ${UE_INET} | tr '/' ' ' | cut -d " " -f 2)
        echo -e "${G}UE has been asigned IP address ${UE_IP}${NOCOLOR}"
-
      fi
    else
        echo -e "${R}UE host is down or unreachable${NOCOLOR}\n"
        exitScript
-fi
-# check if core network is up
-ping -c 1 amf >/dev/null
-CN_UP=$?
-if [ $CN_UP -eq 0 ]
-then
-   echo -e "${G}5G network is up and running${NOCOLOR}\n"
-else
-   echo -e "${R}5G network is not accesible${NOCOLOR}\n"
-   exitScript
 fi
 }
 ##########################################################################
@@ -187,9 +182,10 @@ cat <<EOF
 UOP - DCS LAB author Manolis Bozis 2023
 Testing tool for E2E 5G SA system using Open Air Interface with RFsimulator
 or 2 hosts running OAI nrUE and nrgNB respectively, connected to SDRs.
-SDR link can be OTA or with RF cablesmaximum 
+SDR link can be OTA or with RF cables 
 Usage:  $0 [OPTION]... [+VALUE] 
-  -c, --check              check UE registration status to 5G Network  
+  -c, --checkue            check UE registration status to 5G Network  
+  -C, --checkngi           check RAN connection to core network
   -u, --uplink [value]     create traffic to uplink. Value needs to be in bps
                            example for 30Mbps: -u 30M   
   -d, --downlink [value]   create traffic to downlink. Value needs to be in bps
@@ -275,6 +271,32 @@ sleep 2
 }
 ###########################################################################
 
+###################### Funcion 10 Check connection of gNB to 5GCN #########
+# check if core network is up
+check_NGI(){
+ping -c 1 amf >/dev/null
+AMF_UP=$?
+if [ $AMF_UP -eq 0 ]
+then
+   echo -e "${G}AMF container is reachable${NOCOLOR}\n"
+   ssh 5gcn "docker logs oai-amf --since ${AMF_APP_TIME} | grep 'Connected' -A 2 -B 2" 2>/dev/null
+   NGI_CONNECTED=$?
+   if [ $NGI_CONNECTED -eq 0 ]
+   then
+   echo -e "${G}gNB succesfully established a connection to AMF${NOCOLOR}\n"
+   else
+   echo -e "${R}gNB could not establish a connection to AMF. Check you configuration files${NOCOLOR}\n"
+   exitScript
+   fi
+else
+   echo -e "${R}AMF container is not accesible. Have you deployed 5GCN containers?${NOCOLOR}\n"
+   exitScript
+fi
+}
+###########################################################################
+
+
+####################### MAIN ##############################################
 function main() {
   UE_REGISTERED_FLAG=0 # set the initial value of the flag
   DOIPERFTESTUL=0
@@ -289,9 +311,13 @@ fi
   until [ -z "$1" ]
   do
     case "$1" in
-       -c | --check)
+       -c | --checkue)
             echo "start checking UE registration to 5G network..."
             checkUERegistration
+            shift;;
+       -C | --checkngi)
+            echo "start checking RAN connection to core network..."
+            check_NGI
             shift;;
        --umax)
             if [ ${UE_REGISTERED_FLAG} -ne 1 ]
