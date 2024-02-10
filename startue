@@ -16,7 +16,13 @@ USERFOLDER="/home/manolis"
 SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb" "sa_106prb" "sa_106prb" "sa_106prb_mimo" "sa_133prb_mimo" \
  "sa_band78_133prb" "sa_band78_162prb" )
 OPTIMAL_OTA_UE_RX_GAIN=70   # this value is found empirically by conducting several tests
-
+PLMNS=( "PLMN_1_" "PLMN_2_" )
+SELECTED_PLMN=1 # default PLMN is 00101
+# PLMNs List ##############
+# PLMN1  --> 00101
+# PLMN2  --> 20295
+###########################
+###########################################################################
 
 ######### FUCTIONS ############
 #### FUNCTION 1 Exit Script ###
@@ -32,9 +38,9 @@ exit 1
 print_help(){
 cat <<EOF
 UOP - DCS LAB author Manolis Bozis 2023
-Tool to start UE softmodem for a particular scenorio using Open Air Interface with RFsimulator
-or 2 hosts running OAI nrUE and nrgNB respectively.
-the ethernet link between the 2 hosts  needs to be at least 10Gbps 
+Tool to start UE softmodem for a particular scenorio using Open Air Interface
+-the 2 hosts run OAI nrUE and nrgNB respectively.
+-the ethernet link between the hosts and USRP N310 devices must be at least 10Gbps 
 
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   start UE softmodem executing scenario number [value]
@@ -54,6 +60,9 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 8 | standalone mode band 78 with 133prb (SISO)                    |
                           | 9 | standalone mode band 78 with 162prb (SISO)                    |
                           --------------------------------------------------------------------
+  -p, --plmn               PLMN selection
+                           1 (default) --> 00101
+                           2           --> 20295 
   -i, --info               show Open Air Interface version
   -h, --help               print this help message
 EOF
@@ -64,8 +73,9 @@ EOF
 sa_51prb(){
 ./nr-uesoftmodem \
 -r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --uicc0.imsi 001010000000002 --usrp-args "mgmt_addr=192.168.20.2,addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
---uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml \
+--sa --usrp-args "mgmt_addr=192.168.20.2,addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+--uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
+-O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
 # -d
 # -A 45: Sometimes, the nrUE would keep repeating RA procedure because of Msg3 failure at the gNB. If it happens, add the -A option at the nrUE and/or gNB side, e.g., -A 45.
 #This modifies the timing advance (in samples). Adjust +/-5 if the issue persists.
@@ -78,8 +88,9 @@ sa_106prb(){
 #################  106 PRB ######################################################
 ./nr-uesoftmodem \
 -r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --uicc0.imsi 001010000000002 --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45  \
---uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml \
+--sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45  \
+--uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
+-O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
 #-d
 # --ue-fo-compensation --log_config.global_log_options level,nocolor,time
 # -O ~/scripts/configuration/ue.conf 
@@ -105,8 +116,9 @@ sa_106prb_mimo(){
 ./nr-uesoftmodem \
 -r 106 --numerology 1 --band 78 -C 3319680000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation  \
---sa --uicc0.imsi 001010000000002 --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
---uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports2.xml \
+--sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+--uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports2.xml \
+-O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
 #-d
 ################################################################################
 }
@@ -117,8 +129,9 @@ sa_133prb_mimo(){
 ./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --uicc0.imsi 001010000000002 --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
---uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports2.xml \
+--sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+--uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports2.xml \
+-O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
 #-d
 }
 
@@ -127,8 +140,9 @@ sa_band78_133prb(){
 ./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
- --sa --uicc0.imsi 001010000000001 --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
---uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml \
+ --sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+--uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
+-O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
 #-d
 }
 
@@ -139,8 +153,9 @@ sa_band78_162prb(){
 ./nr-uesoftmodem \
 -r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --uicc0.imsi 001010000000001 --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
- --uecap_file /home/manolis/scripts/configuration/uecap/uecap_ports1.xml \
+--sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+ --uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
+ -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
 #-d
 }
 
@@ -167,6 +182,7 @@ fi
             sleep 1
             cd ${USERFOLDER}/openairinterface5g/
             echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
+            exit 0
             shift;;
        -s | --scenario)
             # check if scenario value is valid
@@ -204,9 +220,17 @@ fi
             cd ${USERFOLDER}/openairinterface5g
             source oaienv
             cd cmake_targets/ran_build/build
-            ###########################################################
-            ${SCENARIOS["$SELECTED_SCENARIO"-1]}
+            ###########################################################         
             shift 2;;
+        -p | --plmn)
+            SELECTED_PLMN=$2
+            if [[ ! $SELECTED_PLMN =~ $re ]] || [[ $SELECTED_PLMN -gt ${#PLMNS[@]} ]] || [[ $SELECTED_PLMN -le 0 ]] ; then
+               echo -e "${R}selected PLMN is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+            shift 2;;  
 	-h | --help)
             print_help
             exit 0;;
@@ -215,6 +239,8 @@ fi
             ;;    
     esac
   done
+# start nr=uesoftmodem program with selected parameters
+${SCENARIOS["$SELECTED_SCENARIO"-1]}
 # end of script
   }
  
