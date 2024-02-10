@@ -24,6 +24,7 @@ NOCOLOR='\033[0m'
 #
 ROUTER_IP="195.251.38.129" # router ip for DCS LAB
 EXT_DN_IP="192.168.70.135" # Ip of oai-ext-dn container
+#EXT_DN_IP="195.251.38.147" # Ip of oai-ext-dn container
 PING_COUNT=40 # number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
 TEST_TIME=10            # time interval to perform iperf test

@@ -9,14 +9,19 @@
 R='\033[0;31m'   #'0;31' is Red's ANSI color code
 G='\033[0;32m'   #'0;32' is Green's ANSI color code
 NOCOLOR='\033[0m'
-###############################
+############################## VARIABLES SECTION #####################################
 # the followin variable needs to be updated when new scenarios are added
 USERFOLDER="/home/manolis"
 SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
  "sa_band78_133prb" "sa_band78_162prb" )
 re='^[0-9]+$'    # integer value for selected scenario to be checked
-
-
+PLMNS=( "PLMN_1_" "PLMN_2_" )
+SELECTED_PLMN=1 # default PLMN is 00101
+# PLMNs List ##############
+# PLMN1  --> 00101
+# PLMN2  --> 20295
+###########################
+######################################################################################
 
 #### FUNCTION 1 print help message  ############
 print_help(){
@@ -44,16 +49,20 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 8 | standalone mode band 78 with 133prb (SISO)                   |
                           | 9 | standalone mode band 78 with 162prb (SISO)                   |
                           -------------------------------------------------------------------
+  -p, --plmn               PLMN selection
+                           1 (default) --> 00101
+                           2           --> 20295   
   -i, --info               show Open Air Interface version
   -h, --help               print this help message
 EOF
 }
 #################################################
 
-######### Function 2 51 PRB SA           ###################################
-############## SCENARIO 1 ##################################################-
+
+############## SCENARIO 1 ##################################################
+############## 51 PRB SA  ##################################################
 sa_51prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
 #--MACRLCs.[0].ul_max_mcs 16 
 # --continuous-tx --MACRLCs.[0].ul_max_mcs 25 
@@ -64,7 +73,7 @@ sa_51prb(){
 # > ~/gnb.log 2>&1
 # Tracer util usage with:--T_stdout 2
 #--opt.type wireshark --opt.ip 127.0.0.1 
-# --opt.path /home/manolis/scripts/captures/
+# --opt.path ${USERFOLDER}/scripts/captures/
 #  --continuous-tx --d
 # " --MACRLCs.[0].ul_max_mcs 14 " reduces heavy UL traffic by setting max MCS in UPLINK, "-d" starts the scope utility
 # There is noise on the DC carriers on N300 and especially the X300 in UL.
@@ -80,29 +89,32 @@ sa_51prb(){
 
 ############################################################################
 
-######### Function 3 106 PRB SA           ###################################
-############## SCENARIO 2 ##################################################-
+
+############## SCENARIO 2 ##################################################
+#########           106 PRB SA           ###################################
 sa_106prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
 #--MACRLCs.[0].ul_max_mcs 16 
 }
 
 ############################################################################
 
-######### Function 4 SA mode band 78 106prb TDD 1  ########################
-############## SCENARIO 3 ##################################################-
+
+############## SCENARIO 3 ##################################################
+##################### SA mode band 78 106prb TDD 1  ########################
 sa_106prb_TDD_1(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
 #--MACRLCs.[0].ul_max_mcs 16 
 }
 ############################################################################
 
-######### Function 5 SA mode band 78 106prb TDD 2  ########################
-############## SCENARIO 4 ##################################################-
+
+############## SCENARIO 4 ##################################################
+##################### SA mode band 78 106prb TDD 2  ########################
 sa_106prb_TDD_2(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
 #--MACRLCs.[0].ul_max_mcs 16 
 }
@@ -110,7 +122,7 @@ sa_106prb_TDD_2(){
 
 ############## SCENARIO 5 ##################################################-
 sa_106prb_tracer(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
 --T_stdout 2 \ 
 #> ~/gnb.log 2>&1
@@ -122,20 +134,20 @@ sa_106prb_tracer(){
 
 ######### Scenario 6 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_106prb_mimo(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
 --sa  --usrp-tx-thread-config 1 --thread-pool 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 --gNBs.[0].min_rxtxtime 6 -A 45 
 }
 ############################################################################
 
 ######### Scenario 7 SA mode band 78 133 prb (2x2 MIMO)  ###################
 sa_133prb_mimo(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/gNB_SA_n78_133PRB.2x2_usrpn310.conf \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.2x2_usrpn310.conf \
 --sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45  
 }
 
 ######## Scenario 8 SA mode band 78 133 prb SISO #########################
 sa_band78_133prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gNB_SA_n78_133PRB.usrpn310.conf \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 \
 #-d
 }
@@ -144,7 +156,7 @@ sa_band78_133prb(){
 ############################################################################
 ######### Scenario 9 SA mode band 78 162 prb  SISO ########################
 sa_band78_162prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.162PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 
 }
 ############################################################################
@@ -170,6 +182,7 @@ fi
             sleep 1
             cd ${USERFOLDER}/openairinterface5g/
             echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
+            exit 0;
             shift;;
        -s | --scenario)
 	    # check if scenario value is valid
@@ -204,8 +217,16 @@ fi
             source oaienv
             cd cmake_targets/ran_build/build
             ###########################################################
-            ${SCENARIOS["$SELECTED_SCENARIO"-1]}
             shift 2;;
+         -p | --plmn)
+            SELECTED_PLMN=$2
+            if [[ ! $SELECTED_PLMN =~ $re ]] || [[ $SELECTED_PLMN -gt ${#PLMNS[@]} ]] || [[ $SELECTED_PLMN -le 0 ]] ; then
+               echo -e "${R}selected PLMN is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+            shift 2;;                   
 	-h | --help)
             print_help
             exit 0;;
@@ -214,6 +235,8 @@ fi
             ;;
     esac
   done
+# start execution of nr-softmodem for the selected scenario and PLMN  
+${SCENARIOS["$SELECTED_SCENARIO"-1]} 
 # end of script
   }
 

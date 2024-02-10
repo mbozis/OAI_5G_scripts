@@ -1,0 +1,115 @@
+#!/bin/bash
+# uop dcs lab
+# Manolis Bozis 
+# Jul 2023
+
+################### VARIABLES SECTION ####################################
+# Version list
+# 1 --> 1.5
+# 2 --> 2.0.1
+
+VERSIONS=( "v_1_5" "v_2_0_1" )
+re='^[0-9]+$'    # integer value for selected scenario to be checked
+MODES=( "start" "stop" )
+SELECTED_VERSION=1 # default version is 1.5
+
+###########################
+###########################################################################
+#### FUNCTION 1 print help message  ############
+print_help(){
+cat <<EOF
+UOP - DCS LAB author Manolis Bozis 2023
+tool for deploying Open Air Interface 5G core Network in containers
+Usage:  $0 [OPTION]... [+VALUE] 
+  -d, --deploy             start 5G Core Network containers 
+  -s, --stop               stop 5G Core Network containers
+  -v, --version [value]    specify version of containers to deploy or stop
+                           1. version 1.51
+                           2. version 2.0.1
+                           example: $0 -d -v 2   
+  -h, --help               print this help message
+EOF
+}
+
+
+########## start 5G CN v1.5 of containers #############
+start_v_1_5(){
+cd ~/oai-cn5g
+docker compose up -d
+}
+#######################################################
+
+########### stop 5G CN v1.5 of containers #############
+stop_v_1_5(){
+cd ~/oai-cn5g
+docker compose down
+}
+#######################################################
+
+
+########## start 5G core network v 2.0.1 ##############
+start_v_2_0_1() {
+cd ~/oai-cn5g-fed/docker-compose
+# type Basic Deployment
+# Scenario with NRF ("1")
+python3 core-network.py --type start-basic --scenario 1
+}
+#######################################################
+
+########### stop 5G core network v 2.0.1 ##############
+
+stop_v_2_0_1() {
+cd ~/oai-cn5g-fed/docker-compose
+# type Basic Deployment
+# Scenario with NRF ("1")
+python3 core-network.py --type stop-basic
+}
+#######################################################
+
+
+
+
+function main() {
+###########################################################
+if [ "$*" == "" ]; then
+    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
+    print_help
+    exit 1
+fi
+###########################################################
+ until [ -z "$1" ]
+  do
+    case "$1" in
+        -v | --version)
+            SELECTED_VERSION=$2
+            if [[ ! $SELECTED_VERSION =~ $re ]] || [[ "$SELECTED_VERSION" -gt "${#VERSIONS[@]}" ]] || [[ $SELECTED_VERSION -le 0 ]] ; then
+               echo -e "${R}selected version is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+            shift 2;;     
+       -d | --deploy)
+            SELECTED_MODE="start"
+            shift;;
+       -s | --stop)
+            SELECTED_MODE="stop"
+            shift;;       
+       -h | --help)
+            print_help
+            exit 0;;
+        *) 
+            exit
+            ;;    
+    esac
+  done
+  
+  
+ # start execution of nr-softmodem for the selected scenario and PLMN  
+${SELECTED_MODE}_${VERSIONS["$SELECTED_VERSION"-1]} 
+  }
+
+main "$@"
+
+
+ 
