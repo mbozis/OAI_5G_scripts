@@ -145,3 +145,42 @@ Usage:  ./5gcn [OPTION]... [+VALUE]
 ​                                           example: ./5gcn -d -v 2   
 
   -h, --help               print this help message
+
+
+
+**./gnbconfig**
+
+Tool to edit configuration files for a particular scenario
+using USRP N310 SDR device
+or 2 hosts running OAI nrUE and nrgNB respectively.
+The ethernet link between the host and SDR needs to be at least 10Gbps 
+
+Usage:  ./gnbconfig [OPTION]... [+VALUE] 
+  -s, --scenario [value]   edit gnb softmodem configuration file for a specific scenario
+                           number
+                           value is from the following table
+
+                           ------------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 51prb (SISO)                    |
+                          | 2 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 3 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots (SISO)     |
+                          | 4 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots  (SISO)     |
+                          | 5 | standalone mode band 78 with 106prb and radio packets        |
+                          |   | capture with T Tracer  (SISO)                                |
+                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)               |
+                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)               |
+                          | 8 | standalone mode band 78 with 133prb (SISO)                   |
+                          | 9 | standalone mode band 78 with 162prb (SISO)                   |
+                          -------------------------------------------------------------------
+
+  -p, --plmn               PLMN selection
+                           1 (default) --> 00101
+                           2           --> 20295    
+  -e, --editor             choose editor
+                           1 (default) --> nano
+                           2           --> gedit                                                        
+  -i, --info               show Open Air Interface software version
+  -h, --help               print this help message
+

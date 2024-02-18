@@ -24,11 +24,12 @@ NOCOLOR='\033[0m'
 #
 ROUTER_IP="195.251.38.129" # router ip for DCS LAB
 EXT_DN_IP="192.168.70.135" # Ip of oai-ext-dn container
+UPF_IP="192.168.70.134" # IP address of oai-upf container
 #EXT_DN_IP="195.251.38.147" # Ip of oai-ext-dn container
 PING_COUNT=40 # number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
 TEST_TIME=10            # time interval to perform iperf test
-AMF_APP_TIME="20s"      # AMF APP reporting period for connected gNBs and UEs
+AMF_APP_TIME="25s"      # AMF APP reporting period for connected gNBs and UEs
 
 #
 ##########################################################################
@@ -49,13 +50,13 @@ ping -c 1 5gcn > /dev/null 2>&1
 CNHOST=$?
 if [ $CNHOST -eq 0 ]
   then
-   ssh 5gcn "docker logs oai-amf --since ${AMF_APP_TIME} | grep '5GMM-REGISTERED' -A 5 -B 12" 2>/dev/null
+   ssh 5gcn "docker logs oai-amf --since ${AMF_APP_TIME} 2>&1 | grep '5GMM-REGISTERED' -A 5 -B 12" 2>/dev/null
    REGISTERED=$?
 #   clear (removed not to lose screen buffer data)
    if [ $REGISTERED -eq 0 ]
      then
        echo -e "${G} UE has been registered successfully${NOCOLOR}\n"
-       UE_REGISTERED_FLAG=1 # flag to report successful registration to other functions
+       export UE_REGISTERED_FLAG=1 # flag to report successful registration to other functions
      else
        echo -e "${R}UE has not been registered to Core Network${NOCOLOR}\n"
        exitScript
@@ -187,6 +188,7 @@ SDR link can be OTA or with RF cables
 Usage:  $0 [OPTION]... [+VALUE] 
   -c, --checkue            check UE registration status to 5G Network  
   -C, --checkngi           check RAN connection to core network
+  -p, --pdusession         check pdu session creation in UPF and PFCP switch Packet Detection Rule list 
   -u, --uplink [value]     create traffic to uplink. Value needs to be in bps
                            example for 30Mbps: -u 30M   
   -d, --downlink [value]   create traffic to downlink. Value needs to be in bps
@@ -296,10 +298,30 @@ fi
 }
 ###########################################################################
 
+###################### Funcion 11 view PDU sessionID and PFCP switch packet Detection Rule set #########
+check_PDU_session(){
+ping -c 1 $UPF_IP >/dev/null
+UPF_UP=$?
+if [ $UPF_UP -eq 0 ]
+then
+   echo -e "${G}UPF container is reachable${NOCOLOR}\n"
+   docker ps | grep spgwu-tiny
+   if [ $? = 0 ] ; then
+   ssh 5gcn "docker logs oai-spgwu-tiny 2>&1 | grep '''PFCP switch Packet Detection Rule list''' -A 20 -B 2 | tail -n 22"
+   else
+   ssh 5gcn "docker logs oai-upf 2>&1 | grep '''PFCP switch Packet Detection Rule list''' -A 20 -B 2 | tail -n 22"
+   fi
+else
+   echo -e "${R}UPF container is not accesible. Have you deployed 5GCN containers?${NOCOLOR}\n"
+   exitScript
+fi
+}
+#docker logs oai-upf 2>&1 |grep "PFCP switch Packet Detection Rule list" -A 6 -B 2 | tail -n 8
+########################################################################################################
 
 ####################### MAIN ##############################################
 function main() {
-  UE_REGISTERED_FLAG=0 # set the initial value of the flag
+  UE_REGISTERED_FLAG=0; # set the initial value of the flag denoting the successful previous registration of UE to 5G network
   DOIPERFTESTUL=0
   DOIPERFTESTDL=0
   TEST_TIME=5
@@ -320,6 +342,10 @@ fi
             echo "start checking RAN connection to core network..."
             check_NGI
             shift;;
+       -p | --pdusession)
+            echo "start checking PDU session creation..."
+            check_PDU_session
+            shift;;            
        --umax)
             if [ ${UE_REGISTERED_FLAG} -ne 1 ]
             then
