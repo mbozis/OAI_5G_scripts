@@ -109,13 +109,13 @@ ${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$
 
 ######### Scenario 6 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_106prb_mimo(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf
 }
 ############################################################################
 
 ######### Scenario 7 SA mode band 78 133 prb (2x2 MIMO)  ###################
 sa_133prb_mimo(){
-${EDITORS["$SELECTED_EDITOR"-1]} ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.2x2_usrpn310.conf 
+${EDITORS["$SELECTED_EDITOR"-1]} ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.2x2_usrpn310.conf 
 }
 
 ######## Scenario 8 SA mode band 78 133 prb SISO #########################

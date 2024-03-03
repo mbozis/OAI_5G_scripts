@@ -28,7 +28,7 @@ UPF_IP="192.168.70.134" # IP address of oai-upf container
 #EXT_DN_IP="195.251.38.147" # Ip of oai-ext-dn container
 PING_COUNT=40 # number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
-TEST_TIME=10            # time interval to perform iperf test
+TEST_TIME=20            # time interval to perform iperf test
 AMF_APP_TIME="25s"      # AMF APP reporting period for connected gNBs and UEs
 
 #
@@ -172,10 +172,7 @@ sleep 2
 ###########################################################################
 #### FUNCTION 6 Bandwidth Graph with Speedometer Test on 5G oaitun_ue1 interface  ############
 speedometer(){
-ssh ue 
-export DISPLAY=:1
-gnome-terminal -x bash -c "speedometer -t oaitun_ue1 -r aoitun_ue1"
-exit # exit from ue session
+ssh -X ue  "~/scripts/speedometer" 2> /dev/null
 }
 ###########################################################################
 #### FUNCTION 7 print help message  ############
@@ -195,6 +192,8 @@ Usage:  $0 [OPTION]... [+VALUE]
                            example for 30Mbps: -d 30M
   -t  --time [value[       time to execute downlink and uplink tests (used with '-d' and '-u' arguments) 
                            [value] is in seconds. If not defined default value is 10
+  -s, --speedtest          run speedometer tool in oaitun_ue1 interface in UE host   
+                           (if not already installed, install with sudo apt-get install -y speedometer)                           
   -r, --rtt                measure rtt executing ping commands in both uplink and
                            downlink
   -h, --help               print this help message
@@ -338,6 +337,11 @@ fi
             echo "start checking UE registration to 5G network..."
             checkUERegistration
             shift;;
+       -s | --speedtest)
+            checkUERegistration > /dev/null
+            echo "starting speedotest tool on UE host...."
+            speedometer
+            shift;;            
        -C | --checkngi)
             echo "start checking RAN connection to core network..."
             check_NGI

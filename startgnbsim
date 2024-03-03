@@ -156,7 +156,7 @@ sa_band78_51prb(){
 ################## SCENARIO 7 ##############################################
 #################### SA mode band 77 273prb  ###############################
 sa_band77_273prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
 --rfsimulator.serveraddr server --rfsimulator.serverport 4043 --usrp-tx-thread-config 1 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
 }
@@ -192,7 +192,7 @@ sa_106prb_tracer(){
 
 ######### Scenario 11 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_106prb_mimo(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
 --conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
 }
@@ -200,7 +200,7 @@ sa_106prb_mimo(){
 
 ######### Scenario 12 SA mode band 78 133 prb MIMO #########################
 sa_mimo_band78_133prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.2x2_usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.2x2_usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
 --conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
 }
@@ -208,14 +208,14 @@ sa_mimo_band78_133prb(){
 ############################################################################
 ######### Scenario 13 SA mode band 78 162 prb  MIMO ########################
 sa_mimo_band78_162prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.162PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.162PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
 --conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
 }
 ############################################################################
 ######### Scenarion 14 SA mode band 78 217 prb MIMO ########################
 sa_mimo_band78_217prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gnb.sa.band78.fr1.217PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.sa.band78.fr1.217PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
 --conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
 }

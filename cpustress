@@ -1,0 +1,44 @@
+#!/bin/bash
+# oai 5G testbed with USRP N310
+# 
+# DCS LAB Oct 2023
+# Manolis Bozis
+# scripts MUST run with root privillages
+NICNAME_1="enp1s0f0"
+NICNAME_2="enp1s0f1"
+
+# change mtu value to 9000 fir 10gbps network interface controllers
+ip link set dev ${NICNAME_1} mtu 9000
+ip link set dev ${NICNAME_2} mtu 9000
+
+# To set the CPU governor to performance for all cores: 
+for ((i=0;i<$(nproc --all);i++)); do cpufreq-set -c $i -r -g performance; done
+
+#Adjust Network Buffers
+#This applies to USRP devices connected via Ethernet, such as the N200, N210, N300, N310, N320, N321, X300, X310, E320. 
+#Note that these settings will not persist across a reboot.
+sysctl -w net.core.wmem_max=33554432
+sysctl -w net.core.rmem_max=33554432
+sysctl -w net.core.wmem_default=33554432
+sysctl -w net.core.rmem_default=33554432
+
+#Adjust Ethernet MTU
+# can be done from GUI once for the 10Gbps NIC MTU is set to 9000
+
+#Increasing Ring Buffers
+#This applies to Ethernet connected USRPs using a 10 Gb interface (X3xx, N3xx, E320). 
+#Increasing the Ring Buffers on the NIC may help prevent flow control errors at higher rates. 
+ethtool -G ${NICNAME_1} tx 4096 rx 4096
+ethtool -G ${NICNAME_2} tx 4096 rx 4096
+
+
+# install linux-tools packet for the current kernel version before running cpupower
+# uncomment the following line in case of cpupower not finding  
+# cpupower the specific kenrel version
+apt install linux-tools-common linux-tools-`uname -r`
+#enable performance mode and display current frequency for all CPUs
+cpupower idle-set -D 0
+cpufreq-info | awk '/analyzing CPU/ || /current CPU frequency is/ {print}'
+#
+
+

@@ -1,0 +1,9 @@
+#!/bin/bash
+# Manolis Bozis Aug 2023
+# relax CPU frequencies whan Open Air Interface doesn't run
+# set back to ondemand governor
+
+#  SCRIPT NEEDS TO RUN WITH SUDO PRIVILAGES !!!!
+
+for ((i=0;i<$(nproc --all);i++)); do cpufreq-set -c $i -r -g powersave; done
+cpupower idle-set -E 0

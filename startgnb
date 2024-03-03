@@ -8,6 +8,7 @@
 #---------COLOR CODES --------------------
 R='\033[0;31m'   #'0;31' is Red's ANSI color code
 G='\033[0;32m'   #'0;32' is Green's ANSI color code
+Y='\033[0;33m'   #'0;33' is Yellow's ANSI color code
 NOCOLOR='\033[0m'
 ############################## VARIABLES SECTION #####################################
 # the followin variable needs to be updated when new scenarios are added
@@ -23,6 +24,9 @@ SELECTED_PLMN=1 # default PLMN is 00101
 ###########################
 UL_MAX_MCS=16   # Mzximum mcs value for UL (default value is 9)
 NRSCOPE="" # do not use nr-scope tool by default
+CL=0       # default value for flag CL is execute directly from the script
+           # if changed to 1 nr-softmodem command is copied to clipboard 
+           # and script exits 
 ######################################################################################
 
 #### FUNCTION 1 print help message  ############
@@ -34,8 +38,13 @@ or 2 hosts running OAI nrUE and nrgNB respectively.
 the ethernet link between the host and SDR needs to be at least 10Gbps 
 
 Usage:  $0 [OPTION]... [+VALUE] 
-  -s, --scenario [value]   start gnb softmodem executing scenario number [value]
-                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
+  -s, --scenario [value]   start gNB softmodem selecting scenario number [value]
+                           --------------------------------------------------------   
+                           | FOR "-s" OPTION AND WITHOUT "-c" PARAMETER SPECIFIED  |
+                           | YOU MUST RUN SCRIPT WITH SUDO                         |
+                           | IN ALL OTHER CASES RUN SCRIPT WITHOUT SUDO            |
+                           --------------------------------------------------------
+                           
                            value is from the following table
                            ------------------------------------------------------------------
                           | 1 | standalone mode band 78 with 51prb (SISO)                    |
@@ -57,6 +66,9 @@ Usage:  $0 [OPTION]... [+VALUE]
   -o, --scope              use nr-scope tool                               
   -i, --info               show Open Air Interface version
   -h, --help               print this help message
+  -c, --command_line       exit script, copy selected scenario command to a text file named COMMAND in the same folder
+                           To view command before executing it type $(echo -e "${G}cat COMMAND${NOCOLOR}") in the command line. 
+                           To start gNB softmodem type $(echo -e "${G}cd ${OAI_FOLDER} ${NOCOLOR}") and then execute the created command 
 EOF
 }
 #################################################
@@ -65,9 +77,10 @@ EOF
 ############## SCENARIO 1 ##################################################
 ############## 51 PRB SA  ##################################################
 sa_51prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+
 # --continuous-tx --MACRLCs.[0].ul_max_mcs 25 
 # -d  # uncomment the line to use scope
 #--tune-offset 20000000
@@ -96,9 +109,9 @@ sa_51prb(){
 ############## SCENARIO 2 ##################################################
 #########           106 PRB SA           ###################################
 sa_106prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 
 ############################################################################
@@ -107,9 +120,9 @@ sa_106prb(){
 ############## SCENARIO 3 ##################################################
 ##################### SA mode band 78 106prb TDD 1  ########################
 sa_106prb_TDD_1(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
@@ -117,18 +130,18 @@ sa_106prb_TDD_1(){
 ############## SCENARIO 4 ##################################################
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_106prb_TDD_2(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
 ############## SCENARIO 5 ##################################################-
 sa_106prb_tracer(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 -A 45 \
 --T_stdout 2 \ 
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 #> ~/gnb.log 2>&1
 # Tracer util usage with:--T_stdout 2
 #--MACRLCs.[0].ul_max_mcs 16 
@@ -138,33 +151,33 @@ sa_106prb_tracer(){
 
 ######### Scenario 6 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_106prb_mimo(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
 --sa  --usrp-tx-thread-config 1 --thread-pool 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 --gNBs.[0].min_rxtxtime 6 -A 45 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
 ######### Scenario 7 SA mode band 78 133 prb (2x2 MIMO)  ###################
 sa_133prb_mimo(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/2x2/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.2x2_usrpn310.conf \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.2x2_usrpn310.conf \
 --sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 
 ######## Scenario 8 SA mode band 78 133 prb SISO #########################
 sa_band78_133prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.133PRB.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.133PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
 ############################################################################
 ######### Scenario 9 SA mode band 78 162 prb  SISO ########################
 sa_band78_162prb(){
-./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.162PRB.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.162PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
@@ -200,29 +213,35 @@ fi
                exit 1 
 	    fi
             ###########################################################
-
-	    # check if script is run with sudo privilages
-            SCRIPTUSER=$(whoami)
-            if [[ $SCRIPTUSER != "root" ]] ; then 
-               echo -e "${R}script must be run with sudo privilages\n${NOCOLOR}"
-            exit 1
-            fi
 	    # check if core network is up, executing a ping to AMF ####
-            echo -e "checking connection to AMF...\n"
+            echo -e "checking connection to AMF..."
             ping amf -c 1 > /dev/null
             if [ $? -ne 0 ]; then
-            echo -e "${R} No connection to AMF\n"
+            echo -e "${R}\nNo connection to AMF\n"
             echo -e "start 5G core network prior to executing RAN ${NOCOLOR}\n"
             exit 1
+            else 
+            echo -e "${G}OK...${NOCOLOR}"
             fi 
             ###########################################################
             # check cpu state #########################################
-            cpufreq-info | awk '/analyzing CPU/ || /current CPU frequency is/ {print}'
+            CPUCORES=$(lscpu | awk '/^CPU\(s\)\:/ {print $2}')
+            for ((i=1; i < $CPUCORES+1 ; i++)); do
+            CPU_INDEX=$(( $i -1 ))
+            CURRENT_GOVERNOR=$(cat /sys/devices/system/cpu/cpu${CPU_INDEX}/cpufreq/scaling_governor)
+            if [[ ${CURRENT_GOVERNOR} != "performance" ]] ; then 
+            WARNING_FLAG=1
+            fi
+            done
+            if [[ ${WARNING_FLAG} -eq 1 ]] ; then
+            echo -e "${Y}WARNING:CPU governor not set to performance. COnsider running ${G}sudo ./cpustress${Y} to set maximum performance for all CPUs${NOCOLOR}"
+            fi
             ###########################################################
             # switch to softmodem binary file folder ##################
-            cd ${USERFOLDER}/openairinterface5g
+            cd ${USERFOLDER}/openairinterface5g 
             source oaienv
             cd cmake_targets/ran_build/build
+            OAI_FOLDER=$(pwd)
             ###########################################################
             shift 2;;
          -p | --plmn)
@@ -240,14 +259,46 @@ fi
 	-h | --help)
             print_help
             exit 0;;
+        -c | --command_line)
+            CL=1
+            shift;;            
         *) 
             exit
             ;;
     esac
   done
-# start execution of nr-softmodem for the selected scenario and PLMN  
-${SCENARIOS["$SELECTED_SCENARIO"-1]} 
-# end of script
+############# compose command with arguments for the specific scenario ####
+${SCENARIOS["$SELECTED_SCENARIO"-1]}   
+echo -e $COMMAND | xclip 
+###########################################################################
+############# check if command is to be executed inside the script ########
+#############   or copied to clipboard                          ###########
+if [[ ${CL} -eq 1 ]]; then
+            SCRIPTUSER=$(whoami)
+            if [[ $SCRIPTUSER = "root" ]] ; then 
+               echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
+               echo -e "${R}when using the -c parameter \n${NOCOLOR}"               
+            exit 1
+            fi
+            cd ${OAI_FOLDER} # move to binaries folder
+            cat <<EOF
+$(echo -e "${G}the command to start nr-softmodem was saved in file COMMAND in the current folder\n${NOCOLOR}")
+-To view command before executing it type $(echo -e "${G}cat COMMAND${NOCOLOR}") in the command line. 
+-To start gNB softmodem type $(echo -e "${G}cd ${OAI_FOLDER} ${NOCOLOR}") and then execute the created command 
+EOF
+            # export COMMAND
+            echo -e "sudo ${COMMAND}" > ${USERFOLDER}/scripts/COMMAND            
+            # bash  # execute bash in the same environment to keep the current directory            
+else
+# check if script is run with sudo privilages
+            SCRIPTUSER=$(whoami)
+            if [[ $SCRIPTUSER != "root" ]] ; then 
+               echo -e "${R}script must be run with sudo privilages\n${NOCOLOR}"
+            exit 1
+            fi     
+            # start execution of nr-softmodem for the selected scenario and PLMN   
+            $(xclip -o) # execute command from clipboard     
+fi    
   }
 
 main "$@"

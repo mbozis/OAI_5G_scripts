@@ -1,0 +1,157 @@
+#!/bin/bash
+# uop dcs lab
+# Manolis Bozis 
+# Feb 2024
+
+################### VARIABLES SECTION ####################################
+# Version list
+# 1 --> 1.5
+# 2 --> 2.0.1
+#---------COLOR CODES --------------------
+R='\033[0;31m'   #'0;31' is Red's ANSI color code
+G='\033[0;32m'   #'0;32' is Green's ANSI color code
+NOCOLOR='\033[0m'
+
+VERSIONS=( "v_1_5" "v_2_0_1" )
+re='^[0-9]+$'    # integer value for selected scenario to be checked
+MODES=( "start" "stop" )
+SELECTED_VERSION=1 # default version is 1.5
+HOME_FOLDER="/home/manolis/scripts/configuration"
+SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
+ "sa_band78_133prb" "sa_band78_162prb" )
+CONF_FILES=( "gnb.sa.band78.51prb.usrpn310.conf" "gnb.band78.sa.fr1.106PRB.usrpn310.conf" "gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf" "gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf" \
+ "gnb.band78.sa.fr1.106PRB.usrpn310.conf" "gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf" "gNB_SA_n78_133PRB.2x2_usrpn310.conf" "gnb.band78.sa.fr1.133PRB.usrpn310.conf" \
+ "gnb.band78.sa.fr1.162PRB.usrpn310.conf" )
+PLMNS=( "PLMN_1_" "PLMN_2_" )
+ # ${PLMNS["$SELECTED_PLMN"-1]}
+###########################
+###########################################################################
+#### FUNCTION 1 print help message  ############
+print_help(){
+cat <<EOF
+UOP - DCS LAB author Manolis Bozis 2024
+tool for configuring RF parameters in Open Air Interface gNB
+Usage:  $0 [OPTION]... [+VALUE] 
+  -e, --external_source        specify SDR clock and time source as external                                 
+  -i, --internal_source        specify SDR clock and time source as internal                              
+  -t  --att_tx [value]         specify attenuation value in dB (0 - 30) for transmitter                                
+                               example: $0 -t 10   
+  -r, --att_rx [value]         specify attenuation value in dB (0 - 30) for receiver
+                               example: $0 -r 15   
+  -v, --view                   view current configuration parameters                             
+  -h, --help                   print this help message
+EOF
+}
+
+
+
+###############################################################
+########## view settings in configuration files ###############
+##########       for every scenario             ###############
+view_config(){
+SCENARIO=1
+for file in ${CONF_FILES[@]}
+do
+  echo -e "${G}scenario: ${SCENARIO}${NOCOLOR}"
+  for plmn in ${PLMNS[@]}
+  do
+  echo -e "${G}${plmn}${NOCOLOR}" | tr "_" " "
+  grep -E 'att_tx|att_rx|sdr_addrs' ${HOME_FOLDER}/${plmn}${file}
+  done
+((SCENARIO++))
+echo "---------------------------------------------"
+done
+}
+###############################################################
+
+
+########## set att_tx value in configuration file #############
+set_att_tx(){
+for file in ${HOME_FOLDER}/*
+do
+sed -i "/att_tx/c\         att_tx         = ${SELECTED_TX_VALUE};" ${file}
+done
+}
+###############################################################
+########## set att_rx value in configuration file #############
+set_att_rx(){
+for file in ${HOME_FOLDER}/*
+do
+sed -i "/att_rx/c\         att_rx         = ${SELECTED_RX_VALUE};" ${file}
+done
+}
+###############################################################
+
+### set internal source for SDR in configuration file #########
+set_internal(){
+for file in ${HOME_FOLDER}/*
+do
+sed -i 's/clock_source=external/clock_source=internal/;s/time_source=external/time_source=internal/' ${file}
+done
+}
+###############################################################
+### set external source for SDR in configuration file #########
+set_external(){
+for file in ${HOME_FOLDER}/*
+do
+sed -i 's/clock_source=internal/clock_source=external/;s/time_source=internal/time_source=external/' ${file}
+done
+}
+###############################################################
+
+function main() {
+###############################################################
+if [ "$*" == "" ]; then
+    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
+    print_help
+    exit 1
+fi
+###############################################################
+ until [ -z "$1" ]
+  do
+    case "$1" in
+         -t | --att_tx)
+            SELECTED_TX_VALUE=$2
+            if [[ ! ${SELECTED_TX_VALUE} =~ $re ]] || [[ ${SELECTED_TX_VALUE} -gt 30 ]] || [[ ! ${SELECTED_TX_VALUE} -gt 0 ]] ; then
+               echo -e "${R}selected value is not valid. Choose a value from 0 to 30 \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            set_att_tx
+            ###########################################################
+            shift 2;;     
+        -r | --att_rx)
+            SELECTED_RX_VALUE=$2
+            if [[ ! ${SELECTED_RX_VALUE} =~ $re ]] || [[ ${SELECTED_RX_VALUE} -gt 30 ]] || [[ ! ${SELECTED_RX_VALUE} -gt 0 ]] ; then
+               echo -e "${R}selected value is not valid. Choose a value from 0 to 30 \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            set_att_rx 
+            ###########################################################
+            shift 2;;                 
+       -e | --external_source)
+            set_external
+            shift;;
+       -i | --internal_source)
+            set_internal
+            shift;;  
+       -v | --view)
+            view_config
+            exit 0;;     
+       -h | --help)
+            print_help
+            exit 0;;
+        *) 
+            exit
+            ;;    
+    esac
+  done
+ # start execution of functions to set appropriate values to configuration files
+
+  }
+
+main "$@"
+
+
+ 

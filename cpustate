@@ -1,0 +1,37 @@
+#!/bin/bash
+# UOP DCS LAB
+# Author Manolis Bozis
+# Sep 2023
+#
+#
+#---------COLOR CODES --------------------
+R='\033[0;31m'   #'0;31' is Red's ANSI color code
+G='\033[0;32m'   #'0;32' is Green's ANSI color code
+NOCOLOR='\033[0m'
+############ Multiline Message Variable ########
+MESSAGE=$(cat << END
+UOP - DCS LAB author Manolis Bozis 2023\n
+CPU state monitoring tool\n
+Display combined info from lscpu, cpufreq and sensors utilities
+END
+)
+
+CPUCORES=$(lscpu | awk '/^CPU\(s\)\:/ {print $2}')
+echo -e $MESSAGE
+echo -e "Your system has ${G} "$CPUCORES" ${NOCOLOR} cores"
+printf '%-7s  %-12s %-12s %s\n' "CPU ID" "CURRENT FREQ" "CURRENT TEMP" "CURRENT GOVERNOR"
+
+for ((i=1; i < $CPUCORES+1 ; i++)); do
+CPU_INDEX=$(( $i -1 ))
+################# extract current cpu frequency using cpufreq-info tool @#########
+CURRENT_FREQ=$(cpufreq-info | awk '/current CPU frequency is/ {print $5,$6}' | cut -d$'\n' -f "$i")
+##################################################################################
+
+################# extract current cpu temperature using sensors tool ####@########
+CURRENT_TEMP=$(sensors | awk '/Core/ {print $3}' | cut -d$'\n' -f "$i")
+##################################################################################
+CURRENT_GOVERNOR=$(cat /sys/devices/system/cpu/cpu${CPU_INDEX}/cpufreq/scaling_governor)
+
+#echo -e "CPU $i frequency: ${G}${CURRENT_FREQ}${NOCOLOR} , temperature: ${G}${CURRENT_TEMP}${NOCOLOR}" 
+printf 'CPU %2d:    %-12s %-12s %s\n' "$CPU_INDEX" "$CURRENT_FREQ" "$CURRENT_TEMP" "$CURRENT_GOVERNOR"
+done
