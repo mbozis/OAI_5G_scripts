@@ -35,12 +35,20 @@ Usage:  ./startue [OPTION]... [+VALUE]
                           ------------------------------------------------------------------
 
 -p, --plmn               PLMN selection
-                                1 (default) --> 00101
-                                2                 --> 20295  
+
+​                                1 (default) --> 00101
+
+​                                2                 --> 20295
+
+​                                3                 --> 20895  
 
  -i, --info               show Open Air Interface version
 
+
+
   -h, --help               print this help message
+
+
 
 ​                           
 
@@ -83,11 +91,17 @@ Usage:  ./startuesim [OPTION]... [+VALUE]
 
   -o, --scope              use nr-scope tool
 
+
+
   -p, --plmn               PLMN selection
+
+
 
 ​                                  1 (default) --> 00101
 
-​                                  2                 --> 20295  
+​                                  2                 --> 50501
+
+​                                  3                 -->  20895
 
  -i, --info               show Open Air Interface version
 

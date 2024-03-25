@@ -10,12 +10,12 @@ G='\033[0;32m'   #'0;32' is Green's ANSI color code
 NOCOLOR='\033[0m'
 ###############################
 # the followin variable needs to be updated when new scenarios are added
-USERFOLDER="/home/manolis"
+USERFOLDER="/home/manolis/scripts/configuration"
 # scenarios 3 and 4 are the same with 2, so the same function is executed,
 # given that TDD slot configuration is in the gNB side
 SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb" "sa_106prb" "sa_106prb" "sa_106prb_mimo" "sa_133prb_mimo" \
  "sa_band78_133prb" "sa_band78_162prb" )
-PLMNS=( "PLMN_1_" "PLMN_2_" )
+PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_" )
 SELECTED_PLMN=1 # default PLMN is 00101
 # PLMNs List ##############
 # PLMN1  --> 00101
@@ -39,27 +39,11 @@ exit 1
 print_help(){
 cat <<EOF
 UOP - DCS LAB author Manolis Bozis 2023
-Tool to configure UE softmodem for a particular scenario using Open Air Interface
+Tool to configure UE softmodem for a particular PLMN using Open Air Interface
 -the 2 hosts run OAI nrUE and nrgNB respectively.
 -the ethernet link between the hosts and USRP N310 devices must be at least 10Gbps 
 
 Usage:  $0 [OPTION]... [+VALUE] 
-  -s, --scenario [value]   edit gnb softmodem configuration file for a specific scenario
-                           value is from the following table
-                           -------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb (SISO)                     |
-                          | 2 | standalone mode band 78 with 106prb  (SISO)                   |
-                          | 3 | standalone mode band 78 with 106 prb TDD slot configuration 1 |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 slots             |
-                          | 4 | standalone mode band 78 with 106 prb TDD slot configuration 2 |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 slots              |
-                          | 5 | standalone mode band 78 with 106prb and radio packets         |
-                          |   | capture with T Tracer                                         |
-                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)                |
-                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)                |
-                          | 8 | standalone mode band 78 with 133prb (SISO)                    |
-                          | 9 | standalone mode band 78 with 162prb (SISO)                    |
-                          --------------------------------------------------------------------
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
                            2           --> 20295 
@@ -71,63 +55,6 @@ Usage:  $0 [OPTION]... [+VALUE]
 EOF
 }
 
-############## SCENARIO 1 ##################################################-
-#################### 51 prb SA #############################################
-sa_51prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
-}
-#################################################################################
-
-############## SCENARIO 2 ##################################################-
-####################106 prb SA #############################################
-sa_106prb(){
-${EDITORS["$SELECTED_EDITOR"-1]} ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
-}
-
-############## SCENARIO 6 ##################################################-
-sa_106prb_mimo(){
-#################  106 PRB (2x2 MIMO) #########################################
-${EDITORS["$SELECTED_EDITOR"-1]} ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
-################################################################################
-}
-
-############## SCENARIO 7 ##################################################-
-sa_133prb_mimo(){
-#################  1336 PRB (2x2 MIMO) #####################################
-./nr-uesoftmodem \
--r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports2.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
-#-d
-}
-
-################## SCENARIO 8 #############################################
-sa_band78_133prb(){
-./nr-uesoftmodem \
--r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
- --sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
-#-d
-}
-
-############################################################################
-
-################## SCENARIO 9 #############################################
-sa_band78_162prb(){
-./nr-uesoftmodem \
--r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
- --uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
- -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
-#-d
-}
-
-############################################################################
 
 
 ######################## MAIN FUNCTION #####################################
@@ -152,16 +79,6 @@ fi
             echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
             exit 0
             shift;;
-       -s | --scenario)
-            # check if scenario value is valid
-            SELECTED_SCENARIO=$2
-            if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${#SCENARIOS[@]} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
-               echo -e "${R}selected senario is not valid\n${NOCOLOR}"
-               print_help
-               exit 1 
-	    fi
-            #########################################################        
-            shift 2;;
         -p | --plmn)
             SELECTED_PLMN=$2
             if [[ ! $SELECTED_PLMN =~ $re ]] || [[ $SELECTED_PLMN -gt ${#PLMNS[@]} ]] || [[ $SELECTED_PLMN -le 0 ]] ; then
@@ -190,7 +107,8 @@ fi
     esac
   done
 # start nr=uesoftmodem program with selected parameters
-${SCENARIOS["$SELECTED_SCENARIO"-1]}
+cd ${USERFOLDER}
+${EDITORS["$SELECTED_EDITOR"-1]} ${PLMNS["$SELECTED_PLMN"-1]}ue.conf
 # end of script
   }
  
