@@ -9,10 +9,12 @@
 # 2 --> 2.0.1
 
 VERSIONS=( "v_1_5" "v_2_0_1" )
+PLMNS=( "00101" "50501" "20895" )
 re='^[0-9]+$'    # integer value for selected scenario to be checked
 MODES=( "start" "stop" )
 SELECTED_VERSION=1 # default version is 1.5
-
+SELECTED_PLMN=1 # default PLMN id is 00101
+SELECTED_MODE="start"  # default mode is start
 ###########################
 ###########################################################################
 #### FUNCTION 1 print help message  ############
@@ -26,7 +28,12 @@ Usage:  $0 [OPTION]... [+VALUE]
   -v, --version [value]    specify version of containers to deploy or stop
                            1. version 1.51
                            2. version 2.0.1
-                           example: $0 -d -v 2   
+                           example: $0 -d -v 2
+  -p, --plmn [value]       specify PLMN id (valid only for version 1.51) 
+                           1. PLMN ---> 00101
+                           2. PLMN ---> 50501
+                           3. PLMN ---> 20895
+                           example: $0 -d -v 1 -p 2                                 
   -h, --help               print this help message
 EOF
 }
@@ -35,6 +42,20 @@ EOF
 ########## start 5G CN v1.5 of containers #############
 start_v_1_5(){
 cd ~/oai-cn5g
+case ${SELECTED_PLMN} in
+   1)
+    cp docker-compose_00101.yml docker-compose.yml
+    cp ./database/oai_db_00101.sql ./database/oai_db.sql
+    ;;
+   2)
+    cp docker-compose_50501.yml docker-compose.yml
+    cp ./database/oai_db_50501.sql ./database/oai_db.sql
+    ;;
+   *)
+   echo -e "${R}Not able to start selected PLMN${NOCOLOR}"
+   exit 
+   ;;
+esac
 docker compose up -d
 }
 #######################################################
@@ -50,6 +71,21 @@ docker compose down
 ########## start 5G core network v 2.0.1 ##############
 start_v_2_0_1() {
 cd ~/oai-cn5g-fed/docker-compose
+#case ${SELECTED_PLMN} in
+#   1)
+#    cp ./database/oai_db2_00101.sql ./database/oai_db2.sql
+#    ;;
+#   2)
+#    cp ./database/oai_db2_50501.sql ./database/oai_db2.sql
+#    ;;
+#   3)
+#    cp ./database/oai_db2_20895.sql ./database/oai_db2.sql
+#    ;;
+#   *)
+#   echo -e "${R}Not able to start selected PLMN${NOCOLOR}"
+#   exit 
+#   ;;
+# esac
 # type Basic Deployment
 # Scenario with NRF ("1")
 python3 core-network.py --type start-basic --scenario 1
@@ -88,7 +124,16 @@ fi
                exit 1 
 	    fi
             ###########################################################
-            shift 2;;     
+            shift 2;;   
+        -p | --plmn)
+            SELECTED_PLMN=$2
+            if [[ ! $SELECTED_PLMN =~ $re ]] || [[ "$SELECTED_PLMN" -gt "${#PLMNS[@]}" ]] || [[ $SELECTED_PLMN -le 0 ]] ; then
+               echo -e "${R}selected PLMN id is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+            shift 2;;                   
        -d | --deploy)
             SELECTED_MODE="start"
             shift;;

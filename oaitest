@@ -21,7 +21,12 @@ R='\033[0;31m'   #'0;31' is Red's ANSI color code
 G='\033[0;32m'   #'0;32' is Green's ANSI color code
 NOCOLOR='\033[0m'
 ######################## VARIABLES SECTION ###############################
-#
+# Core Network Ip set to gnb host ip in the following line
+CN_IP=$(hostname --ip-address | awk '{print $1}')
+# if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
+# CN host
+HOME_FOLDER="/home/manolis/" # change this to your home directory value
+USER_SCRIPTS_FOLDER="${HOME_FOLDER}scripts/"
 ROUTER_IP="195.251.38.129" # router ip for DCS LAB
 EXT_DN_IP="192.168.70.135" # Ip of oai-ext-dn container
 UPF_IP="192.168.70.134" # IP address of oai-upf container
@@ -30,7 +35,9 @@ PING_COUNT=40 # number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
 TEST_TIME=20            # time interval to perform iperf test
 AMF_APP_TIME="25s"      # AMF APP reporting period for connected gNBs and UEs
-
+GNB_EXEC_FOLDER=${HOME_FOLDER}"openairinterface5g/cmake_targets/ran_build/build/" # Folder where nr-softmodem executable is
+CI_SCRIPTS_FOLDER=${HOME_FOLDER}"openairinterface5g/ci-scripts/" # Folder where ci-scripts are
+MONITOR_FILENAMES="unspecified" # default name tp use for log and png files produced from stats_monitor.py (-m argument)
 #
 ##########################################################################
 # If you want to use TCP window size
@@ -46,18 +53,18 @@ exit 1
 ############################### FUNCTION 2 Check UE Registration to 5G Network #####
 checkUERegistration(){
 # check first if 5gcn is reachable 
-ping -c 1 5gcn > /dev/null 2>&1
+ping -c 1 amf > /dev/null 2>&1
 CNHOST=$?
 if [ $CNHOST -eq 0 ]
   then
-   ssh 5gcn "docker logs oai-amf --since ${AMF_APP_TIME} 2>&1 | grep '5GMM-REGISTERED' -A 5 -B 12" 2>/dev/null
+   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} 2>&1 | grep '5GMM-REGISTERED' -A 5 -B 12" 2>/dev/null
    REGISTERED=$?
 #   clear (removed not to lose screen buffer data)
-   if [ $REGISTERED -eq 0 ]
-     then
+     if [ $REGISTERED -eq 0 ]
+      then
        echo -e "${G} UE has been registered successfully${NOCOLOR}\n"
        export UE_REGISTERED_FLAG=1 # flag to report successful registration to other functions
-     else
+      else
        echo -e "${R}UE has not been registered to Core Network${NOCOLOR}\n"
        exitScript
      fi
@@ -97,7 +104,7 @@ ssh ue "ping ${ROUTER_IP} -c ${PING_COUNT} -I oaitun_ue1"
 
 #  ping test from oai-ext-dn container to UE
 echo -e "${G}start pinging from core network to UE${NOCOLOR}\n"
-ssh 5gcn "docker exec oai-ext-dn ping $UE_IP -c ${PING_COUNT}"
+ssh ${CN_IP} "docker exec oai-ext-dn ping $UE_IP -c ${PING_COUNT}"
 }
 ##########################################################################
 #### FUNCTION 4 Throughput Test with iperf command in Downlink ###########
@@ -128,7 +135,7 @@ fi
 # 
 echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
 echo -e "${G}Sending DOWNLINK traffic at ${DOWNLINK_SPEED_TEST}bps${NOCOLOR}"
-ssh 5gcn "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -B ${EXT_DN_IP} -i1 -b ${DOWNLINK_SPEED_TEST} -c ${UE_IP} -fm"
+ssh ${CN_IP} "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -B ${EXT_DN_IP} -i1 -b ${DOWNLINK_SPEED_TEST} -c ${UE_IP} -fm"
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
 ssh ue "pkill iperf"
@@ -139,7 +146,7 @@ sleep 2
 #### FUNCTION 5 Throughput Test with iperf command in Uplink ############
 iperftestUL(){
 # start iperf server deamon on oai-ext-dn container 
-ssh 5gcn "docker exec oai-ext-dn pgrep iperf >/dev/null"
+ssh ${CN_IP} "docker exec oai-ext-dn pgrep iperf >/dev/null"
 iperf_RUNNING=$?
 if [ ${iperf_RUNNING} -eq 0 ]
 then
@@ -166,7 +173,7 @@ echo -e "${G}Sending UPLINK traffic at ${UPLINK_SPEED_TEST}bps${NOCOLOR}"
 ssh ue "iperf -u -t ${TEST_TIME} -i1 -fm -B ${UE_IP} -b ${UPLINK_SPEED_TEST} -c ${EXT_DN_IP}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
-ssh 5gcn "docker exec oai-ext-dn pkill -KILL iperf"
+ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
 sleep 2
 }
 ###########################################################################
@@ -183,22 +190,26 @@ Testing tool for E2E 5G SA system using Open Air Interface with RFsimulator
 or 2 hosts running OAI nrUE and nrgNB respectively, connected to SDRs.
 SDR link can be OTA or with RF cables 
 Usage:  $0 [OPTION]... [+VALUE] 
-  -c, --checkue            check UE registration status to 5G Network  
-  -C, --checkngi           check RAN connection to core network
-  -p, --pdusession         check pdu session creation in UPF and PFCP switch Packet Detection Rule list 
-  -u, --uplink [value]     create traffic to uplink. Value needs to be in bps
-                           example for 30Mbps: -u 30M   
-  -d, --downlink [value]   create traffic to downlink. Value needs to be in bps
-                           example for 30Mbps: -d 30M
-  -t  --time [value[       time to execute downlink and uplink tests (used with '-d' and '-u' arguments) 
-                           [value] is in seconds. If not defined default value is 10
-  -s, --speedtest          run speedometer tool in oaitun_ue1 interface in UE host   
-                           (if not already installed, install with sudo apt-get install -y speedometer)                           
-  -r, --rtt                measure rtt executing ping commands in both uplink and
-                           downlink
-  -h, --help               print this help message
-  --dmax                   get downlink throughput
-  --umax                   get uplink trhoughput 
+  -c, --checkue              check UE registration status to 5G Network  
+  -C, --checkngi             check RAN connection to core network
+  -p, --pdusession           check pdu session creation in UPF and PFCP switch Packet Detection Rule list 
+  -u, --uplink [value]       create traffic to uplink. Value needs to be in bps
+                             example for 30Mbps: -u 30M   
+  -d, --downlink [value]     create traffic to downlink. Value needs to be in bps
+                             example for 30Mbps: -d 30M
+  -t  --time [value[         time to execute downlink and uplink tests (used with '-d' and '-u' arguments) 
+                             [value] is in seconds. If not defined default value is 10
+  -s, --speedtest            run speedometer tool in oaitun_ue1 interface in UE host   
+                             (if not already installed, install with sudo apt-get install -y speedometer)                           
+  -r, --rtt                  measure rtt executing ping commands in both uplink and
+                             downlink
+  -m, --monitor [FILENAME]   starts monitoring L1, MAC and RRC producing logs and figures in figures directory.
+                             The names of files produced contain the chosen [FILENAME] string   
+  --stats [PROTOCOL]         displays stats of selected protocol.
+                             [PROTOCOL] can be L1, MAC or RRC                                                    
+  -h, --help                 print this help message
+  --dmax                     get downlink throughput
+  --umax                     get uplink throughput 
 EOF
 }
 ######### Function 8 Max Downlink throughput ###################################
@@ -228,7 +239,7 @@ fi
 # ssh to 5gcn VM and create traffic from ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
-ssh 5gcn "docker exec oai-ext-dn iperf -B ${EXT_DN_IP} -c ${UE_IP} -t ${TEST_TIME}"
+ssh ${CN_IP} "docker exec oai-ext-dn iperf -B ${EXT_DN_IP} -c ${UE_IP} -t ${TEST_TIME}"
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
 ssh ue "pkill iperf"
@@ -267,7 +278,7 @@ echo -e "${G}Starting transmitting data on 5G UPLINK${NOCOLOR}"
 ssh ue "iperf -B ${UE_IP} -c ${EXT_DN_IP} -t ${TEST_TIME}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
-ssh 5gcn "docker exec oai-ext-dn pkill -KILL iperf"
+ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
 sleep 2
 
 }
@@ -281,7 +292,7 @@ AMF_UP=$?
 if [ $AMF_UP -eq 0 ]
 then
    echo -e "${G}AMF container is reachable${NOCOLOR}\n"
-   ssh 5gcn "docker logs oai-amf --since ${AMF_APP_TIME} | grep 'Connected' -A 2 -B 2" 2>/dev/null
+   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} | grep 'Connected' -A 2 -B 2" 2>/dev/null
    NGI_CONNECTED=$?
    if [ $NGI_CONNECTED -eq 0 ]
    then
@@ -306,9 +317,9 @@ then
    echo -e "${G}UPF container is reachable${NOCOLOR}\n"
    docker ps | grep spgwu-tiny
    if [ $? = 0 ] ; then
-   ssh 5gcn "docker logs oai-spgwu-tiny 2>&1 | grep '''PFCP switch Packet Detection Rule list''' -A 20 -B 2 | tail -n 22"
+   ssh ${CN_IP} "docker logs oai-spgwu-tiny 2>&1 | grep '''PFCP switch Packet Detection Rule list''' -A 20 -B 2 | tail -n 22"
    else
-   ssh 5gcn "docker logs oai-upf 2>&1 | grep '''PFCP switch Packet Detection Rule list''' -A 20 -B 2 | tail -n 22"
+   ssh ${CN_IP} "docker logs oai-upf 2>&1 | grep '''PFCP switch Packet Detection Rule list''' -A 20 -B 2 | tail -n 22"
    fi
 else
    echo -e "${R}UPF container is not accesible. Have you deployed 5GCN containers?${NOCOLOR}\n"
@@ -317,6 +328,52 @@ fi
 }
 #docker logs oai-upf 2>&1 |grep "PFCP switch Packet Detection Rule list" -A 6 -B 2 | tail -n 8
 ########################################################################################################
+###################### Funcion 12 monitor L1, MAC and RRC rpoducing stats ##############################
+monitor(){
+## check if needed files exist in nr-softmodem executable folder #######################################
+if ! test -f ${GNB_EXEC_FOLDER}stats_monitor.py; then
+echo -e "stats_monitor.py script doesnot exist in ${GNB_EXEC_FOLDER}"
+echo -e "copying it from ${CI_SCRIPTS_FOLDER}"
+cp ${CI_SCRIPTS_FOLDER}stats_monitor.py ${GNB_EXEC_FOLDER}stats_monitor.py
+fi
+if ! test -f ${GNB_EXEC_FOLDER}stats_monitor.py; then
+echo -e "stats_monitor_conf.yaml file doesnot exist in ${GNB_EXEC_FOLDER}"
+echo -e "copying it from ${CI_SCRIPTS_FOLDER}"
+cp ${CI_SCRIPTS_FOLDER}stats_monitor_conf.yaml ${GNB_EXEC_FOLDER}stats_monitor_conf.yaml
+fi
+if ! test -f ${GNB_EXEC_FOLDER}gnb_stats_monitor.pickle; then
+echo -e "gnb_stats_monitor.pickle file doesnot exist in ${GNB_EXEC_FOLDER}"
+echo -e "copying it from ${CI_SCRIPTS_FOLDER}"
+cp ${CI_SCRIPTS_FOLDER}gnb_stats_monitor.pickle ${GNB_EXEC_FOLDER}gnb_stats_monitor.pickle
+fi
+########################################################################################################
+# start stats_monitor.py script in nr-softmodem executable folder
+echo -e "${G}starting stats_monitor python script...${NOCOLOR}"
+cd ${GNB_EXEC_FOLDER}
+python3 stats_monitor.py stats_monitor_conf.yaml ${MONITOR_FILENAMES} gnb 
+#
+# copy created files to figures folder
+echo -e "${G}moving created files to figures folder...${NOCOLOR}"
+if ! test -d ${USER_SCRIPTS_FOLDER}figures; then
+mkdir ${USER_SCRIPTS_FOLDER}figures
+fi
+mv *${MONITOR_FILENAMES}*stats.log "${USER_SCRIPTS_FOLDER}figures/"
+mv *${MONITOR_FILENAMES}*page*.png "${USER_SCRIPTS_FOLDER}figures/"
+}
+########################################################################################################
+display_stats(){
+## check if needed files exist in nr-softmodem executable folder #######################################
+case "${PROTOCOL_LAYER}" in
+       L1 | MAC | RRC)
+         watch -n 1 cat ${GNB_EXEC_FOLDER}nr${PROTOCOL_LAYER}_stats.log
+         ;;
+      *) 
+         echo -e "${R} selected protocol value is left null or not supported. Select L1, MAC or RRC after --stats argument${NOCOLOR}"
+         exit -1
+         ;;      
+esac
+
+}
 
 ####################### MAIN ##############################################
 function main() {
@@ -372,6 +429,26 @@ fi
             fi
             pingtests
             shift;;
+       -m | --monitor)
+            if [ ${UE_REGISTERED_FLAG} -ne 1 ]
+            then
+            checkUERegistration        
+            fi
+            if [ ! -z $2 ] ; then
+            MONITOR_FILENAMES=$2
+            fi
+            monitor
+            shift 2;;
+       --stats)
+            if [ ${UE_REGISTERED_FLAG} -ne 1 ]
+            then
+            checkUERegistration       
+            fi
+            if [ ! -z $2 ] ; then
+            PROTOCOL_LAYER=$2
+            fi
+            display_stats
+            shift 2;;            
        --dmax)
             if [ ${UE_REGISTERED_FLAG} -ne 1 ]
             then

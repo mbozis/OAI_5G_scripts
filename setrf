@@ -53,11 +53,11 @@ SCENARIO=1
 for file in ${CONF_FILES[@]}
 do
   echo -e "${G}scenario: ${SCENARIO}${NOCOLOR}"
-  for plmn in ${PLMNS[@]}
-  do
-  echo -e "${G}${plmn}${NOCOLOR}" | tr "_" " "
-  grep -E 'att_tx|att_rx|sdr_addrs' ${HOME_FOLDER}/${plmn}${file}
-  done
+#  for plmn in ${PLMNS[@]}
+#  do
+#  echo -e "${G}${plmn}${NOCOLOR}" | tr "_" " "
+  grep -E 'att_tx|att_rx|sdr_addrs' ${HOME_FOLDER}/${file}
+#  done
 ((SCENARIO++))
 echo "---------------------------------------------"
 done
@@ -112,7 +112,7 @@ fi
     case "$1" in
          -t | --att_tx)
             SELECTED_TX_VALUE=$2
-            if [[ ! ${SELECTED_TX_VALUE} =~ $re ]] || [[ ${SELECTED_TX_VALUE} -gt 30 ]] || [[ ! ${SELECTED_TX_VALUE} -gt 0 ]] ; then
+            if [[ ! ${SELECTED_TX_VALUE} =~ $re ]] || [[ ${SELECTED_TX_VALUE} -gt 30 ]] || [[ ${SELECTED_TX_VALUE} -lt 0 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 0 to 30 \n${NOCOLOR}"
                print_help
                exit 1 
@@ -122,7 +122,7 @@ fi
             shift 2;;     
         -r | --att_rx)
             SELECTED_RX_VALUE=$2
-            if [[ ! ${SELECTED_RX_VALUE} =~ $re ]] || [[ ${SELECTED_RX_VALUE} -gt 30 ]] || [[ ! ${SELECTED_RX_VALUE} -gt 0 ]] ; then
+            if [[ ! ${SELECTED_RX_VALUE} =~ $re ]] || [[ ${SELECTED_RX_VALUE} -gt 30 ]] || [[ ${SELECTED_RX_VALUE} -lt 0 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 0 to 30 \n${NOCOLOR}"
                print_help
                exit 1 

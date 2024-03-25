@@ -11,18 +11,21 @@ G='\033[0;32m'   #'0;32' is Green's ANSI color code
 NOCOLOR='\033[0m'
 ############################## VARIABLES SECTION #####################################
 # the followin variable needs to be updated when new scenarios are added
+HOME_FOLDER="/home/manolis/scripts/configuration"
 USERFOLDER="/home/manolis"
 SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
  "sa_band78_133prb" "sa_band78_162prb" )
 EDITORS=( "nano" "gedit" )
 SELECTED_EDITOR=1 # default editor is nano
 re='^[0-9]+$'    # integer value for selected scenario to be checked
-PLMNS=( "PLMN_1_" "PLMN_2_" )
+PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_")
 SELECTED_PLMN=1 # default PLMN is 00101
 # PLMNs List ##############
 # PLMN1  --> 00101
+# PLMN1  --> 50501
 # PLMN2  --> 20295
 ###########################
+START_EDITOR=0 # Flag (default value is 0 --> do not edit configuration file)
 
 ######################################################################################
 
@@ -54,10 +57,11 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 8 | standalone mode band 78 with 133prb (SISO)                   |
                           | 9 | standalone mode band 78 with 162prb (SISO)                   |
                           -------------------------------------------------------------------
-  -p, --plmn               PLMN selection
-                           1 (default) --> 00101
-                           2           --> 20295    
-  -e, --editor             choose editor
+  -p, --plmn               set PLMN and TAC settings
+                           1 (default) --> 00101  TAC --> 0001
+                           2           --> 50501  TAC --> 0001 
+                           3           --> 20295  TAC --> 40960 
+  -e, --editor             choose editor, combined with -s argument
                            1 (default) --> nano
                            2           --> gedit                                                        
   -i, --info               show Open Air Interface software version
@@ -70,17 +74,15 @@ EOF
 ############## SCENARIO 1 ##################################################
 ############## 51 PRB SA  ##################################################
 sa_51prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.sa.band78.51prb.usrpn310.conf
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51prb.usrpn310.conf
 #
 }
-
 ############################################################################
-
 
 ############## SCENARIO 2 ##################################################
 #########           106 PRB SA           ###################################
 sa_106prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310.conf 
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf 
 }
 ############################################################################
 
@@ -88,7 +90,7 @@ ${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$
 ############## SCENARIO 3 ##################################################
 ##################### SA mode band 78 106prb TDD 1  ########################
 sa_106prb_TDD_1(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf
 }
 ############################################################################
 
@@ -96,40 +98,68 @@ ${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$
 ############## SCENARIO 4 ##################################################
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_106prb_TDD_2(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf
 }
 ############################################################################
 
 ############## SCENARIO 5 ##################################################-
 sa_106prb_tracer(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.usrpn310.conf
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf
 }
 
 ############################################################################
 
 ######### Scenario 6 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_106prb_mimo(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf
 }
 ############################################################################
 
 ######### Scenario 7 SA mode band 78 133 prb (2x2 MIMO)  ###################
 sa_133prb_mimo(){
-${EDITORS["$SELECTED_EDITOR"-1]} ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gNB_SA_n78_133PRB.2x2_usrpn310.conf 
+${EDITORS["$SELECTED_EDITOR"-1]} ${USERFOLDER}/scripts/configuration/gNB_SA_n78_133PRB.2x2_usrpn310.conf 
 }
 
 ######## Scenario 8 SA mode band 78 133 prb SISO #########################
 sa_band78_133prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.133PRB.usrpn310.conf 
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.133PRB.usrpn310.conf 
 }
 ############################################################################
 
 ############################################################################
 ######### Scenario 9 SA mode band 78 162 prb  SISO ########################
 sa_band78_162prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}gnb.band78.sa.fr1.162PRB.usrpn310.conf 
+${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.162PRB.usrpn310.conf 
 }
 ############################################################################
+
+
+set_plmn(){
+case $SELECTED_PLMN in
+    1)
+    SELECTED_PLMN_VALUE="plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }); });"
+    SELECTED_TAC="tracking_area_code = 1;"
+    ;;
+    2)
+    SELECTED_PLMN_VALUE="plmn_list = ({ mcc = 505; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }); });"
+    SELECTED_TAC="tracking_area_code = 1;"
+    ;;
+    3)
+    SELECTED_PLMN_VALUE="plmn_list = ({ mcc = 208; mnc = 95; mnc_length = 2; snssaiList = ({ sst = 1; }) });"
+    SELECTED_TAC="tracking_area_code  =  40960"
+    ;;
+    *)
+    exit
+    ;;
+esac
+################### change plmn and tac for all configuration files ########    
+for file in ${HOME_FOLDER}/*
+do
+sed -i "/plmn_list/c\     ${SELECTED_PLMN_VALUE}" ${file}
+sed -i "/tracking_area_code/c\     ${SELECTED_TAC}" ${file}
+done
+############################################################################
+}
 
 
 ######################## MAIN FUNCTION #####################################
@@ -163,6 +193,7 @@ fi
                exit 1 
 	    fi
             ###########################################################
+           START_EDITOR=1 
            shift 2;;
        -e | --editor)
 	    # check if scenario value is valid
@@ -181,6 +212,7 @@ fi
                print_help
                exit 1 
 	    fi
+	    set_plmn
             ###########################################################
             shift 2;;   
 	-h | --help)
@@ -191,8 +223,10 @@ fi
             ;;
     esac
   done
-# start execution of nr-softmodem for the selected scenario and PLMN  
-${SCENARIOS["$SELECTED_SCENARIO"-1]} 
+if [[ $START_EDITOR -eq 1 ]] ; then   
+# edit configuration file of the selected scenario
+${SCENARIOS["$SELECTED_SCENARIO"-1]}
+fi 
 # end of script
   }
 
