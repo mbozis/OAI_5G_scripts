@@ -75,25 +75,41 @@ or 2 hosts running OAI nrUE and gNB respectively, connected to USRP N310 SDR dev
 Usage:  ./oaitest [OPTION]... [+VALUE] 
 
    -c, --checkue                               check UE registration status to 5G Network  
+
   -C, --checkngi                              check RAN connection to core network
+
   -p, --pdusession                         check pdu session creation in UPF and PFCP switch Packet Detection Rule list 
+
   -u, --uplink [value]                     create traffic to uplink. Value needs to be in bps
                                                        example for 30Mbps: -u 30M   
+
   -d, --downlink [value]                create traffic to downlink. Value needs to be in bps
-                                                       example for 30Mbps: -d 30M
+
+​                                                       example for 30Mbps: -d 30M
+
   -t  --time [value[                         time to execute downlink and uplink tests (used with '-d' and '-u' arguments) 
-                                                       [value] is in seconds. If not defined default value is 10
+
+​                                                       [value] is in seconds. If not defined default value is 10
+
   -s, --speedtest                            run speedometer tool in oaitun_ue1 interface in UE host   
-                                                       (if not already installed, install with sudo apt-get install -y speedometer)                           
-  -r, --rtt                                         measure rtt executing ping commands in both uplink and
-                                                      downlink
+
+​                                                       (if not already installed, install with sudo apt-get install -y speedometer)                           
+  -r, --rtt                                         measure rtt executing ping commands in both uplink and downlink
+
   -m, --monitor [FILENAME]      starts monitoring L1, MAC and RRC producing logs and figures in figures directory.
                                                      The names of files produced contain the chosen [FILENAME] string   
+
   --stats [PROTOCOL]                 displays stats of selected protocol.
-                                                     [PROTOCOL] can be L1, MAC or RRC                                                    
+                                                     [PROTOCOL] can be L1, MAC or RRC          
+
+
   -h, --help                                   print this help message
+
   --dmax                                      get downlink maximum throughput
+
   --umax                                      get uplink maximum throughput 
+
+
 
 **./startgnb**
 
@@ -132,16 +148,27 @@ Usage:  ./startgnb [OPTION]... [+VALUE]
                               -------------------------------------------------------------------
 
   -p, --plmn                      PLMN selection
-                                         1 (default) --> 00101
-                                         2                 --> 50501
-                                         3                 --> 20295   
+
+​                                         1 (default) --> 00101
+
+​                                         2                 --> 50501
+
+​                                         3                 --> 20295   
+
   -o, --scope                     use nr-scope tool              
-  -l, --log                           write nr-softmodem output to a log file with date and time stamp in scripts/logs folder                 
+
+  -l, --log                           write nr-softmodem output to a log file with date and time stamp in scripts/logs folder        
+
+
   -i, --info                          show Open Air Interface version
+
   -h, --help                        print this help message
+
   -c, --command_line      exit script, copy selected scenario command to a text file named COMMAND in the same folder
                                          -To view command before executing it type $(echo -e "${G}cat COMMAND${NOCOLOR}") in the command line. 
                                          -To start gNB softmodem copy and paste command to new terminal window in OAI binaries folder
+
+
 
 
 
@@ -183,12 +210,21 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
                           -------------------------------------------------------------------
 
   -p, --plmn               PLMN selection
-                                  1 (default)   --> 00101
-                                  2                   --> 50501
-                                  3                   --> 20295  
-  -o, --scope               use nr-scope tool                                    
+
+​                                  1 (default)   --> 00101
+
+​                                  2                   --> 50501
+
+​                                  3                   --> 20295  
+
+  -o, --scope               use nr-scope tool                              
+
+
   -i, --info                   show Open Air Interface version
+
   -h, --help                 print this help message
+
+
 
 **./5gcn**
 
@@ -196,21 +232,33 @@ Tool to deploy and stop OAI Core Network containers
 
 Usage:  ./5gcn [OPTION]... [+VALUE] 
 
+
+
   -d, --deploy                  start 5G Core Network containers 
+
   -s, --stop                       stop 5G Core Network containers
+
   -v, --version [value]    specify version of containers to deploy or stop
                                           [value]=1  version 1.51
-                                          [value]=2  version 2.0.1
+
+​                                          [value]=2  version 2.0.1
 
 ​                                           example: ./5gcn  -d -v 2
+
   -p, --plmn [value]       specify PLMN id (valid only for version 1.51) 
+
 ​                                          [value]=1  PLMN ---> 00101
+
 ​                                          [value]=2  PLMN ---> 50501
 
 ​                                          [value]=3  PLMN ---> 20895
 
-​                                          example: ./5gcn -d -v 1 -p 2                                 
+​                                          example: ./5gcn -d -v 1 -p 2               
+
+
   -h, --help                      print this help message
+
+
 
 
 
@@ -220,14 +268,29 @@ tool for configuring RF parameters in Open Air Interface gNB
 
 Usage:  ./setrf  [OPTION]... [+VALUE] 
 
-  -e, --external_source        specify SDR clock and time source as external                                 
-  -i, --internal_source        specify SDR clock and time source as internal                              
-  -t  --att_tx [value]         specify attenuation value in dB (0 - 30) for transmitter                                
-                                         example: ./setrf -t 10   
+
+
+  -e, --external_source        specify SDR clock and time source as external     
+
+
+  -i, --internal_source        specify SDR clock and time source as internal       
+
+
+  -t  --att_tx [value]         specify attenuation value in dB (0 - 30) for transmitter           
+
+
+​                                         example: ./setrf -t 10   
+
   -r, --att_rx [value]         specify attenuation value in dB (0 - 30) for receiver
-                                         example: ./setrf -r 15   
-  -v, --view                   view current configuration parameters                             
+
+​                                         example: ./setrf -r 15   
+
+  -v, --view                   view current configuration parameters           
+
+
   -h, --help                   print this help message
+
+
 
 **./gnbconfig**
 
@@ -257,12 +320,23 @@ Usage:  ./gnbconfig [OPTION]... [+VALUE]
                           -------------------------------------------------------------------
 
   -p, --plmn              set PLMN and TAC settings
-                                       1 (default) --> 00101  TAC --> 0001
-                                       2           --> 50501  TAC --> 0001 
-                                       3           --> 20295  TAC --> 40960 
+
+​                                       1 (default) --> 00101  TAC --> 0001
+
+​                                       2           --> 50501  TAC --> 0001 
+
+​                                       3           --> 20295  TAC --> 40960 
+
   -e, --editor             choose editor, combined with -s argument
-                                       1 (default) --> nano
-                                       2           --> gedit                                                        
+
+​                                       1 (default) --> nano
+
+​                                       2           --> gedit                               
+
+
   -i, --info                  show Open Air Interface software version
+
   -h, --help                print this help message
+
+
 
