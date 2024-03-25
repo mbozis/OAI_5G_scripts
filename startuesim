@@ -19,11 +19,12 @@ USERFOLDER="/home/manolis"
 SCENARIOS=( "phytest" "phytestextended" "dora" "sa_band66" "sa_band78_106prb" "sa_band78_51prb" "sa_band77_273prb" \
  "sa_band78_106prb" "sa_band78_106prb" "sa_band78_106prb" "sa_band78_106prb_mimo" "sa_band78_133prb_mimo" "sa_band78_162prb_mimo" \
  "sa_band78_217prb_mimo" "sa_band78_133prb" "sa_band78_162prb" "sa_band78_217prb" )
-PLMNS=( "PLMN_1_" "PLMN_2_" )
+PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_" )
 SELECTED_PLMN=1 # default PLMN is 00101
 # PLMNs List ##############
 # PLMN1  --> 00101
-# PLMN2  --> 20295
+# PLMN2  --> 50501
+# PLMN3  --> 20295
 ###########################
 NRSCOPE="" # do not use nr-scope tool by default
 ###########################################################################
@@ -76,6 +77,7 @@ Usage:  $0 [OPTION]... [+VALUE]
   -o, --scope              use nr-scope tool
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
+                           2           --> 50501                          
                            2           --> 20295 
   -i, --info               show Open Air Interface version
   -h, --help               print this help message
@@ -154,6 +156,7 @@ sa_band78_106prb(){
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
 -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+
 # --rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
 
 ################################################################################
