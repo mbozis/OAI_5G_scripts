@@ -1,18 +1,13 @@
 #!/bin/bash
 # oai 5G testbed with USRP N310
 # UOP
-# DCS LAB Feb 2024
+# DCS LAB Apr 2024
 # Manolis Bozis
-# scripts MUST run with root privillages
-
-#---------COLOR CODES --------------------
-R='\033[0;31m'   #'0;31' is Red's ANSI color code
-G='\033[0;32m'   #'0;32' is Green's ANSI color code
-Y='\033[0;33m'   #'0;33' is Yellow's ANSI color code
-NOCOLOR='\033[0m'
+# do not run script with root privillages !!
+# load platform initial configuration
+source gnbconfig.ini
 ############################## VARIABLES SECTION #####################################
 # the followin variable needs to be updated when new scenarios are added
-USERFOLDER="/home/manolis"
 SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
  "sa_band78_133prb" "sa_band78_162prb" )
 re='^[0-9]+$'    # integer value for selected scenario to be checked
@@ -23,12 +18,12 @@ SELECTED_PLMN=1 # default PLMN is 00101
 # PLMN2  --> 50501
 # PLMN3  --> 20295
 ###########################
-UL_MAX_MCS=9   # Maximum mcs value for UL (default value is 9)
 NRSCOPE="" # do not use nr-scope tool by default
 CL=0       # default value for flag CL is execute directly from the script
            # if changed to 1 nr-softmodem command is copied to clipboard 
            # and script exits 
 LOG=0      # do not write to a log file (default). You van change it with the -l argument
+LOG_FILE_TIMESTAMP=$(date +%d_%m_20%y_at_%H_%M_%S)
 ######################################################################################
 
 #### FUNCTION 1 print help message  ############
@@ -41,12 +36,6 @@ the ethernet link between the host and SDR needs to be at least 10Gbps
 
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   start gNB softmodem selecting scenario number [value]
-                           --------------------------------------------------------   
-                           | FOR "-s" OPTION AND WITHOUT "-c" PARAMETER SPECIFIED  |
-                           | YOU MUST RUN SCRIPT WITH SUDO                         |
-                           | IN ALL OTHER CASES RUN SCRIPT WITHOUT SUDO            |
-                           --------------------------------------------------------
-                           
                            value is from the following table
                            ------------------------------------------------------------------
                           | 1 | standalone mode band 78 with 51prb (SISO)                    |
@@ -143,12 +132,13 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1
 ############## SCENARIO 5 ##################################################-
 sa_106prb_tracer(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 -A 45 \
---T_stdout 2 \ 
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
-#> ~/gnb.log 2>&1
+--gNBs.[0].min_rxtxtime 6 -A 45 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} \
+--T_stdout 2 ${USERFOLDER}/scripts/logs/gnb_log_${LOG_FILE_TIMESTAMP}.txt 2>&1"
 # Tracer util usage with:--T_stdout 2
-#--MACRLCs.[0].ul_max_mcs 16 
+# IMPORTANT !!!!!!
+# if tracer tool is not build 
+# goto home/openairinterface5g/common/utis/T/tracer and run make command to build all executables needed
+LOG=1 # set LOG flag to 1 so that the owner and group change from root to current user at the end of script
 }
 
 ############################################################################
@@ -205,7 +195,7 @@ fi
             echo "getting the version of OAI software..."
             sleep 1
             cd ${USERFOLDER}/openairinterface5g/
-            echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
+            echo -e "The version of the Open Air Interface is: ${G}$(git show | grep 'Merge branch' | cut -d "'" -f 2)${NOCOLOR}\n"
             exit 0;
             shift;;
        -s | --scenario)
@@ -263,7 +253,10 @@ fi
             CL=1
             shift;;         
         -l | --log)
+            # set LOG flag to 1 except in the case of running scenario 5
+            if [[ ${SELECTED_SCENARIO} -ne 5 ]] ; then
             LOG=1
+            fi
             shift;;                    
         *) 
             exit
@@ -274,48 +267,49 @@ fi
 ${SCENARIOS["$SELECTED_SCENARIO"-1]}  
 ##### write to log file ################################################### 
 if [[ ${LOG} -eq 1 ]]; then
-COMMAND="${COMMAND} 2>&1 |tee ${USERFOLDER}/scripts/logs/gnb_log_$(date +%d_%m_20%y_at_%H_%M_%S).txt"
+COMMAND="${COMMAND} 2>&1 |tee ${LOGS_FOLDER}/gnb_log_${LOG_FILE_TIMESTAMP}.txt"
 fi
-########################################################################### 
+########## copy command to clipboard ###################### 
 echo -e "${COMMAND}" | xclip 
 ###########################################################################
 ###########################################################
 # switch to softmodem binary file folder ##################
 cd ${USERFOLDER}/openairinterface5g 
 source oaienv
-OAI_FOLDER=$(pwd)
-###########################################################
+# check if script is run with sudo privilages #############################
 
+SCRIPTUSER=$(whoami)
+if [[ $SCRIPTUSER = "root" ]] ; then 
+               echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
+               echo -e "${R}when using the -c parameter \n${NOCOLOR}"               
+    exit 1
+fi
 ############# check if command is to be executed inside the script ########
 #############   or copied to clipboard                          ###########
 if [[ ${CL} -eq 1 ]]; then
-            SCRIPTUSER=$(whoami)
-            if [[ $SCRIPTUSER = "root" ]] ; then 
-               echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
-               echo -e "${R}when using the -c parameter \n${NOCOLOR}"               
-            exit 1
-            fi
             cat <<EOF
 $(echo -e "${G}the command to start nr-softmodem was saved in file COMMAND in the current folder\n${NOCOLOR}")
 -To view command before executing it type $(echo -e "${G}cat COMMAND${NOCOLOR}") in the command line. 
 -To start gNB softmodem copy and paste command to new terminal window in OAI binaries folder
 EOF
             export COMMAND
-            export OAI_FOLDER
-            export MESSAGE="to execute nr-softmodem copy and paste the following command to command line or type \$(xclip -o):\n "
+            #export MESSAGE="to execute nr-softmodem copy and paste the following command to command line or type \$(xclip -o):\n "
             echo -e "sudo ${COMMAND}" > ${USERFOLDER}/scripts/COMMAND            
             # execute bash in the same environment to keep the current directory
-            gnome-terminal --working-directory=${OAI_FOLDER} -- bash -c 'echo -e "${MESSAGE} sudo $COMMAND" ; bash'         
+            gnome-terminal --working-directory=${GNB_EXEC_FOLDER} -- bash -c 'echo -e "${MESSAGE} sudo $COMMAND" ; bash'         
 else
-# check if script is run with sudo privilages
-            SCRIPTUSER=$(whoami)
-            if [[ $SCRIPTUSER != "root" ]] ; then 
-               echo -e "${R}script must be run with sudo privilages\n${NOCOLOR}"
-            exit 1
-            fi     
-            # start execution of nr-softmodem for the selected scenario and PLMN   
-            echo -e "$(xclip -o)" | bash  # execute command from clipboard     
+# check if script is run with sudo privilages    
+# start execution of nr-softmodem for the selected scenario and PLMN   
+            cd ${GNB_EXEC_FOLDER}
+            echo -e "$(xclip -o)" | sudo bash  # execute command from clipboard     
 fi    
+###  change owner and group of newly created log file #############
+if [[ ${LOG} -eq 1 ]]; then
+cd ${LOGS_FOLDER}
+sudo chown ${USER} gnb_log_${LOG_FILE_TIMESTAMP}.txt
+sudo chgrp ${USER} gnb_log_${LOG_FILE_TIMESTAMP}.txt
+fi
+###################################################################
   }
 
 main "$@"

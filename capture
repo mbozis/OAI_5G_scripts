@@ -1,0 +1,137 @@
+#!/bin/bash
+# Capture traffic on oai-demo NIC
+# DCS Lab
+# Manolis Bozis
+# Sep 2023
+#
+# define capture file name
+# DO NOT RUN WITH SUDO
+# load configuration parameters
+source gnbconfig.ini
+INTERFACE=lo  # default interface for capturing packets
+CAPTURE_FILTER="sctp or udp"  # default capture filter
+CAPTURE_MAX_TIME=480   # max capture time is 480 secs
+######### CAPTURE FILTER #######################
+# NO ARP, NO DNS (PORT 53)
+# NO HOST archive.ubuntu.com and security.ubuntu.com
+# No BROADCAST AND MULTICAST PACKETS
+# for oai-demo NIC
+# CAPTURE_FILTER="not arp and not port 53 and not host archive.ubuntu.com and not host security.ubuntu.com and not broadcast and not multicast"
+# for loopback
+################################################
+############ Multiline Message Variable ########
+MESSAGE=$(cat << END
+UOP - DCS LAB author Manolis Bozis 2023
+Capture tool for E2E 5G SA system using Open Air Interface
+create pcap file to be analyzed with wireshark
+END
+)
+
+################################################
+
+#### FUNCTION 1 print help message  ############
+print_help(){
+cat <<EOF
+$MESSAGE
+Usage:  $0 [OPTION]... [+VALUE]
+  -i, --interface [value]  select [value]=1 for loopback (deafult)
+                                          2 for demo-oai   
+  -t, --time [value]       capture traffic for [value] seconds (can be decimal values like 0.1 up to 480)
+  -h, --help               print this help message
+EOF
+}
+################### EOF FUNCTION 1 ##############
+
+######## FUNCTION 2 capture packets  ############
+capture(){
+PCAP_FILE_TIMESTAMP=$(date +%d_%m_20%y_at_%H_%M_%S)
+CAPTURE_FILE=$CAPTURE_DIRECTORY/${INTERFACE}_nic_${PCAP_FILE_TIMESTAMP}.pcap
+
+# echo default values
+echo -e "default capture file is:${G} $CAPTURE_FILE ${NOCOLOR}"
+echo -e "default filter set to:${G} $CAPTURE_FILTER ${NOCOLOR}"
+echo -e "default capture interface is ${G} $INTERFACE ${NOCOLOR}"
+# echo user selected values
+echo -e "capture duration set to:${G} $DURATION secs ${NOCOLOR}"
+#
+####### Create capture file if it does not exist ##########
+echo "searching for capture file..."
+if [[ -e  "$CAPTURE_FILE" ]];
+then
+ if touch "$CAPTURE_FILE" ;
+ then echo -e "capture file exists and is writable. ${R}overwriting the old file ...${NOCOLOR}"
+ else echo -e "${R}capture file exists but is not writable ${NOCOLOR}"
+ exit 1
+ fi
+else echo "no capture file exists"
+     echo "creating the file..."
+     touch $CAPTURE_FILE
+fi
+###########################################################
+
+echo -e "${G}start capturing..${NOCOLOR}" 
+tshark -i ${INTERFACE} -w ${CAPTURE_FILE} -f "$CAPTURE_FILTER" -a duration:$DURATION &
+CAPTURE_PID=$!
+echo -e "Packet capturing (PID=${CAPTURE_PID}) launched for ${DURATION} secs"
+wait "$CAPTURE_PID"
+echo -e "${G}packet capturing finished${NOCOLOR}"
+echo -e "capture file size in disk is: ${R} $(du -h ${CAPTURE_FILE} | cut -d$'\t' -f 1) ${NOCOLOR}"
+}
+###########################EOF FUNCTION 2 ###################################
+function main() {
+############ CHECK IF FIRST ARGUMENT IS NULL ##############
+if [ $1 -n ];
+then
+print_help
+exit 1
+fi
+######### CHECK IF 5gCN has started and demo-oai NIC ######
+ip a |grep "demo-oai" > /dev/null
+RESULT=$?
+if [ ${RESULT} -ne 0 ];
+then 
+echo -e "${R}demo-oai NIC doesn't exit. Start first the 5g Core Network ${NOCOLOR} "
+exit 1
+fi
+###########################################################
+
+  until [ -z "$1" ]
+  do
+    case "$1" in
+        -i | --interface)
+            case "$2" in 
+            1)
+            INTERFACE="lo";;
+            2) 
+            INTERFACE="demo-oai";;
+            *)
+            echo -e "${R} values for interface should be 1 or 2${NOCOLOR}"
+            print_help
+            exit 1;;
+            esac            	    
+            shift 2;;     
+       -t | --time)
+            if [[ $2 -gt ${CAPTURE_MAX_TIME} ]] || [[ $2 -le 0 ]] ; then
+               echo -e "${R}selected capture time must be greater than 0 and less than ${CAPTURE_MAX_TIME} \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            echo "$MESSAGE"
+	    echo "start capturing function"
+            DURATION=$2           
+            shift 2;;
+       -h | --help)
+            print_help
+            exit 0;;
+         *) 
+            print_help
+            exit
+            ;;
+    esac
+  done
+   echo "$MESSAGE"
+   echo "${G}start capturing function..${NOCOLOR}"
+   capture
+  }
+#############################################################################  
+  main "$@"

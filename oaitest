@@ -8,35 +8,29 @@
 # in order to run tests UE needs to have a PDU session established
 # to core network
 # NETWORK CONFIGURATION
-# add to your /etc/hosts file
 # amf 192.168.70.132
-# ue 192.168.45.8
+# ue host and
 # 5gcn IP needs to be set accordingly to host OR VM IP 
-# (make changes to /etc/hosts file)
+# IMPORTANT !!!!
 # 5gcn VM or actual host needs to have ssh HOST keys installed
 # so that to accept password less ssh connections
 # ----------------------------
-##########COLOR CODES #############################
-R='\033[0;31m'   #'0;31' is Red's ANSI color code
-G='\033[0;32m'   #'0;32' is Green's ANSI color code
-NOCOLOR='\033[0m'
+# Load initial configuration values
+source gnbconfig.ini
+
 ######################## VARIABLES SECTION ###############################
+if [ -z "${CN_IP}" ]; then
 # Core Network Ip set to gnb host ip in the following line
 CN_IP=$(hostname --ip-address | awk '{print $1}')
 # if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
-# CN host
-HOME_FOLDER="/home/manolis/" # change this to your home directory value
-USER_SCRIPTS_FOLDER="${HOME_FOLDER}scripts/"
-ROUTER_IP="195.251.38.129" # router ip for DCS LAB
-EXT_DN_IP="192.168.70.135" # Ip of oai-ext-dn container
-UPF_IP="192.168.70.134" # IP address of oai-upf container
+# CN host in the config.ini file
+fi
+
 #EXT_DN_IP="195.251.38.147" # Ip of oai-ext-dn container
 PING_COUNT=40 # number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
 TEST_TIME=20            # time interval to perform iperf test
 AMF_APP_TIME="25s"      # AMF APP reporting period for connected gNBs and UEs
-GNB_EXEC_FOLDER=${HOME_FOLDER}"openairinterface5g/cmake_targets/ran_build/build/" # Folder where nr-softmodem executable is
-CI_SCRIPTS_FOLDER=${HOME_FOLDER}"openairinterface5g/ci-scripts/" # Folder where ci-scripts are
 MONITOR_FILENAMES="unspecified" # default name tp use for log and png files produced from stats_monitor.py (-m argument)
 #
 ##########################################################################
@@ -79,7 +73,7 @@ NRUEHOST=$?
 if [ "${NRUEHOST}" -eq '0' ]
    then
    # check if oai_tun interface is UP
-   UE_INET=$(ssh ue "ip a  | grep 12.1.1")
+   UE_INET=$(ssh ${UE_HOST_IP} "ip a  | grep 12.1.1")
    if [ "${UE_INET}" == "" ]
      then 
        echo -e "${R}UE has not been asigned an IP address${NOCOLOR}"
@@ -100,7 +94,7 @@ pingtests(){
 # do ping connectivity tests from UE side
 # ping lab router from UE
 echo -e "${G}Starting pinging from UE to lab router${NOCOLOR}\n"
-ssh ue "ping ${ROUTER_IP} -c ${PING_COUNT} -I oaitun_ue1"
+ssh ${UE_HOST_IP} "ping ${ROUTER_IP} -c ${PING_COUNT} -I oaitun_ue1"
 
 #  ping test from oai-ext-dn container to UE
 echo -e "${G}start pinging from core network to UE${NOCOLOR}\n"
@@ -110,16 +104,16 @@ ssh ${CN_IP} "docker exec oai-ext-dn ping $UE_IP -c ${PING_COUNT}"
 #### FUNCTION 4 Throughput Test with iperf command in Downlink ###########
 iperftestDL(){
 # start iperf server deamon on UE side
-ssh ue "pgrep iperf >/dev/null"
+ssh ${UE_HOST_IP} "pgrep iperf >/dev/null"
 iperf_RUNNING=$?
 if [ ${iperf_RUNNING} -eq 0 ]
 then
  echo -e "iperf server is already running\n"
  echo -e "wait a sec to terminate and restart iperf\n"
- ssh ue "pkill iperf"
+ ssh ${UE_HOST_IP} "pkill iperf"
  sleep 2
 fi
- ssh ue "iperf -s -D -u -i1 -B ${UE_IP}"
+ ssh ${UE_HOST_IP} "iperf -s -D -u -i1 -B ${UE_IP}"
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -138,7 +132,7 @@ echo -e "${G}Sending DOWNLINK traffic at ${DOWNLINK_SPEED_TEST}bps${NOCOLOR}"
 ssh ${CN_IP} "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -B ${EXT_DN_IP} -i1 -b ${DOWNLINK_SPEED_TEST} -c ${UE_IP} -fm"
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
-ssh ue "pkill iperf"
+ssh ${UE_HOST_IP} "pkill iperf"
 sleep 2
 # 
 }
@@ -152,10 +146,10 @@ if [ ${iperf_RUNNING} -eq 0 ]
 then
  echo -e "iperf server is already running\n"
  echo -e "wait a sec to terminate and restart iperf\n"
- ssh 5gcn "docker exec oai-ext-dn pkill -KILL iperf"
+ ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
  sleep 2
 fi
- ssh 5gcn "docker exec oai-ext-dn iperf -s -D -u -i1 -B 192.168.70.135"
+ ssh ${CN_IP} "docker exec oai-ext-dn iperf -s -D -u -i1 -B 192.168.70.135"
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -170,7 +164,7 @@ fi
 # 
 echo -e "${G}Starting transmitting data on 5G UPLINK${NOCOLOR}"
 echo -e "${G}Sending UPLINK traffic at ${UPLINK_SPEED_TEST}bps${NOCOLOR}"
-ssh ue "iperf -u -t ${TEST_TIME} -i1 -fm -B ${UE_IP} -b ${UPLINK_SPEED_TEST} -c ${EXT_DN_IP}"
+ssh ${UE_HOST_IP} "iperf -u -t ${TEST_TIME} -i1 -fm -B ${UE_IP} -b ${UPLINK_SPEED_TEST} -c ${EXT_DN_IP}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
 ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
@@ -215,16 +209,16 @@ EOF
 ######### Function 8 Max Downlink throughput ###################################
 checkDownlinkThroughput(){
 # start iperf server deamon on UE side
-ssh ue "pgrep iperf >/dev/null"
+ssh ${UE_HOST_IP} "pgrep iperf >/dev/null"
 iperf_RUNNING=$?
 if [ ${iperf_RUNNING} -eq 0 ]
 then
  echo -e "iperf server is already running\n"
  echo -e "wait a sec to terminate and restart iperf\n"
- ssh ue "pkill iperf"
+ ssh ${UE_HOST_IP} "pkill iperf"
  sleep 2
 fi
- ssh ue "iperf -s -D -B $UE_IP"
+ ssh ${UE_HOST_IP} "iperf -s -D -B $UE_IP"
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -242,7 +236,7 @@ echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
 ssh ${CN_IP} "docker exec oai-ext-dn iperf -B ${EXT_DN_IP} -c ${UE_IP} -t ${TEST_TIME}"
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
-ssh ue "pkill iperf"
+ssh ${UE_HOST_IP} "pkill iperf"
 sleep 2
 # 
 
@@ -252,16 +246,16 @@ sleep 2
 ######### Function 9 Uplink throughput ###################################
 
 checkUplinkThroughput(){
-ssh 5gcn "docker exec oai-ext-dn pgrep iperf >/dev/null"
+ssh ${CN_IP} "docker exec oai-ext-dn pgrep iperf >/dev/null"
 iperf_RUNNING=$?
 if [ ${iperf_RUNNING} -eq 0 ]
 then
  echo -e "iperf server is already running\n"
  echo -e "wait a sec to terminate and restart iperf\n"
- ssh 5gcn "docker exec oai-ext-dn pkill -KILL iperf"
+ ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
  sleep 2
 fi
- ssh 5gcn "docker exec oai-ext-dn iperf -s -D -B 192.168.70.135"
+ ssh ${CN_IP} "docker exec oai-ext-dn iperf -s -D -B 192.168.70.135"
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -275,7 +269,7 @@ fi
 # ssh to UE host and create traffic from UE to oai-ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G UPLINK${NOCOLOR}"
-ssh ue "iperf -B ${UE_IP} -c ${EXT_DN_IP} -t ${TEST_TIME}"
+ssh ${UE_HOST_IP} "iperf -B ${UE_IP} -c ${EXT_DN_IP} -t ${TEST_TIME}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
 ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
@@ -354,11 +348,11 @@ python3 stats_monitor.py stats_monitor_conf.yaml ${MONITOR_FILENAMES} gnb
 #
 # copy created files to figures folder
 echo -e "${G}moving created files to figures folder...${NOCOLOR}"
-if ! test -d ${USER_SCRIPTS_FOLDER}figures; then
-mkdir ${USER_SCRIPTS_FOLDER}figures
+if ! test -d ${USER_SCRIPTS_FOLDER}/figures; then
+mkdir ${USER_SCRIPTS_FOLDER}/figures
 fi
-mv *${MONITOR_FILENAMES}*stats.log "${USER_SCRIPTS_FOLDER}figures/"
-mv *${MONITOR_FILENAMES}*page*.png "${USER_SCRIPTS_FOLDER}figures/"
+mv *${MONITOR_FILENAMES}*stats.log "${USER_SCRIPTS_FOLDER}/figures/"
+mv *${MONITOR_FILENAMES}*page*.png "${USER_SCRIPTS_FOLDER}/figures/"
 }
 ########################################################################################################
 display_stats(){

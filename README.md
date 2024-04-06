@@ -14,13 +14,13 @@ To pull the 2.0.1 version of OAI 5GCN containers  follow the guidelines form the
 
 https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed/-/blob/master/docs/RETRIEVE_OFFICIAL_IMAGES.md?ref_type=heads
 
-Add to your /etc/hosts file the correct IP assignments for the oaiue host and 5gcn host (it is the same ip as gnbhost if gnb and core network run on the same host) . Also make any needed changes to VARIABLES SECTION in each script to be in line with your local network setup.
+**Add to config.ini file the correct IP assignments for the oaiue host and 5gcn host (it is the same ip as gnbhost if gnb and core network run on the same host) . Also make any needed changes to VARIABLES SECTION in each script to be in line with your local network setup.**
 
 Prerequisite packets are **openssh-server, iperf, speedometer, okla speedtest-cli, xclip, cpufreq-info, linux-tools-common, ethtool ** and **sensors**.
 
-Scripts have been tested in Ubuntu 22.04 LTS environment. 
+Scripts have been tested in **Ubuntu 22.04 LTS** environment. 
 
-Use **./5gcn** to deploy core network containers, then run script **./startgnb** or **./startgnbsim** to start gNB with SDR device or RF simulator respectively. Finally run **./startue** or **./startuesim** in the UE host to connect to gNB. The **./oaitest** script is for testing the interconnection of software modules and to perform measurements of throughput and RTT values. 
+Use **./5gcn** to deploy core network containers, then run script **./startgnb** or **./startgnbsim** to start gNB with SDR device or RF simulator respectively. Finally run **./startue** or **./startuesim** in the UE host to connect to gNB. The **./oaitest** script is for testing the interconnection of software modules and to perform measurements of throughput and RTT values and other. 
 
 **The default PLMN value for Core Network v1.51 and 2.0.1 is 00101 and 20295 respectively. To use different PLMN values (command argument -p in 5gcn script you need to make several changes to the OAI CN files. **
 
@@ -122,15 +122,7 @@ Usage:  ./startgnb [OPTION]... [+VALUE]
 
   -s, --scenario [value]   start gNB softmodem selecting scenario number [value]
 
-                           --------------------------------------------------------
-                           | FOR "-s" OPTION AND WITHOUT "-c" PARAMETER SPECIFIED  |
-                           | YOU MUST RUN SCRIPT WITH SUDO                         |
-                           | IN ALL OTHER CASES RUN SCRIPT WITHOUT SUDO            |
-                           --------------------------------------------------------
-
-
-
-​                           value is from the following table
+   value is from the following table
 
                                ------------------------------------------------------------------
                               | 1 | standalone mode band 78 with 51prb (SISO)                    |
@@ -219,8 +211,9 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
 
   -o, --scope               use nr-scope tool                              
 
-
   -i, --info                   show Open Air Interface version
+
+  -l, --log                     write nr-softmodem output to a log file with date and time stamp in scripts/logs folder    
 
   -h, --help                 print this help message
 
@@ -340,3 +333,21 @@ Usage:  ./gnbconfig [OPTION]... [+VALUE]
 
 
 
+**./capture**
+
+Usage:  ./capture [OPTION]... [+VALUE]
+
+Capture tool for E2E 5G SA system using Open Air Interface
+
+creates pcap file to be analyzed with wireshark
+
+
+
+  -i, --interface [value]                         select [value]=1 for loopback (deafult)
+
+​                                                                                         2 for demo-oai 
+
+
+  -t, --time [value]                                 capture traffic for [value] seconds (can be decimal values like 0.1 up to 480)
+
+ -h, --help                                              print this help message

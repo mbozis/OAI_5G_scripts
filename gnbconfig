@@ -4,15 +4,11 @@
 # DCS LAB Feb 2024
 # Manolis Bozis
 # script to edit configuration files
+# load initial configuration values
+source gnbconfig.ini
 
-#---------COLOR CODES --------------------
-R='\033[0;31m'   #'0;31' is Red's ANSI color code
-G='\033[0;32m'   #'0;32' is Green's ANSI color code
-NOCOLOR='\033[0m'
 ############################## VARIABLES SECTION #####################################
 # the followin variable needs to be updated when new scenarios are added
-HOME_FOLDER="/home/manolis/scripts/configuration"
-USERFOLDER="/home/manolis"
 SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
  "sa_band78_133prb" "sa_band78_162prb" )
 EDITORS=( "nano" "gedit" )
@@ -153,7 +149,7 @@ case $SELECTED_PLMN in
     ;;
 esac
 ################### change plmn and tac for all configuration files ########    
-for file in ${HOME_FOLDER}/*
+for file in ${CONFIGURATION_FOLDER}/*
 do
 sed -i "/plmn_list/c\     ${SELECTED_PLMN_VALUE}" ${file}
 sed -i "/tracking_area_code/c\     ${SELECTED_TAC}" ${file}
@@ -181,7 +177,7 @@ fi
             echo "getting the version of OAI software..."
             sleep 1
             cd ${USERFOLDER}/openairinterface5g/
-            echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
+            echo -e "The version of the Open Air Interface is: ${G}$(git show | grep 'Merge branch' | cut -d "'" -f 2)${NOCOLOR}\n"
             exit 0;
             shift;;
        -s | --scenario)
