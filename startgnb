@@ -13,6 +13,9 @@ SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106pr
 re='^[0-9]+$'    # integer value for selected scenario to be checked
 PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_" )
 SELECTED_PLMN=1 # default PLMN is 00101
+# OAI_RA_FIX="-A 45" # use this parameter when OAI nrUE implementation is connected to gNB
+                   # helps to reduce the ra msg3 retransmissions
+OAI_RA_FIX=""
 # PLMNs List ##############
 # PLMN1  --> 00101
 # PLMN2  --> 50501
@@ -71,7 +74,7 @@ EOF
 ############## 51 PRB SA  ##################################################
 sa_51prb(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 -A 45 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 
 # --continuous-tx --MACRLCs.[0].ul_max_mcs 25 
@@ -103,7 +106,7 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51p
 #########           106 PRB SA           ###################################
 sa_106prb(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 -A 45 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 
@@ -114,7 +117,7 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1
 ##################### SA mode band 78 106prb TDD 1  ########################
 sa_106prb_TDD_1(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 -A 45 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -124,7 +127,7 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_106prb_TDD_2(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 -A 45 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -132,7 +135,7 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1
 ############## SCENARIO 5 ##################################################-
 sa_106prb_tracer(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 -A 45 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} \
 --T_stdout 2 ${USERFOLDER}/scripts/logs/gnb_log_${LOG_FILE_TIMESTAMP}.txt 2>&1"
 # Tracer util usage with:--T_stdout 2
 # IMPORTANT !!!!!!
@@ -146,7 +149,7 @@ LOG=1 # set LOG flag to 1 so that the owner and group change from root to curren
 ######### Scenario 6 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_106prb_mimo(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
---sa  --usrp-tx-thread-config 1 --thread-pool 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 --gNBs.[0].min_rxtxtime 6 -A 45 \
+--sa  --usrp-tx-thread-config 1 --thread-pool 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -154,14 +157,14 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1
 ######### Scenario 7 SA mode band 78 133 prb (2x2 MIMO)  ###################
 sa_133prb_mimo(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gNB_SA_n78_133PRB.2x2_usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 \
+--sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 
 ######## Scenario 8 SA mode band 78 133 prb SISO #########################
 sa_band78_133prb(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.133PRB.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 \
+--sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -170,7 +173,7 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1
 ######### Scenario 9 SA mode band 78 162 prb  SISO ########################
 sa_band78_162prb(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 \
+--sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -269,8 +272,11 @@ ${SCENARIOS["$SELECTED_SCENARIO"-1]}
 if [[ ${LOG} -eq 1 ]]; then
 COMMAND="${COMMAND} 2>&1 |tee ${LOGS_FOLDER}/gnb_log_${LOG_FILE_TIMESTAMP}.txt"
 fi
+##### add cpu affinity commannd in front of command to be executed ########
+COMMAND="${CPU_AFFINITY}${COMMAND}"
 ########## copy command to clipboard ###################### 
 echo -e "${COMMAND}" | xclip 
+echo -e "$COMMAND" > COMMAND
 ###########################################################################
 ###########################################################
 # switch to softmodem binary file folder ##################
