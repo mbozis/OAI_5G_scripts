@@ -67,7 +67,7 @@ if [ $CNHOST -eq 0 ]
        exitScript
 fi
 # check UE IP assigned address
-ping -c 1 ue > /dev/null
+ping -c 1 ${UE_HOST_IP} > /dev/null
 NRUEHOST=$?
 #NRUEHOST=0  # set to skip connectivity test from lab network
 if [ "${NRUEHOST}" -eq '0' ]
@@ -202,6 +202,7 @@ Usage:  $0 [OPTION]... [+VALUE]
   --stats [PROTOCOL]         displays stats of selected protocol.
                              [PROTOCOL] can be L1, MAC or RRC                                                    
   -h, --help                 print this help message
+  --cpu                      show cpu and mem consumption for nr-softmodem threads
   --dmax                     get downlink throughput
   --umax                     get uplink throughput 
 EOF
@@ -458,6 +459,9 @@ fi
             fi        
             DOIPERFTESTDL=1
             shift 2;;
+       --cpu)
+            htop -p $(pgrep -d',' -f "nr-softmodem")
+            shift;;
        -t | --time)
             TEST_TIME=$2
             shift 2;;       
@@ -465,6 +469,8 @@ fi
             print_help
             exit 0;;
         *) 
+            echo -e "${R}Unknown argument${NOCOLOR}"
+            print_help
             exit
             ;;    
     esac
