@@ -202,7 +202,7 @@ Usage:  $0 [OPTION]... [+VALUE]
   --stats [PROTOCOL]         displays stats of selected protocol.
                              [PROTOCOL] can be L1, MAC or RRC                                                    
   -h, --help                 print this help message
-  --cpu                      show cpu and mem consumption for nr-softmodem threads
+  --cpu                      show cpu and mem usage for nr-softmodem threads
   --dmax                     get downlink throughput
   --umax                     get uplink throughput 
 EOF
