@@ -1,0 +1,90 @@
+#/bin/bash
+# DCS LAb, UOP
+# author Manolis Bozis
+MEASUREMENTS_FILE_TIMESTAMP=$(date +%d_%m_20%y_at_%H_%M_%S)
+NO_MEASUREMENTS=20
+source gnbconfig.ini
+OAITEST_ARG="--dmax"   # default argument set for downlink throughput
+FILENAME_PREFIX=""     # default filename prefix set to null  
+
+print_help(){
+cat <<EOF
+UOP - DCS LAB author Manolis Bozis 2023
+Tool to perform measurements of throughput in DL and UL, using the oaitest script.
+Measurements are written to a file with a name starting with the defined prefix
+and a timestamp
+
+Usage:  $0 [OPTION]... [+VALUE] 
+  -d, --downlink               measure downlink maximum throughput
+  -u, --uplink                 measure uplink maximum throughput                         
+  -n, --num [value]            select number of measurements you want to perform
+  -p, --prefix [string]        define a prefix for the filename containing the measurements 
+  -h, --help                   print this help message
+EOF
+}
+
+######################## MAIN FUNCTION #####################################
+function main() {
+if [ "$*" == "" ]; then
+    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
+    print_help
+    exit 1
+fi
+
+# check arguments
+
+  until [ -z "$1" ]
+  do
+        case "$1" in
+       -d | --downlink)
+            OAITEST_ARG="--dmax"
+            FILENAME="dl_throughput_${MEASUREMENTS_FILE_TIMESTAMP}.txt"
+            shift;;   
+       -u | --uplink)
+            OAITEST_ARG="--umax"
+            FILENAME="ul_throughput_${MEASUREMENTS_FILE_TIMESTAMP}.txt"
+            shift;;
+       -n | --num)
+            if [[ ! -z $2 ]]; then
+            NO_MEASUREMENTS=$2
+            else
+            echo -e "${R} number of iterations is missing. Please provide number of measuremnts.${NOCOLOR}"
+            exit 1 
+            fi
+            shift 2;; 
+       -p | --prefix)
+            if [[ ! -z $2 ]]; then
+            FILENAME="$2${FILENAME}"
+            else
+            echo -e "${R} no prefix provided. set a prefix name after the -p argument ${NOCOLOR}"
+            exit 1 
+            fi
+            shift 2;;                                                        
+	-h | --help)
+            print_help
+            exit 0;;                     
+        *) 
+            exit
+            ;;
+    esac  
+  
+  done
+####### perform measurement ################################################
+if [[ ! -d  ${LOGS_FOLDER} ]] ; then
+echo -e "{R} log folder does not exist. creating folder...${NOCOLOR}"
+mkdir ${LOGS_FOLDER}
+fi
+for ((i=1; i<=${NO_MEASUREMENTS}; i++))
+do
+echo -e "test no: $i" | tee -a ${LOGS_FOLDER}/{FILENAME}
+./oaitest ${OAITEST_ARG} 2>/dev/null | grep "Mbits/sec" >> ${LOGS_FOLDER}/${FILENAME}
+sleep 1
+cat ${FILENAME} | grep "Mbits/sec" 
+done
+}
+############################################################################
+
+
+main "$@"
+
+
