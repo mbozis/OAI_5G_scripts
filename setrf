@@ -82,7 +82,7 @@ done
 set_internal(){
 for file in ${CONFIGURATION_FOLDER}/*
 do
-sed -i 's/clock_source=external/clock_source=internal/;s/time_source=external/time_source=internal/' ${file}
+sed -i 's/source=external/source=internal/g;s/source=gpsdo/source=internal/g' ${file}
 done
 }
 ###############################################################
@@ -90,7 +90,17 @@ done
 set_external(){
 for file in ${CONFIGURATION_FOLDER}/*
 do
-sed -i 's/clock_source=internal/clock_source=external/;s/time_source=internal/time_source=external/' ${file}
+sed -i 's/source=internal/source=external/g;s/source=gpsdo/source=external/g' ${file}
+done
+}
+###############################################################
+
+###############################################################
+### set external source for SDR in configuration file #########
+set_gpsdo(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i 's/source=internal/source=gpsdo/g;s/source=external/source=gpsdo/g' ${file}
 done
 }
 ###############################################################
@@ -132,6 +142,9 @@ fi
        -i | --internal_source)
             set_internal
             shift;;  
+       -g | --gpsdo_source)
+            set_gpsdo
+            shift;;               
        -v | --view)
             view_config
             exit 0;;     
