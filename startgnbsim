@@ -187,7 +187,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 ################## SCENARIO 10 #############################################
 ##################### SA mode band 78 tracer  ##############################
 sa_106prb_tracer(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
 --conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --T_stdout 2 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} \
@@ -198,7 +198,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 
 ######### Scenario 11 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_106prb_mimo(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
 --conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
@@ -206,9 +206,9 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.
 
 ######### Scenario 12 SA mode band 78 133 prb MIMO #########################
 sa_mimo_band78_133prb(){
-./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
 --conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 ############################################################################
@@ -337,8 +337,12 @@ if [[ ${LOG} -eq 1 ]]; then
 LOG_FILE_TIMESTAMP=$(date +%d_%m_20%y_at_%H_%M_%S)
 COMMAND="${COMMAND} 2>&1 |tee ${LOGS_FOLDER}/gnb_log_${LOG_FILE_TIMESTAMP}.txt"
 fi
-########## copy command to clipboard ######################
+##### add cpu affinity commannd in front of command to be executed ########
+COMMAND="${CPU_AFFINITY}${COMMAND}"
+########## copy command to clipboard ######################################
 echo -e "${COMMAND}" | xclip 
+########## copy command to file COMMAND ###################################
+echo ${COMMAND} > COMMAND
 # switch to softmodem binary file folder ##################
 echo ${USERFOLDER}
 cd ${USERFOLDER}/openairinterface5g
