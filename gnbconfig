@@ -57,6 +57,7 @@ Usage:  $0 [OPTION]... [+VALUE]
                            1 (default) --> 00101  TAC --> 0001
                            2           --> 50501  TAC --> 0001 
                            3           --> 20295  TAC --> 40960 
+  -c, --core-net           configure network settings in gNB if Core Network is deployed in different host                         
   -e, --editor             choose editor, combined with -s argument
                            1 (default) --> nano
                            2           --> gedit                                                        
@@ -158,6 +159,36 @@ done
 }
 
 
+config_net_ng(){
+################## change plmn and tac for all configuration files ########    
+
+
+if [[ -z "${CN_IP}" || -z "${GNB_NIC_TO_CN}" ]]; then
+ for file in ${CONFIGURATION_FOLDER}/*
+ do
+  sed -i "/GNB_INTERFACE_NAME_FOR_NG_AMF/c\        GNB_INTERFACE_NAME_FOR_NG_AMF            = \"demo-oai\";" ${file}
+  sed -i "/GNB_IPV4_ADDRESS_FOR_NG_AMF/c\          GNB_IPV4_ADDRESS_FOR_NG_AMF            = \"192.168.70.129/24\";" ${file}
+  sed -i "/GNB_INTERFACE_NAME_FOR_NGU/c\           GNB_INTERFACE_NAME_FOR_NGU            = \"demo-oai\";" ${file}
+  sed -i "/GNB_IPV4_ADDRESS_FOR_NGU/c\             GNB_IPV4_ADDRESS_FOR_NGU            = \"192.168.70.129/24\";" ${file}
+ done
+else
+ for file in ${CONFIGURATION_FOLDER}/*
+ do
+  sed -i "/GNB_INTERFACE_NAME_FOR_NG_AMF/c\        GNB_INTERFACE_NAME_FOR_NG_AMF            = \"${GNB_NIC_TO_CN}\";" ${file}
+  sed -i "/GNB_IPV4_ADDRESS_FOR_NG_AMF/c\          GNB_IPV4_ADDRESS_FOR_NG_AMF            = \"${GNB_HOST_IP_CIDR}\";" ${file}
+  sed -i "/GNB_INTERFACE_NAME_FOR_NGU/c\           GNB_INTERFACE_NAME_FOR_NGU            = \"${GNB_NIC_TO_CN}\";" ${file}
+  sed -i "/GNB_IPV4_ADDRESS_FOR_NGU/c\             GNB_IPV4_ADDRESS_FOR_NGU            = \"${GNB_HOST_IP_CIDR}\";" ${file}
+ done
+fi
+
+#sed -i "/tracking_area_code/c\     ${SELECTED_TAC}" ${file}
+
+############################################################################
+}
+
+
+
+
 ######################## MAIN FUNCTION #####################################
 function main() {
 
@@ -211,6 +242,9 @@ fi
 	    set_plmn
             ###########################################################
             shift 2;;   
+        -c | --core-net)
+            config_net_ng
+            shift;;
 	-h | --help)
             print_help
             exit 0;;
