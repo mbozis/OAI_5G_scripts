@@ -5,15 +5,11 @@
 # Manolis Bozis
 # scripts MUST run with root privillages
 # 
-#---------COLOR CODES --------------------
-R='\033[0;31m'   #'0;31' is Red's ANSI color code
-G='\033[0;32m'   #'0;32' is Green's ANSI color code
-NOCOLOR='\033[0m'
+source ueconfig.ini
 ###############################
 
 #######################  VARIABLES SECTION ###############################
 # the followin variable needs to be updated when new scenarios are added
-USERFOLDER="/home/manolis"
 # scenarios 8 and 9 are the same with 5, so the same function is executed,
 # given that TDD slot configuration is in the gNB side
 SCENARIOS=( "phytest" "phytestextended" "dora" "sa_band66" "sa_band78_106prb" "sa_band78_51prb" "sa_band77_273prb" \
@@ -49,7 +45,6 @@ the ethernet link between the 2 hosts  needs to be at least 10Gbps
 
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   start UE softmodem executing scenario number [value]
-                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
                            value is from the following table
                            -------------------------------------------------------------------
                           | 1 | physical layer test with one slot assigned for downlink       |
@@ -90,8 +85,8 @@ EOF
 #################### Physical layer test ###################################
 phytest(){
 # only 1 slot assigned for downlink
-RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
+COMMAND="RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf"
 }
 
 ############################################################################
@@ -107,8 +102,8 @@ phytestextended(){
 # Selections are MCS=27 PRBs=106  
 # and Bitmap of slots = 126 decimal = 01111110 binary that coresponds to slots 1,2,3,4,5 and 6
 # at the UE side we see the number of HACKs are 6 times greater than in 1st scenario
-RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
+COMMAND="RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf"
 }
 ############################################################################
 
@@ -116,8 +111,8 @@ RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test \
 ################## SCENARIO 3 ######### ####################################
 #################### Physical do-ra mode ###################################
 dora(){
-RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --do-ra \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf
+COMMAND="RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --do-ra \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf"
 }
 ############################################################################
 
@@ -134,8 +129,8 @@ sa_band66(){
 # --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
 
 # --------------------------- BAND 66 ---------------------------------------------------------------------------------------------
-FSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem -r 106 --numerology 1 --band 66 -C 2169080000 --CO -400000000 --ssb 396 \
--rfsim --sa --telnetsrv -O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+COMMAND="FSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem -r 106 --numerology 1 --band 66 -C 2169080000 --CO -400000000 --ssb 396 \
+-rfsim --sa --telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 ############################################################################
 
@@ -151,13 +146,11 @@ sa_band78_106prb(){
 
 # -------------------------- BAND 78 (gNB and ue on different host) ---------------------------------------------------------------
 #################  106 PRB #####################################################
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
-
-# --rfsim --sa --uicc0.imsi 001010000000001 --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 
 ################################################################################
 }
@@ -168,11 +161,11 @@ sa_band78_106prb(){
 #################### SA mode band 78 51prb  ################################
 # 51 PRB - usrp n310 #######################################################
 sa_band78_51prb(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 ############################################################################
 
@@ -180,86 +173,85 @@ sa_band78_51prb(){
 ################## SCENARIO 7 ##############################################
 #################### SA mode band 77 273prb  ###############################
 sa_band77_273prb(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports2.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 ############################################################################
 
 ################## SCENARIO 11 #############################################
 sa_band78_106prb_mimo(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 106 --numerology 1 --band 78 -C 3319680000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports2.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 # --uicc0.nssai_sd 0xFFFFFF
 }
 
 ################## SCENARIO 12 #############################################
 sa_band78_133prb_mimo(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports2.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 #-d
 }
 
 ############################################################################
 ################## SCENARIO 13 #############################################
 sa_band78_162prb_mimo(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports2.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
-#-d
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 
 ############################################################################
 ################## SCENARIO 14 #############################################
 sa_band78_217prb_mimo(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports2.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 
 ############################################################################
 
 ################## SCENARIO 15 #############################################
 sa_band78_133prb(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 
 ############################################################################
 
 ################## SCENARIO 16 #############################################
 sa_band78_162prb(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 
 ############################################################################
 
 ################## SCENARIO 17 #############################################
 sa_band78_217prb(){
-./nr-uesoftmodem \
+COMMAND="./nr-uesoftmodem \
 -r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
 --rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${USERFOLDER}/scripts/configuration/uecap/uecap_ports1.xml \
--O ${USERFOLDER}/scripts/configuration/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 
 ############################################################################
@@ -294,14 +286,6 @@ fi
                print_help
                exit 1 
 	    fi
-            ###########################################################
-
-	    # check if script is run with sudo privilages
-            SCRIPTUSER=$(whoami)
-            if [[ $SCRIPTUSER != "root" ]] ; then 
-               echo -e "${R}script must be run with sudo privilages\n${NOCOLOR}"
-            exit 1
-            fi
             ###########################################################
 
             # check if core network is up, executing a ping to AMF ####
@@ -345,9 +329,18 @@ fi
             ;;    
     esac
   done
-  
-# start nr=uesoftmodem program with selected parameters
- ${SCENARIOS["$SELECTED_SCENARIO"-1]}  
+# check if script is run with sudo privilages
+SCRIPTUSER=$(whoami)
+if [[ $SCRIPTUSER = "root" ]] ; then 
+echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
+echo -e "${R}remove sudo and execute again  \n${NOCOLOR}"               
+exit 1
+fi
+############# compose command with arguments for the specific scenario ####
+${SCENARIOS["$SELECTED_SCENARIO"-1]}  
+echo -e $COMMAND | xclip 
+# start execution of nr-softmodem for the selected scenario and PLMN   
+echo -e $(xclip -o) | sudo bash # execute command from clipboard  
 # end of script
 }
  
