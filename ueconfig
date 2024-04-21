@@ -46,7 +46,8 @@ Tool to configure UE softmodem for a particular PLMN using Open Air Interface
 Usage:  $0 [OPTION]... [+VALUE] 
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
-                           2           --> 20295 
+                           2           --> 50501
+                           3           --> 20895 
   -e, --editor             choose editor
                            1 (default) --> nano
                            2           --> gedit                                                        

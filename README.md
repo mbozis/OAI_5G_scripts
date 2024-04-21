@@ -3,6 +3,8 @@ Scripts and configuration files for Open Air Interface. This branch is for files
 
 Scripts were tested in Ubuntu 22.04 LTS environment.
 
+Before running the scripts, you need to make all necessary changes to environment variables stored in **ueconfig.ini** file to match you network setup.  The values of those variables will be imported from scripts at runtime.
+
 Run script **./startue** or **./startuesim** to start OAI nrUE with SDR device or RF simulator respectively.
 
 After a successful connection of the UE to 5G netowrk you can switch your internet connection through the 5G protocol stack running the script **./switch5G** . To go back to your broadband connection run **./switchBB** script.
@@ -16,8 +18,6 @@ the ethernet link between the 2 hosts  needs to be at least 10Gbps
 Usage:  ./startue [OPTION]... [+VALUE] 
 
   -s, --scenario [value]   start UE softmodem executing scenario number [value]
-                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
-                           value is from the following table
                            
                            -----------------------------------------------------------------
                           | 1 | standalone mode band 78 with 51prb (SISO)                     |
@@ -38,7 +38,7 @@ Usage:  ./startue [OPTION]... [+VALUE]
 
 ​                                1 (default) --> 00101
 
-​                                2                 --> 20295
+​                                2                 --> 50501
 
 ​                                3                 --> 20895  
 
@@ -61,8 +61,7 @@ the ethernet link between the 2 hosts  needs to be at least 10Gbps
 Usage:  ./startuesim [OPTION]... [+VALUE] 
 
   -s, --scenario [value]   start UE softmodem executing scenario number [value]
-                           YOU NEED TO RUN WITH SUDO PRIVILAGES FOR "-s" OPTION
-                           value is from the following table
+                 
                            
 
                                -------------------------------------------------------------------
@@ -138,9 +137,11 @@ Usage:  ./ueconfig [OPTION]... [+VALUE]
 
  -p, --plmn               PLMN selection
 
-​                           1 (default) --> 00101
+​                           1 (default) --> 001011 (default) --> 00101
 
-​                           2           --> 20295 
+​                           2                 --> 50501
+
+​                           3                 --> 20895 
 
   -e, --editor             choose editor
 
