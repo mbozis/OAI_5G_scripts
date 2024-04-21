@@ -3,6 +3,10 @@
 
 Scripts and configuration files for Open Air Interface SA testbed with two hosts.
 
+To explore the use cases and measurements performed with this testbed you can read the paper "A Versatile 5G Standalone Testbed Based On Commodity Hardware" under the following link 
+
+https://ieeexplore.ieee.org/document/10497086
+
 This branch contains the files for gNB and 5G core network host.
 The files for the UE host are in the **master_ue** branch.
 
@@ -14,7 +18,7 @@ To pull the 2.0.1 version of OAI 5GCN containers  follow the guidelines form the
 
 https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed/-/blob/master/docs/RETRIEVE_OFFICIAL_IMAGES.md?ref_type=heads
 
-**Add to config.ini file the correct IP assignments for the oaiue host and 5gcn host (it is the same ip as gnbhost if gnb and core network run on the same host) . Also make any needed changes to VARIABLES SECTION in each script to be in line with your local network setup.**
+**Add to gnbconfig.ini file the correct IP assignments for the oaiue host and 5gcn host (it is the same ip as gnbhost if gnb and core network run on the same host) . You can deploy 5G core network containers in a different host. For this you need to make all necessary changes to gnbconfig.ini and then run ./gnbconfig -c to set these changes to all gNB configuration files **
 
 Prerequisite packets are **openssh-server, iperf, speedometer, okla speedtest-cli, xclip, cpufreq-info, linux-tools-common, ethtool ** and **sensors**.
 
