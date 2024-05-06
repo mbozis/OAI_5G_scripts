@@ -9,7 +9,7 @@ source gnbconfig.ini
 ############################## VARIABLES SECTION #####################################
 # the followin variable needs to be updated when new scenarios are added
 SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
- "sa_band78_133prb" "sa_band78_162prb" )
+ "sa_band78_133prb" "sa_band78_162prb" "sa_band77_273_prb")
 re='^[0-9]+$'    # integer value for selected scenario to be checked
 PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_" )
 SELECTED_PLMN=1 # default PLMN is 00101
@@ -53,6 +53,7 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 7 | standalone mode band 78 with 133prb (MIMO 2x2)               |
                           | 8 | standalone mode band 78 with 133prb (SISO)                   |
                           | 9 | standalone mode band 78 with 162prb (SISO)                   |
+                          | 10| standalone mode band 77 with 273prb (SISO)                   |
                           -------------------------------------------------------------------
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
@@ -173,6 +174,14 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1
 ######### Scenario 9 SA mode band 78 162 prb  SISO ########################
 sa_band78_162prb(){
 COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+}
+############################################################################
+
+######### Scenario 10 SA mode band 77 273 prb  SISO ########################
+sa_band77_273_prb(){
+COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band77.fr1.273PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
@@ -307,7 +316,7 @@ else
 # check if script is run with sudo privilages    
 # start execution of nr-softmodem for the selected scenario and PLMN   
             cd ${GNB_EXEC_FOLDER}
-            echo -e "$(xclip -o)" | sudo bash  # execute command from clipboard     
+            cat ${USER_SCRIPTS_FOLDER}/COMMAND | sudo bash  # execute command from clipboard     
 fi    
 ###  change owner and group of newly created log file #############
 if [[ ${LOG} -eq 1 ]]; then
