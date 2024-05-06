@@ -141,6 +141,7 @@ Usage:  ./startgnb [OPTION]... [+VALUE]
                               | 7 | standalone mode band 78 with 133prb (MIMO 2x2)               |
                               | 8 | standalone mode band 78 with 133prb (SISO)                   |
                               | 9 | standalone mode band 78 with 162prb (SISO)                   |
+                              | 10| standalone mode band 77 with 273prb (SISO)                   |
                               -------------------------------------------------------------------
 
   -p, --plmn                      PLMN selection
@@ -202,7 +203,8 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
                           | 14| standalone mode band 78 with 217prb (2x2 MIMO)               |                      
                           | 15| standalone mode band 78 with 133prb (SISO)                   |                      
                           | 16| standalone mode band 78 with 162prb (SISO)                   |      
-                          | 17| standalone mode band 78 with 217prb (SISO)                   |                  
+                          | 17| standalone mode band 78 with 217prb (SISO)                   | 
+                          | 18| standalone mode band 77 with 273prb (SISO)                   |
                           -------------------------------------------------------------------
 
   -p, --plmn               PLMN selection
