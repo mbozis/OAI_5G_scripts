@@ -10,9 +10,12 @@ source ueconfig.ini
 # scenarios 3 and 4 are the same with 2, so the same function is executed,
 # given that TDD slot configuration is in the gNB side
 SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb" "sa_106prb" "sa_106prb" "sa_106prb_mimo" "sa_133prb_mimo" \
- "sa_band78_133prb" "sa_band78_162prb" )
+ "sa_band78_133prb" "sa_band78_162prb" "sa_band77_273prb" )
 
 PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_" )
+LOG=0
+LOG_FILE_TIMESTAMP=$(date +%d_%m_20%y_at_%H_%M_%S)
+
 SELECTED_PLMN=1 # default PLMN is 00101
 # PLMNs List ##############
 # PLMN1  --> 00101
@@ -59,12 +62,14 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 7 | standalone mode band 78 with 133prb (MIMO 2x2)                |
                           | 8 | standalone mode band 78 with 133prb (SISO)                    |
                           | 9 | standalone mode band 78 with 162prb (SISO)                    |
+                          | 10| standalone mode band 77 with 273prb (SISO)                    |
                           --------------------------------------------------------------------
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
                            2           --> 50501
                            3           --> 20295 
   -i, --info               show Open Air Interface version
+  -l, --log                write nr-uesoftmodem output to a log file with date and time stamp in scripts/logs folder
   -o, --scope              use nr-scope tool 
   -c, --command_line       exit script, copy selected scenario command to file COMMAND in current folder
                            and start a new terminal in OAI binaries folder. 
@@ -80,7 +85,7 @@ EOF
 sa_51prb(){
 COMMAND="./nr-uesoftmodem \
 -r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "mgmt_addr=192.168.20.2,addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+--sa --usrp-args "mgmt_addr=192.168.20.2,addr=192.168.20.2,clock_source=external,time_source=external" -A 45 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 
@@ -145,7 +150,7 @@ sa_band78_133prb(){
 COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
- --sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+ --sa --usrp-args "addr=192.168.20.2,clock_source=external,time_source=external" -A 45 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 
@@ -166,6 +171,17 @@ COMMAND="./nr-uesoftmodem \
 
 ############################################################################
 
+################## SCENARIO 10 #############################################
+sa_band77_273prb(){
+COMMAND="./nr-uesoftmodem \
+-r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
+--sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+ --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+ -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+
+############################################################################
 
 ######################## MAIN FUNCTION #####################################
 function main() {
@@ -240,7 +256,10 @@ fi
             shift 2;;  
         -o | --scope)
             NRSCOPE="-d"
-            shift;;     
+            shift;;  
+        -l | --log)
+            LOG=1
+            shift;;      
 	-h | --help)
             print_help
             exit 0;;
@@ -254,7 +273,6 @@ fi
   done
 ############# compose command with arguments for the specific scenario ####
 ${SCENARIOS["$SELECTED_SCENARIO"-1]}   
-echo -e $COMMAND | xclip 
 ###########################################################################
 # check if script is run with sudo privilages
 SCRIPTUSER=$(whoami)
@@ -263,6 +281,16 @@ echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
 echo -e "${R}when using the -c parameter \n${NOCOLOR}"               
 exit 1
 fi
+##### write to log file ################################################### 
+if [[ ${LOG} -eq 1 ]]; then
+COMMAND="${COMMAND} 2>&1 |tee ${LOGS_FOLDER}/ue_log_${LOG_FILE_TIMESTAMP}.txt"
+fi
+###########################################################################
+##### add cpu affinity commannd in front of command to be executed ########
+COMMAND="${CPU_AFFINITY}${COMMAND}"
+echo -e $COMMAND | xclip 
+echo -e $COMMAND > UE_COMMAND 
+
 ############# check if command is to be executed inside the script ########
 #############   or copied to clipboard                          ###########
 if [[ ${CL} -eq 1 ]]; then
@@ -283,6 +311,14 @@ else
             echo -e $(xclip -o) | sudo bash # execute command from clipboard     
 fi  
 ##############################################################################  
+###  change owner and group of newly created log file #############
+if [[ ${LOG} -eq 1 ]]; then
+cd ${LOGS_FOLDER}
+sudo chown ${USER} ue_log_${LOG_FILE_TIMESTAMP}.txt
+sudo chgrp ${USER} ue_log_${LOG_FILE_TIMESTAMP}.txt
+fi
+###################################################################
+
   }
  
   main "$@"
