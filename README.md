@@ -1,6 +1,12 @@
 # OAI_5G_scripts
 Scripts and configuration files for Open Air Interface. This branch is for files to be installed in oaiue host.
 
+To explore the use cases and measurements performed with  this testbed you can read the paper "A Versatile 5G Standalone Testbed  Based On Commodity Hardware" under the following link
+
+https://ieeexplore.ieee.org/document/10497086
+
+This branch contains the files for UE host. The files for the gNB host are in the **master_gnb** branch.
+
 Scripts were tested in Ubuntu 22.04 LTS environment.
 
 Before running the scripts, you need to make all necessary changes to environment variables stored in **ueconfig.ini** file to match you network setup.  The values of those variables will be imported from scripts at runtime.
@@ -32,6 +38,7 @@ Usage:  ./startue [OPTION]... [+VALUE]
                           | 7 | standalone mode band 78 with 133prb (MIMO 2x2)                |
                           | 8 | standalone mode band 78 with 133prb (SISO)                    |
                           | 9 | standalone mode band 78 with 162prb (SISO)                    |
+                          | 10| standalone mode band 78 with 273prb (SISO)                    |
                           ------------------------------------------------------------------
 
 -p, --plmn               PLMN selection
@@ -86,6 +93,7 @@ Usage:  ./startuesim [OPTION]... [+VALUE]
                               | 15| standalone mode band 78 with 133prb (SISO)                    |
                               | 16| standalone mode band 78 with 162prb (SISO)                    |
                               | 17| standalone mode band 78 with 217prb (SISO)                    |
+                              | 18| standalone mode band 78 with 273prb (SISO)                    |
                               --------------------------------------------------------------------
 
   -o, --scope              use nr-scope tool
