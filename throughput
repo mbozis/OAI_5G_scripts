@@ -76,10 +76,10 @@ mkdir ${LOGS_FOLDER}
 fi
 for ((i=1; i<=${NO_MEASUREMENTS}; i++))
 do
-echo -e "test no: $i" | tee -a ${LOGS_FOLDER}/{FILENAME}
+echo -e "test no: $i" | tee -a ${LOGS_FOLDER}/${FILENAME}
 ./oaitest ${OAITEST_ARG} 2>/dev/null | grep "Mbits/sec" >> ${LOGS_FOLDER}/${FILENAME}
 sleep 1
-cat ${FILENAME} | grep "Mbits/sec" 
+cat ${LOGS_FOLDER}/${FILENAME} | grep "Mbits/sec" 
 done
 }
 ############################################################################
