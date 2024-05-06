@@ -331,15 +331,10 @@ echo -e "stats_monitor.py script doesnot exist in ${GNB_EXEC_FOLDER}"
 echo -e "copying it from ${CI_SCRIPTS_FOLDER}"
 cp ${CI_SCRIPTS_FOLDER}stats_monitor.py ${GNB_EXEC_FOLDER}stats_monitor.py
 fi
-if ! test -f ${GNB_EXEC_FOLDER}stats_monitor.py; then
+if ! test -f ${GNB_EXEC_FOLDER}stats_monitor_conf.yaml; then
 echo -e "stats_monitor_conf.yaml file doesnot exist in ${GNB_EXEC_FOLDER}"
 echo -e "copying it from ${CI_SCRIPTS_FOLDER}"
 cp ${CI_SCRIPTS_FOLDER}stats_monitor_conf.yaml ${GNB_EXEC_FOLDER}stats_monitor_conf.yaml
-fi
-if ! test -f ${GNB_EXEC_FOLDER}gnb_stats_monitor.pickle; then
-echo -e "gnb_stats_monitor.pickle file doesnot exist in ${GNB_EXEC_FOLDER}"
-echo -e "copying it from ${CI_SCRIPTS_FOLDER}"
-cp ${CI_SCRIPTS_FOLDER}gnb_stats_monitor.pickle ${GNB_EXEC_FOLDER}gnb_stats_monitor.pickle
 fi
 ########################################################################################################
 # start stats_monitor.py script in nr-softmodem executable folder
