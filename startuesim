@@ -14,7 +14,7 @@ source ueconfig.ini
 # given that TDD slot configuration is in the gNB side
 SCENARIOS=( "phytest" "phytestextended" "dora" "sa_band66" "sa_band78_106prb" "sa_band78_51prb" "sa_band77_273prb" \
  "sa_band78_106prb" "sa_band78_106prb" "sa_band78_106prb" "sa_band78_106prb_mimo" "sa_band78_133prb_mimo" "sa_band78_162prb_mimo" \
- "sa_band78_217prb_mimo" "sa_band78_133prb" "sa_band78_162prb" "sa_band78_217prb" )
+ "sa_band78_217prb_mimo" "sa_band78_133prb" "sa_band78_162prb" "sa_band78_217prb" "sa_band77_273prb" )
 PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_" )
 SELECTED_PLMN=1 # default PLMN is 00101
 # PLMNs List ##############
@@ -68,6 +68,7 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 15| standalone mode band 78 with 133prb (SISO)                    |
                           | 16| standalone mode band 78 with 162prb (SISO)                    |
                           | 17| standalone mode band 78 with 217prb (SISO)                    |
+                          | 18| standalone mode band 77 with 273prb (SISO)                    |
                           --------------------------------------------------------------------
   -o, --scope              use nr-scope tool
   -p, --plmn               PLMN selection
@@ -255,6 +256,19 @@ COMMAND="./nr-uesoftmodem \
 }
 
 ############################################################################
+
+################## SCENARIO 18 #############################################
+sa_band77_273prb(){
+COMMAND="./nr-uesoftmodem \
+-r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+
+############################################################################
+
+
 
 ######################## MAIN FUNCTION #####################################
 function main() {
