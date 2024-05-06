@@ -1,0 +1,1 @@
+gnome-terminal --title="5G Link speed graph" -- speedometer -t oaitun_ue1 -r oaitun_ue1
