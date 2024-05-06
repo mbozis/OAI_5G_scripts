@@ -14,7 +14,8 @@ NOCOLOR='\033[0m'
 # the followin variable needs to be updated when new scenarios are added
 SCENARIOS=( "phytest" "phytestextended" "dora" "sa_band66" "sa_band78_106prb" "sa_band78_51prb" \
  "sa_band77_273prb" "sa_band78_106prb_TDD_1" "sa_band78_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" \
- "sa_mimo_band78_133prb" "sa_mimo_band78_162prb" "sa_mimo_band78_217prb" "sa_band78_133prb" "sa_band78_162prb" "sa_band78_217prb" )
+ "sa_mimo_band78_133prb" "sa_mimo_band78_162prb" "sa_mimo_band78_217prb" "sa_band78_133prb" "sa_band78_162prb" "sa_band78_217prb" \
+ "sa_band77_273prb" )
 re='^[0-9]+$'    # integer value for selected scenario to be checked
 PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_" )
 SELECTED_PLMN=1 # default PLMN is 00101
@@ -72,7 +73,8 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 14| standalone mode band 78 with 217prb (2x2 MIMO)               |                      
                           | 15| standalone mode band 78 with 133prb (SISO)                   |                      
                           | 16| standalone mode band 78 with 162prb (SISO)                   |      
-                          | 17| standalone mode band 78 with 217prb (SISO)                   |                  
+                          | 17| standalone mode band 78 with 217prb (SISO)                   |  
+                          | 18| standalone mode band 77 with 273prb (SISO)                   |                
                           -------------------------------------------------------------------
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
@@ -250,6 +252,16 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrp
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
+######### Scenarion 18 SA mode band 77 273 prb SISO ########################
+sa_band77_273prb(){
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+}
+############################################################################
+
+
+
 ######################## MAIN FUNCTION #####################################
 function main() {
 
