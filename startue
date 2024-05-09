@@ -84,7 +84,7 @@ EOF
 #################### 51 prb SA #############################################
 sa_51prb(){
 COMMAND="./nr-uesoftmodem \
--r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
+-r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 --ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
 --sa --usrp-args "mgmt_addr=192.168.20.2,addr=192.168.20.2,clock_source=external,time_source=external" -A 45 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
@@ -99,7 +99,7 @@ COMMAND="./nr-uesoftmodem \
 sa_106prb(){
 #################  106 PRB ######################################################
 COMMAND="./nr-uesoftmodem \
--r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 --ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
+-r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 --ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
 --sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45  \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
@@ -128,7 +128,7 @@ sa_106prb_mimo(){
 #################  106 PRB (2x2 MIMO) #########################################
 COMMAND="./nr-uesoftmodem \
 -r 106 --numerology 1 --band 78 -C 3319680000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation  \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation  \
 --sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
@@ -139,7 +139,7 @@ sa_133prb_mimo(){
 #################  1336 PRB (2x2 MIMO) #####################################
 COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
 --sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
@@ -149,7 +149,7 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_133prb(){
 COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
  --sa --usrp-args "addr=192.168.20.2,clock_source=external,time_source=external" -A 45 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
@@ -162,8 +162,8 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_162prb(){
 COMMAND="./nr-uesoftmodem \
 -r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
+--sa --usrp-args "addr=192.168.20.2,clock_source=external,time_source=external" -A 45 \
  --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
  -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 # --dlsch-parallel 3
@@ -175,7 +175,7 @@ COMMAND="./nr-uesoftmodem \
 sa_band77_273prb(){
 COMMAND="./nr-uesoftmodem \
 -r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain 0 --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
 --sa --usrp-args "addr=192.168.20.2,clock_source=internal,time_source=internal" -A 45 \
  --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
  -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
@@ -289,7 +289,7 @@ fi
 ##### add cpu affinity commannd in front of command to be executed ########
 COMMAND="${CPU_AFFINITY}${COMMAND}"
 echo -e $COMMAND | xclip 
-echo -e $COMMAND > UE_COMMAND 
+echo -e $COMMAND > ${USER_SCRIPTS_FOLDER}/UE_COMMAND 
 
 ############# check if command is to be executed inside the script ########
 #############   or copied to clipboard                          ###########
@@ -302,8 +302,7 @@ $(echo -e "${G}the command to start nr-softmodem was saved in file COMMAND in th
 EOF
             export COMMAND
             export OAI_FOLDER
-            export MESSAGE="to execute nr-softmodem copy and paste the following command to command line or type \$(xclip -o):\n "
-            echo -e "sudo ${COMMAND}" > ${USERFOLDER}/scripts/COMMAND            
+            export MESSAGE="to execute nr-softmodem copy and paste the following command to command line or type \$(xclip -o):\n "           
             # execute bash in the same environment to keep the current directory
             gnome-terminal --working-directory=${OAI_FOLDER} -- bash -c 'echo -e "${MESSAGE} sudo $COMMAND" ; bash'        
 else  
