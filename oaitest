@@ -310,11 +310,11 @@ UPF_UP=$?
 if [ $UPF_UP -eq 0 ]
 then
    echo -e "${G}UPF container is reachable${NOCOLOR}\n"
-   docker ps | grep spgwu-tiny
+   docker ps | grep spgwu-tiny > /dev/null
    if [ $? = 0 ] ; then
-   ssh ${CN_IP} "docker logs oai-spgwu-tiny 2>&1 | grep '''PFCP switch Packet Detection Rule list''' -A 20 -B 2 | tail -n 22"
+   ssh ${CN_IP} "docker logs oai-spgwu-tiny 2>&1 | tac | sed '''/PFCP switch Packet Detection Rule list/q''' | tac | sed '''/info/q''' | grep -v info"
    else
-   ssh ${CN_IP} "docker logs oai-upf 2>&1 | grep '''PFCP switch Packet Detection Rule list''' -A 20 -B 2 | tail -n 22"
+   ssh ${CN_IP} "docker logs oai-upf 2>&1 | tac | sed '''/PFCP switch Packet Detection Rule list/q''' | tac | sed '''/info/q''' | grep -v info"
    fi
 else
    echo -e "${R}UPF container is not accesible. Have you deployed 5GCN containers?${NOCOLOR}\n"
