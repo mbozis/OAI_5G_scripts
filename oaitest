@@ -25,11 +25,12 @@ CN_IP=$(hostname --ip-address | awk '{print $1}')
 # if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
 # CN host in the config.ini file
 fi
-
+ULMAXTHROUGHPUT=0
+DLMAXTHROUGHPUT=0
 #EXT_DN_IP="195.251.38.147" # Ip of oai-ext-dn container
 PING_COUNT=40 # number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
-TEST_TIME=20            # time interval to perform iperf test
+TEST_TIME=10            # time interval to perform iperf test
 AMF_APP_TIME="25s"      # AMF APP reporting period for connected gNBs and UEs
 MONITOR_FILENAMES="unspecified" # default name tp use for log and png files produced from stats_monitor.py (-m argument)
 #
@@ -234,7 +235,7 @@ fi
 # ssh to 5gcn VM and create traffic from ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
-ssh ${CN_IP} "docker exec oai-ext-dn iperf -B ${EXT_DN_IP} -c ${UE_IP} -t ${TEST_TIME}"
+ssh ${CN_IP} "docker exec oai-ext-dn iperf -B ${EXT_DN_IP} -c ${UE_IP} -t ${TEST_TIME} "
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
 ssh ${UE_HOST_IP} "pkill iperf"
@@ -370,7 +371,6 @@ function main() {
   UE_REGISTERED_FLAG=0; # set the initial value of the flag denoting the successful previous registration of UE to 5G network
   DOIPERFTESTUL=0
   DOIPERFTESTDL=0
-  TEST_TIME=5
 if [ "$*" == "" ]; then
     >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
     print_help
@@ -402,7 +402,7 @@ fi
             then
             checkUERegistration       
             fi
-            checkUplinkThroughput
+            ULMAXTHROUGHPUT=1 # flag to execute checkUplinkThroughput
             shift;;
        -u | --uplink)
             UPLINK_SPEED_TEST=$2
@@ -444,7 +444,7 @@ fi
             then
             checkUERegistration       
             fi
-            checkDownlinkThroughput
+            DLMAXTHROUGHPUT=1 # flag to execute checkDownlinkThroughput
             shift;;
        -d | --downlink)
             DOWNLINK_SPEED_TEST=$2
@@ -478,6 +478,14 @@ fi
 if [ ${DOIPERFTESTUL} == 1 ]
 then
 iperftestUL
+fi
+if [ ${DLMAXTHROUGHPUT} == 1 ]
+then
+checkDownlinkThroughput
+fi
+if [ ${ULMAXTHROUGHPUT} == 1 ]
+then
+checkUplinkThroughput
 fi
 #
   }
