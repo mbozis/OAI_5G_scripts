@@ -25,33 +25,48 @@ Usage:  ./startue [OPTION]... [+VALUE]
 
   -s, --scenario [value]   start UE softmodem executing scenario number [value]
                            
-                           -----------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb (SISO)                     |
-                          | 2 | standalone mode band 78 with 106prb  (SISO)                   |
-                          | 3 | standalone mode band 78 with 106 prb TDD slot configuration 1 |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 slots             |
-                          | 4 | standalone mode band 78 with 106 prb TDD slot configuration 2 |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 slots              |
-                          | 5 | standalone mode band 78 with 106prb and radio packets         |
-                          |   | capture with T Tracer                                         |
-                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)                |
-                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)                |
-                          | 8 | standalone mode band 78 with 133prb (SISO)                    |
-                          | 9 | standalone mode band 78 with 162prb (SISO)                    |
-                          | 10| standalone mode band 78 with 273prb (SISO)                    |
-                          ------------------------------------------------------------------
+                               ------------------------------------------------------------------
+                              | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                              | 2 | standalone mode band 78 with 106prb (SISO)                   |
+                              | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
+                              | 4 | standalone mode band 78 with 162prb (SISO)                   |      
+                              | 5 | standalone mode band 78 with 217prb (SISO)                   |  
+                              | 6 | standalone mode band 77 with 273prb (SISO)                   |   
+                              | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                              | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                              | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                              | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                              | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                              | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                              | 14| standalone mode band 66 with 106prb (SISO,FDD)               |        
+                              -------------------------------------------------------------------
 
--p, --plmn               PLMN selection
+  -p, --plmn               PLMN selection
 
-​                                1 (default) --> 00101
+​                           1 (default) --> 00101
 
-​                                2                 --> 50501
+​                           2           --> 50501
 
-​                                3                 --> 20895  
+​                           3           --> 20295 
 
- -i, --info               show Open Air Interface version
+  -i, --info               show Open Air Interface version
 
+  -l, --log                write nr-uesoftmodem output to a log file with date and time stamp in scripts/logs folder
 
+  -o, --scope              use nr-scope tool 
+
+  -c, --command_line       exit script, copy selected scenario command to file COMMAND in current folder
+
+​                           and start a new terminal in OAI binaries folder. 
+
+​                           -To view command before executing it type cat COMMAND in the command line. 
+
+​                           -To start gNB softmodem copy and paste command to new terminal window in OAI binaries folder
+
+​                           To go back to scripts folder type exit
 
   -h, --help               print this help message
 
@@ -71,48 +86,44 @@ Usage:  ./startuesim [OPTION]... [+VALUE]
                  
                            
 
-                               -------------------------------------------------------------------
-                              | 1 | physical layer test with one slot assigned for downlink       |
-                              | 2 | extended phy layer test with parameters changed               |
-                              |   | (parameters need to be changed directly to script code)       |
-                              | 3 | do-ra mode                                                    |
-                              | 4 | standalone mode band 66                                       |
-                              | 5 | standalone mode band 78 with 106prb (SISO)                    |
-                              | 6 | standalone mode band 78 with 51prb (SISO)                     |
-                              | 7 | standalone mode band 77 with 273prb (2x2 MIMO)                |
-                              | 8 | standalone mode band 78 with 106 prb TDD slot configuration 1 |
-                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 slots             |
-                              | 9 | standalone mode band 78 with 106 prb TDD slot configuration 2 |
-                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 slots              |
-                              | 10| standalone mode band 78 with 106prb and radio packets         |
-                              |   | capture with T Tracer                                         |
-                              | 11| standalone mode band 78 with 106prb (2x2 MIMO)                |
-                              | 12| standalone mode band 78 with 133prb (2x2 MIMO)                |
-                              | 13| standalone mode band 78 with 162prb (2x2 MIMO)                |
-                              | 14| standalone mode band 78 with 217prb (2x2 MIMO)                |
-                              | 15| standalone mode band 78 with 133prb (SISO)                    |
-                              | 16| standalone mode band 78 with 162prb (SISO)                    |
-                              | 17| standalone mode band 78 with 217prb (SISO)                    |
-                              | 18| standalone mode band 78 with 273prb (SISO)                    |
-                              --------------------------------------------------------------------
+                               ------------------------------------------------------------------
+                              | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                              | 2 | standalone mode band 78 with 106prb (SISO)                   |
+                              | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
+                              | 4 | standalone mode band 78 with 162prb (SISO)                   |      
+                              | 5 | standalone mode band 78 with 217prb (SISO)                   |  
+                              | 6 | standalone mode band 77 with 273prb (SISO)                   |   
+                              | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                              | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                              | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                              | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                              | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                              | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                              | 14| standalone mode band 66 with 106prb (SISO,FDD)               |
+                              | 15| do-ra mode: simualated 5G NSA connection with only 5G        |
+                              |   | terminals being present                                      |                      
+                              | 16| physical layer test with one slot assigned for downlink      |
+                              | 17| extended phy layer test with parameters changed              |
+                              |   | (parameters need to be changed directly to script code)      |        
+                              -------------------------------------------------------------------
+    
 
   -o, --scope              use nr-scope tool
 
-
-
   -p, --plmn               PLMN selection
 
+​                           1 (default) --> 00101
 
+​                           2           --> 50501                          
 
-​                                  1 (default) --> 00101
+​                           2           --> 20295 
 
-​                                  2                 --> 50501
+  -i, --info               show Open Air Interface version
 
-​                                  3                 -->  20895
-
- -i, --info               show Open Air Interface version
-
- -h, --help               print this help message
+  -h, --help               print this help message
 
 
 
@@ -123,33 +134,20 @@ Tool to configure UE softmodem for a particular scenario using Open Air Interfac
 -the ethernet link between the hosts and USRP N310 devices must be at least 10Gbps 
 
 Usage:  ./ueconfig [OPTION]... [+VALUE] 
-  -s, --scenario [value]   edit gnb softmodem configuration file for a specific scenario
-                           value is from the following table
+UOP - DCS LAB author Manolis Bozis 2023
+Tool to configure UE softmodem for a particular PLMN using Open Air Interface
+-the 2 hosts run OAI nrUE and nrgNB respectively.
+-the ethernet link between the hosts and USRP N310 devices must be at least 10Gbps 
 
-                           -------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb (SISO)                     |
-                          | 2 | standalone mode band 78 with 106prb  (SISO)                   |
-                          | 3 | standalone mode band 78 with 106 prb TDD slot configuration 1 |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 slots             |
-                          | 4 | standalone mode band 78 with 106 prb TDD slot configuration 2 |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 slots              |
-                          | 5 | standalone mode band 78 with 106prb and radio packets         |
-                          |   | capture with T Tracer                                         |
-                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)                |
-                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)                |
-                          | 8 | standalone mode band 78 with 133prb (SISO)                    |
-                          | 9 | standalone mode band 78 with 162prb (SISO)                    |
-                          --------------------------------------------------------------------
+Usage:  ./ueconfig [OPTION]... [+VALUE] 
 
+  -p, --plmn               PLMN selection
 
+​                           1 (default) --> 00101
 
- -p, --plmn               PLMN selection
+​                           2           --> 50501
 
-​                           1 (default) --> 001011 (default) --> 00101
-
-​                           2                 --> 50501
-
-​                           3                 --> 20895 
+​                           3           --> 20895 
 
   -e, --editor             choose editor
 
