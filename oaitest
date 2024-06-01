@@ -430,10 +430,10 @@ fi
             monitor
             shift 2;;
        --stats)
-            if [ ${UE_REGISTERED_FLAG} -ne 1 ]
-            then
-            checkUERegistration       
-            fi
+            #if [ ${UE_REGISTERED_FLAG} -ne 1 ]
+            #then
+            #checkUERegistration       
+            #fi
             if [ ! -z $2 ] ; then
             PROTOCOL_LAYER=$2
             fi
