@@ -18,7 +18,7 @@ To pull the 2.0.1 version of OAI 5GCN containers  follow the guidelines form the
 
 https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed/-/blob/master/docs/RETRIEVE_OFFICIAL_IMAGES.md?ref_type=heads
 
-**Add to gnbconfig.ini file the correct IP assignments for the oaiue host and 5gcn host (it is the same ip as gnbhost if gnb and core network run on the same host) . You can deploy 5G core network containers in a different host. For this you need to make all necessary changes to gnbconfig.ini and then run ./gnbconfig -c to set these changes to all gNB configuration files **
+**Start by editing gnb config.ini file in your gNB host and make all necessary changes to be in line with your network setup. Add to gnbconfig.ini file the correct IP assignments for the oaiue host and 5gcn host (it is the same ip as gnbhost if gnb and core network run on the same host) . You can deploy 5G core network containers in a different host. For this you need to make all necessary changes to gnbconfig.ini and then run ./gnbconfig -c to set these changes to all gNB configuration files **
 
 Prerequisite packets are **openssh-server, iperf, speedometer, okla speedtest-cli, xclip, cpufreq-info, linux-tools-common, ethtool ** and **sensors**.
 
@@ -128,42 +128,49 @@ Usage:  ./startgnb [OPTION]... [+VALUE]
 
    value is from the following table
 
-                               ------------------------------------------------------------------
-                              | 1 | standalone mode band 78 with 51prb (SISO)                    |
+                              --------------------------------------------------------------------
+                              | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
                               | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                              | 3 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots (SISO)     |
-                              | 4 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots  (SISO)     |
-                              | 5 | standalone mode band 78 with 106prb and radio packets        |
-                              |   | capture with T Tracer  (SISO)                                |
-                              | 6 | standalone mode band 78 with 106prb (MIMO 2x2)               |
-                              | 7 | standalone mode band 78 with 133prb (MIMO 2x2)               |
-                              | 8 | standalone mode band 78 with 133prb (SISO)                   |
-                              | 9 | standalone mode band 78 with 162prb (SISO)                   |
-                              | 10| standalone mode band 77 with 273prb (SISO)                   |
-                              -------------------------------------------------------------------
+                              | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
+                              | 4 | standalone mode band 78 with 162prb (SISO)                   |      
+                              | 5 | standalone mode band 78 with 217prb (SISO)                   |  
+                              | 6 | standalone mode band 77 with 273prb (SISO)                   |   
+                              | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                              | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                              | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                              | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                              | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                              | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                              | 14| standalone mode band 66 with 106prb (SISO,FDD)               |      
+                              --------------------------------------------------------------------
+    
 
-  -p, --plmn                      PLMN selection
+  -p, --plmn               PLMN selection
 
-​                                         1 (default) --> 00101
+​                           1 (default) --> 00101
 
-​                                         2                 --> 50501
+​                           2           --> 50501
 
-​                                         3                 --> 20295   
+​                           3           --> 20295 
 
-  -o, --scope                     use nr-scope tool              
+  -o, --scope              use nr-scope tool 
 
-  -l, --log                           write nr-softmodem output to a log file with date and time stamp in scripts/logs folder        
+  -t, --tracer             use tracer tool to capture packets
 
+  -l, --log                write nr-softmodem output to a log file with date and time stamp in scripts/logs folder                 
 
-  -i, --info                          show Open Air Interface version
+  -i, --info               show Open Air Interface version
 
-  -h, --help                        print this help message
+  -h, --help               print this help message
 
-  -c, --command_line      exit script, copy selected scenario command to a text file named COMMAND in the same folder
-                                         -To view command before executing it type $(echo -e "${G}cat COMMAND${NOCOLOR}") in the command line. 
-                                         -To start gNB softmodem copy and paste command to new terminal window in OAI binaries folder
+  -c, --command_line       exit script, copy selected scenario command to a text file named COMMAND in the same folder
+
+​                           -To view command before executing it type cat COMMAND in the command line. 
+
+​                           -To start gNB softmodem copy and paste command to new terminal window in OAI binaries folder
 
 
 
@@ -182,46 +189,48 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
                            value is from the following table
                            
 
-                           -----------------------------------------------------------------
-                          | 1 | physical layer test with one slot assigned for downlink      |
-                          | 2 | extended phy layer test with parameters changed              |
-                          |   | (parameters need to be changed directly to script code)      |
-                          | 3 | do-ra mode                                                   |
-                          | 4 | standalone mode band 66                                      |
-                          | 5 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 6 | standalone mode band 78 with 51prb  (SISO)                   |
-                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |
-                          | 10| standalone mode band 78 with 106prb and radio packets        |
-                          |   | capture with T Tracer                                        |
-                          | 11| standalone mode band 78 with 106prb (2x2 MIMO)               |
-                          | 12| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 13| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 14| standalone mode band 78 with 217prb (2x2 MIMO)               |                      
-                          | 15| standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 16| standalone mode band 78 with 162prb (SISO)                   |      
-                          | 17| standalone mode band 78 with 217prb (SISO)                   | 
-                          | 18| standalone mode band 77 with 273prb (SISO)                   |
-                          -------------------------------------------------------------------
+                               ------------------------------------------------------------------
+                              | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                              | 2 | standalone mode band 78 with 106prb (SISO)                   |
+                              | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
+                              | 4 | standalone mode band 78 with 162prb (SISO)                   |      
+                              | 5 | standalone mode band 78 with 217prb (SISO)                   |  
+                              | 6 | standalone mode band 77 with 273prb (SISO)                   |   
+                              | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                              | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                              | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                              | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                              | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                              | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                              | 14| standalone mode band 66 with 106prb (SISO,FDD)               |   
+                              | 15| do-ra mode: simulated 5G NSA connection with only 5G         |
+                              |   | terminals being present                                      |                                   
+                              | 16| physical layer test with one slot assigned for downlink      |
+                              | 17| extended phy layer test with parameters changed              |
+                              |   | (parameters need to be changed directly to script code)      |      
+                              -------------------------------------------------------------------
+    
 
   -p, --plmn               PLMN selection
 
-​                                  1 (default)   --> 00101
+​                           1 (default) --> 00101
 
-​                                  2                   --> 50501
+​                           2           --> 50501
 
-​                                  3                   --> 20295  
+​                           3           --> 20295  
 
-  -o, --scope               use nr-scope tool                              
+  -o, --scope              use nr-scope tool  
 
-  -i, --info                   show Open Air Interface version
+  -l, --log                write nr-softmodem output to a log file with date and time stamp in scripts/logs folder
 
-  -l, --log                     write nr-softmodem output to a log file with date and time stamp in scripts/logs folder    
+  -t, --tracer             capture with T Tracer tool                        
 
-  -h, --help                 print this help message
+  -i, --info               show Open Air Interface version
+
+  -h, --help               print this help message
 
 
 
@@ -303,39 +312,47 @@ Usage:  ./gnbconfig [OPTION]... [+VALUE]
                            number
                            value is from the following table
 
-                           ------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb (SISO)                    |
-                          | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 3 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots (SISO)     |
-                          | 4 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots  (SISO)     |
-                          | 5 | standalone mode band 78 with 106prb and radio packets        |
-                          |   | capture with T Tracer  (SISO)                                |
-                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)               |
-                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)               |
-                          | 8 | standalone mode band 78 with 133prb (SISO)                   |
-                          | 9 | standalone mode band 78 with 162prb (SISO)                   |
-                          -------------------------------------------------------------------
+                               ------------------------------------------------------------------
+                              | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                              | 2 | standalone mode band 78 with 106prb (SISO)                   |
+                              | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
+                              | 4 | standalone mode band 78 with 162prb (SISO)                   |      
+                              | 5 | standalone mode band 78 with 217prb (SISO)                   |  
+                              | 6 | standalone mode band 77 with 273prb (SISO)                   |   
+                              | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                              | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                              | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                              | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                              | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                              | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                              | 14| standalone mode band 66 with 106prb (SISO,FDD)               | 
+                               ------------------------------------------------------------------
+    
 
-  -p, --plmn              set PLMN and TAC settings
+  -p, --plmn               set PLMN and TAC settings
 
-​                                       1 (default) --> 00101  TAC --> 0001
+​                           1 (default) --> 00101  TAC --> 0001
 
-​                                       2           --> 50501  TAC --> 0001 
+​                           2           --> 50501  TAC --> 0001 
 
-​                                       3           --> 20295  TAC --> 40960 
+​                           3           --> 20295  TAC --> 40960 
+
+  --ul_max_mcs             set max MCS in Uplink                         
+
+  -c, --core-net           configure network settings in gNB if Core Network is deployed in different host                         
 
   -e, --editor             choose editor, combined with -s argument
 
-​                                       1 (default) --> nano
+​                            1 (default) --> nano
 
-​                                       2           --> gedit                               
+​                            2                 --> gedit                                                        
 
+  -i, --info               show Open Air Interface software version
 
-  -i, --info                  show Open Air Interface software version
-
-  -h, --help                print this help message
+  -h, --help               print this help message
 
 
 
