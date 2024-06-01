@@ -12,17 +12,7 @@ source ueconfig.ini
 # the followin variable needs to be updated when new scenarios are added
 # scenarios 8 and 9 are the same with 5, so the same function is executed,
 # given that TDD slot configuration is in the gNB side
-SCENARIOS=( "phytest" "phytestextended" "dora" "sa_band66" "sa_band78_106prb" "sa_band78_51prb" "sa_band77_273prb" \
- "sa_band78_106prb" "sa_band78_106prb" "sa_band78_106prb" "sa_band78_106prb_mimo" "sa_band78_133prb_mimo" "sa_band78_162prb_mimo" \
- "sa_band78_217prb_mimo" "sa_band78_133prb" "sa_band78_162prb" "sa_band78_217prb" "sa_band77_273prb" )
-PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_" )
-SELECTED_PLMN=1 # default PLMN is 00101
-# PLMNs List ##############
-# PLMN1  --> 00101
-# PLMN2  --> 50501
-# PLMN3  --> 20295
-###########################
-NRSCOPE="" # do not use nr-scope tool by default
+
 ###########################################################################
 
 ######### FUCTIONS ############
@@ -46,30 +36,29 @@ the ethernet link between the 2 hosts  needs to be at least 10Gbps
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   start UE softmodem executing scenario number [value]
                            value is from the following table
-                           -------------------------------------------------------------------
-                          | 1 | physical layer test with one slot assigned for downlink       |
-                          | 2 | extended phy layer test with parameters changed               |
-                          |   | (parameters need to be changed directly to script code)       |
-                          | 3 | do-ra mode                                                    |
-                          | 4 | standalone mode band 66                                       |
-                          | 5 | standalone mode band 78 with 106prb (SISO)                    |
-                          | 6 | standalone mode band 78 with 51prb (SISO)                     |
-                          | 7 | standalone mode band 77 with 273prb (2x2 MIMO)                |
-                          | 8 | standalone mode band 78 with 106 prb TDD slot configuration 1 |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 slots             |
-                          | 9 | standalone mode band 78 with 106 prb TDD slot configuration 2 |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 slots              |
-                          | 10| standalone mode band 78 with 106prb and radio packets         |
-                          |   | capture with T Tracer                                         |
-                          | 11| standalone mode band 78 with 106prb (2x2 MIMO)                |
-                          | 12| standalone mode band 78 with 133prb (2x2 MIMO)                |
-                          | 13| standalone mode band 78 with 162prb (2x2 MIMO)                |
-                          | 14| standalone mode band 78 with 217prb (2x2 MIMO)                |
-                          | 15| standalone mode band 78 with 133prb (SISO)                    |
-                          | 16| standalone mode band 78 with 162prb (SISO)                    |
-                          | 17| standalone mode band 78 with 217prb (SISO)                    |
-                          | 18| standalone mode band 77 with 273prb (SISO)                    |
-                          --------------------------------------------------------------------
+                           ------------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                          | 2 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 4 | standalone mode band 78 with 162prb (SISO)                   |      
+                          | 5 | standalone mode band 78 with 217prb (SISO)                   |  
+                          | 6 | standalone mode band 77 with 273prb (SISO)                   |   
+                          | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                          | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                          | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                          | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 14| standalone mode band 66 with 106prb (SISO,FDD)               |
+                          | 15| do-ra mode: simualated 5G NSA connection with only 5G        |
+                          |   | terminals being present                                      |                      
+                          | 16| physical layer test with one slot assigned for downlink      |
+                          | 17| extended phy layer test with parameters changed              |
+                          |   | (parameters need to be changed directly to script code)      |        
+                          -------------------------------------------------------------------
   -o, --scope              use nr-scope tool
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
@@ -79,46 +68,146 @@ Usage:  $0 [OPTION]... [+VALUE]
   -h, --help               print this help message
 EOF
 }
-
-
-
-############## SCENARIO 1 ##################################################-
-#################### Physical layer test ###################################
-phytest(){
-# only 1 slot assigned for downlink
-COMMAND="RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf"
+###################################### FUNCTION 3  ##########################
+# copy raw files from gNB host, to UE host execution folder for the RA process
+copy_raw_files(){
+scp ${GNB_HOST_USER}@${GNB_HOST_1GBPS_NIC_IP}:${GNB_EXEC_FOLDER}/*.raw ${GNB_EXEC_FOLDER}/
+if [[ $? -eq 0 ]] ; then
+echo -e "${G}raw Files successfully copied to destination folder ${NOCOLOR}"
+else
+echo -e "${G}raw Files could not be copied to destination folder ${NOCOLOR}"
+exitScript
+fi  
+sleep 2
 }
+##############################################################################
 
-############################################################################
-
-
-############## SCENARIO 2 ##################################################-
-#################### Physical layer test with parameters  ##################
-phytestextended(){
-#  new parameters added on gNB side scripts (startuesim)
-# -m     MCS (Modulation Coding Scheme)
-# -M     number of resource blocks asigned
-# -D     Bitmap of slots in downlink
-# Selections are MCS=27 PRBs=106  
-# and Bitmap of slots = 126 decimal = 01111110 binary that coresponds to slots 1,2,3,4,5 and 6
-# at the UE side we see the number of HACKs are 6 times greater than in 1st scenario
-COMMAND="RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --phy-test \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf"
+################## SCENARIO 1 ##############################################
+#################### SA mode band 78 51prb  ################################
+# 51 PRB - usrp n310 #######################################################
+sa_band78_51prb(){
+COMMAND="./nr-uesoftmodem \
+-r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 ############################################################################
 
-
-################## SCENARIO 3 ######### ####################################
-#################### Physical do-ra mode ###################################
-dora(){
-COMMAND="RFSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --do-ra \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf"
+################## SCENARIO 2 ##############################################
+#########  SA mode band 78 106prb  #########################################
+sa_band78_106prb(){
+# RFSIMULATOR=127.0.0.1 ./nr-uesoftmodem -O ${USERFOLDER}/scripts/ue.conf -r 106 --numerology 1 --band 78 -C 3619200000 \
+# --nokrnmod --rfsim --sa --uicc0.imsi 001010000000001 --uicc0.nssai_sd 1 \
+# -d --telnetsrv --rfsimulator.options chanmod --rfsimulator.modelname rfsimu_channel_gnb0 
+COMMAND="./nr-uesoftmodem \
+-r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+################################################################################
 }
 ############################################################################
 
+################## SCENARIO 3 ##############################################
+sa_band78_133prb(){
+COMMAND="./nr-uesoftmodem \
+-r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
 
 ################## SCENARIO 4 ##############################################
+sa_band78_162prb(){
+COMMAND="./nr-uesoftmodem \
+-r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
+
+################## SCENARIO 5 ##############################################
+sa_band78_217prb(){
+COMMAND="./nr-uesoftmodem \
+-r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
+
+################## SCENARIO 6 ##############################################
+sa_band77_273prb(){
+COMMAND="./nr-uesoftmodem \
+-r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
+
+#### IMPORTANT !!! #########################################################
+#### SCENARIOS 7 and 8 are the same with scenario 2 ########################
+############################################################################
+
+################## SCENARIO 9 ##############################################
+sa_mimo_band78_106prb(){
+COMMAND="./nr-uesoftmodem \
+-r 106 --numerology 1 --band 78 -C 3319680000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+# --uicc0.nssai_sd 0xFFFFFF
+}
+############################################################################
+
+################## SCENARIO 10 #############################################
+sa_mimo_band78_133prb(){
+COMMAND="./nr-uesoftmodem \
+-r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+#-d
+}
+
+############################################################################
+################## SCENARIO 11 #############################################
+sa_mimo_band78_162prb(){
+COMMAND="./nr-uesoftmodem \
+-r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+
+############################################################################
+
+################## SCENARIO 12 #############################################
+sa_mimo_band78_217prb(){
+COMMAND="./nr-uesoftmodem \
+-r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
+
+################## SCENARIO 13 ##############################################
+#################### SA mode band 77 273prb  ###############################
+sa_mimo_band77_273prb(){
+COMMAND="./nr-uesoftmodem \
+-r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
+--rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
+
+################## SCENARIO 14 ##############################################
 #################### SA mode band 66 #######################################
 sa_band66(){
 # band 66 
@@ -135,138 +224,40 @@ COMMAND="FSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem -r 106 --numero
 }
 ############################################################################
 
-
-################## SCENARIO 5 ##############################################
-#########  SA mode band 78 106prb  ###############################
-# 106 PRB - usrp n310 ######################################################
-sa_band78_106prb(){
-# -------------------------- BAND 78 (gNB and UE on the same host) ----------------------------------------------------------------
-# RFSIMULATOR=127.0.0.1 ./nr-uesoftmodem -O ${USERFOLDER}/scripts/ue.conf -r 106 --numerology 1 --band 78 -C 3619200000 \
-# --nokrnmod --rfsim --sa --uicc0.imsi 001010000000001 --uicc0.nssai_sd 1 \
-# -d --telnetsrv --rfsimulator.options chanmod --rfsimulator.modelname rfsimu_channel_gnb0 
-
-# -------------------------- BAND 78 (gNB and ue on different host) ---------------------------------------------------------------
-#################  106 PRB #####################################################
-COMMAND="./nr-uesoftmodem \
--r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-
-################################################################################
+################## SCENARIO 15 ######### ####################################
+#################### Physical do-ra mode ###################################
+dora(){
+copy_raw_files
+COMMAND="LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --rfsimulator.serveraddr ${GNB_HOST_10GBPS_NIC_IP} --do-ra"
 }
 ############################################################################
 
-
-################## SCENARIO 6 ##############################################
-#################### SA mode band 78 51prb  ################################
-# 51 PRB - usrp n310 #######################################################
-sa_band78_51prb(){
-COMMAND="./nr-uesoftmodem \
--r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-}
-############################################################################
-
-
-################## SCENARIO 7 ##############################################
-#################### SA mode band 77 273prb  ###############################
-sa_band77_273prb(){
-COMMAND="./nr-uesoftmodem \
--r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-}
-############################################################################
-
-################## SCENARIO 11 #############################################
-sa_band78_106prb_mimo(){
-COMMAND="./nr-uesoftmodem \
--r 106 --numerology 1 --band 78 -C 3319680000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-# --uicc0.nssai_sd 0xFFFFFF
-}
-
-################## SCENARIO 12 #############################################
-sa_band78_133prb_mimo(){
-COMMAND="./nr-uesoftmodem \
--r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-#-d
-}
-
-############################################################################
-################## SCENARIO 13 #############################################
-sa_band78_162prb_mimo(){
-COMMAND="./nr-uesoftmodem \
--r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-}
-
-############################################################################
-################## SCENARIO 14 #############################################
-sa_band78_217prb_mimo(){
-COMMAND="./nr-uesoftmodem \
--r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+############## SCENARIO 16 ##################################################-
+#################### Physical layer test ###################################
+phytest(){
+# only 1 slot assigned for downlink
+copy_raw_files
+COMMAND="LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --rfsimulator.serveraddr ${GNB_HOST_10GBPS_NIC_IP} --phy-test" 
 }
 
 ############################################################################
 
-################## SCENARIO 15 #############################################
-sa_band78_133prb(){
-COMMAND="./nr-uesoftmodem \
--r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-}
 
+############## SCENARIO 17 ##################################################-
+#################### Physical layer test with parameters  ##################
+phytestextended(){
+#  new parameters added on gNB side scripts (startuesim)
+# -m     MCS (Modulation Coding Scheme)
+# -M     number of resource blocks asigned
+# -D     Bitmap of slots in downlink
+# Selections are MCS=27 PRBs=106  
+# and Bitmap of slots = 126 decimal = 01111110 binary that coresponds to slots 1,2,3,4,5 and 6
+# at the UE side we see the number of HACKs are 6 times greater than in 1st scenario
+copy_raw_files
+COMMAND="LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --rfsimulator.serveraddr ${GNB_HOST_10GBPS_NIC_IP} --phy-test"
+}
 ############################################################################
 
-################## SCENARIO 16 #############################################
-sa_band78_162prb(){
-COMMAND="./nr-uesoftmodem \
--r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-}
-
-############################################################################
-
-################## SCENARIO 17 #############################################
-sa_band78_217prb(){
-COMMAND="./nr-uesoftmodem \
--r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-}
-
-############################################################################
-
-################## SCENARIO 18 #############################################
-sa_band77_273prb(){
-COMMAND="./nr-uesoftmodem \
--r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
--O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-}
-
-############################################################################
 
 
 
@@ -357,43 +348,6 @@ echo -e $COMMAND | xclip
 echo -e $(xclip -o) | sudo bash # execute command from clipboard  
 # end of script
 }
- 
   main "$@"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
