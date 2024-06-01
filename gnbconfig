@@ -8,9 +8,7 @@
 source gnbconfig.ini
 
 ############################## VARIABLES SECTION #####################################
-# the followin variable needs to be updated when new scenarios are added
-SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
- "sa_band78_133prb" "sa_band78_162prb" )
+
 EDITORS=( "nano" "gedit" )
 SELECTED_EDITOR=1 # default editor is nano
 re='^[0-9]+$'    # integer value for selected scenario to be checked
@@ -40,23 +38,29 @@ Usage:  $0 [OPTION]... [+VALUE]
                            value is from the following table
                            
                            ------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb (SISO)                    |
+                          | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
                           | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 3 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots (SISO)     |
-                          | 4 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots  (SISO)     |
-                          | 5 | standalone mode band 78 with 106prb and radio packets        |
-                          |   | capture with T Tracer  (SISO)                                |
-                          | 6 | standalone mode band 78 with 106prb (MIMO 2x2)               |
-                          | 7 | standalone mode band 78 with 133prb (MIMO 2x2)               |
-                          | 8 | standalone mode band 78 with 133prb (SISO)                   |
-                          | 9 | standalone mode band 78 with 162prb (SISO)                   |
-                          -------------------------------------------------------------------
+                          | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 4 | standalone mode band 78 with 162prb (SISO)                   |      
+                          | 5 | standalone mode band 78 with 217prb (SISO)                   |  
+                          | 6 | standalone mode band 77 with 273prb (SISO)                   |   
+                          | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                          | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                          | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                          | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 14| standalone mode band 66 with 106prb (SISO,FDD)               | 
+                           ------------------------------------------------------------------
+                          
   -p, --plmn               set PLMN and TAC settings
                            1 (default) --> 00101  TAC --> 0001
                            2           --> 50501  TAC --> 0001 
                            3           --> 20295  TAC --> 40960 
+  --ul_max_mcs             set max MCS in Uplink                         
   -c, --core-net           configure network settings in gNB if Core Network is deployed in different host                         
   -e, --editor             choose editor, combined with -s argument
                            1 (default) --> nano
@@ -66,69 +70,6 @@ Usage:  $0 [OPTION]... [+VALUE]
 EOF
 }
 #################################################
-
-
-############## SCENARIO 1 ##################################################
-############## 51 PRB SA  ##################################################
-sa_51prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51prb.usrpn310.conf
-#
-}
-############################################################################
-
-############## SCENARIO 2 ##################################################
-#########           106 PRB SA           ###################################
-sa_106prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf 
-}
-############################################################################
-
-
-############## SCENARIO 3 ##################################################
-##################### SA mode band 78 106prb TDD 1  ########################
-sa_106prb_TDD_1(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf
-}
-############################################################################
-
-
-############## SCENARIO 4 ##################################################
-##################### SA mode band 78 106prb TDD 2  ########################
-sa_106prb_TDD_2(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf
-}
-############################################################################
-
-############## SCENARIO 5 ##################################################-
-sa_106prb_tracer(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf
-}
-
-############################################################################
-
-######### Scenario 6 SA mode band 78 106 prb (2x2 MIMO) ###################
-sa_106prb_mimo(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf
-}
-############################################################################
-
-######### Scenario 7 SA mode band 78 133 prb (2x2 MIMO)  ###################
-sa_133prb_mimo(){
-${EDITORS["$SELECTED_EDITOR"-1]} ${USERFOLDER}/scripts/configuration/gNB_SA_n78_133PRB.2x2_usrpn310.conf 
-}
-
-######## Scenario 8 SA mode band 78 133 prb SISO #########################
-sa_band78_133prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.133PRB.usrpn310.conf 
-}
-############################################################################
-
-############################################################################
-######### Scenario 9 SA mode band 78 162 prb  SISO ########################
-sa_band78_162prb(){
-${EDITORS["$SELECTED_EDITOR"-1]}  ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.162PRB.usrpn310.conf 
-}
-############################################################################
 
 
 set_plmn(){
@@ -187,7 +128,9 @@ fi
 }
 
 
-
+set_ul_max_mcs(){
+sed -i "/export UL_MAX_MCS/c\export UL_MAX_MCS=${SELECTED_UL_MAX_MCS}" gnbconfig.ini
+}
 
 ######################## MAIN FUNCTION #####################################
 function main() {
@@ -214,7 +157,7 @@ fi
        -s | --scenario)
 	    # check if scenario value is valid
             SELECTED_SCENARIO=$2
-            if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${#SCENARIOS[@]} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
+            if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${OTA_SCENARIOS} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
                echo -e "${R}selected senario is not valid\n${NOCOLOR}"
                print_help
                exit 1 
@@ -245,6 +188,17 @@ fi
         -c | --core-net)
             config_net_ng
             shift;;
+        --ul_max_mcs)
+            # check if selected UL max MCS is valid
+            SELECTED_UL_MAX_MCS=$2
+            if [[ ! $SELECTED_UL_MAX_MCS =~ $re ]] || [[ ${SELECTED_UL_MAX_MCS} -gt 27 ]] || [[ ${SELECTED_UL_MAX_MCS} -le 0 ]] ; then
+               echo -e "${R}selected UL max MCS is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+            set_ul_max_mcs
+            shift 2;;
 	-h | --help)
             print_help
             exit 0;;
@@ -255,7 +209,8 @@ fi
   done
 if [[ $START_EDITOR -eq 1 ]] ; then   
 # edit configuration file of the selected scenario
-${SCENARIOS["$SELECTED_SCENARIO"-1]}
+#${SCENARIOS["$SELECTED_SCENARIO"-1]}
+${EDITORS["$SELECTED_EDITOR"-1]}  ${CONFIGURATION_FOLDER}/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}
 fi 
 # end of script
   }
