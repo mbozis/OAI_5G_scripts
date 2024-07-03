@@ -129,24 +129,25 @@ Usage:  ./startgnb [OPTION]... [+VALUE]
    value is from the following table
 
                               --------------------------------------------------------------------
-                              | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                              | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                              | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
-                              | 4 | standalone mode band 78 with 162prb (SISO)                   |      
-                              | 5 | standalone mode band 78 with 217prb (SISO)                   |  
-                              | 6 | standalone mode band 77 with 273prb (SISO)                   |   
-                              | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                             
+                              | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                              | 3 | standalone mode band 78 with 106prb (SISO)                   |
+                              | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
+                              | 5 | standalone mode band 78 with 162prb (SISO)                   |      
+                              | 6 | standalone mode band 78 with 217prb (SISO)                   |  
+                              | 7 | standalone mode band 77 with 273prb (SISO)                   |   
+                              | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
                               |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                              | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                              | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
                               |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                              | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                              | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                              | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                              | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                              | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                              | 14| standalone mode band 66 with 106prb (SISO,FDD)               |      
+                              | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                              | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                              | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                              | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |      
                               --------------------------------------------------------------------
-    
+
 
   -p, --plmn               PLMN selection
 
@@ -190,29 +191,30 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
                            
 
                                ------------------------------------------------------------------
-                              | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                              | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                              | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
-                              | 4 | standalone mode band 78 with 162prb (SISO)                   |      
-                              | 5 | standalone mode band 78 with 217prb (SISO)                   |  
-                              | 6 | standalone mode band 77 with 273prb (SISO)                   |   
-                              | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                             
+                              | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                              | 3 | standalone mode band 78 with 106prb (SISO)                   |
+                              | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
+                              | 5 | standalone mode band 78 with 162prb (SISO)                   |      
+                              | 6 | standalone mode band 78 with 217prb (SISO)                   |  
+                              | 7 | standalone mode band 77 with 273prb (SISO)                   |   
+                              | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
                               |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                              | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                              | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
                               |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                              | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                              | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                              | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                              | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                              | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                              | 14| standalone mode band 66 with 106prb (SISO,FDD)               |   
-                              | 15| do-ra mode: simulated 5G NSA connection with only 5G         |
+                              | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                              | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                              | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                              | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |    
+                              | 16| do-ra mode: simulated 5G NSA connection with only 5G         |
                               |   | terminals being present                                      |                                   
-                              | 16| physical layer test with one slot assigned for downlink      |
-                              | 17| extended phy layer test with parameters changed              |
+                              | 17| physical layer test with one slot assigned for downlink      |
+                              | 18| extended phy layer test with parameters changed              |
                               |   | (parameters need to be changed directly to script code)      |      
                               -------------------------------------------------------------------
-    
+
 
   -p, --plmn               PLMN selection
 
@@ -313,24 +315,25 @@ Usage:  ./gnbconfig [OPTION]... [+VALUE]
                            value is from the following table
 
                                ------------------------------------------------------------------
-                              | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                              | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                              | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
-                              | 4 | standalone mode band 78 with 162prb (SISO)                   |      
-                              | 5 | standalone mode band 78 with 217prb (SISO)                   |  
-                              | 6 | standalone mode band 77 with 273prb (SISO)                   |   
-                              | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                             
+                              | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                              | 3 | standalone mode band 78 with 106prb (SISO)                   |
+                              | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
+                              | 5 | standalone mode band 78 with 162prb (SISO)                   |      
+                              | 6 | standalone mode band 78 with 217prb (SISO)                   |  
+                              | 7 | standalone mode band 77 with 273prb (SISO)                   |   
+                              | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
                               |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                              | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                              | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
                               |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                              | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                              | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                              | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                              | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                              | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                              | 14| standalone mode band 66 with 106prb (SISO,FDD)               | 
+                              | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                              | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                              | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                              | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |   
                                ------------------------------------------------------------------
-    
+
 
   -p, --plmn               set PLMN and TAC settings
 
