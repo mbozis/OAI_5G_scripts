@@ -30,26 +30,27 @@ Usage:  $0 [OPTION]... [+VALUE]
   -s, --scenario [value]   start gnb softmodem executing scenario number [value]
                            value is from the following table
                            ------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                          | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 4 | standalone mode band 78 with 162prb (SISO)                   |      
-                          | 5 | standalone mode band 78 with 217prb (SISO)                   |  
-                          | 6 | standalone mode band 77 with 273prb (SISO)                   |   
-                          | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                            
+                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
+                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
+                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
+                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
                           |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
                           |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                          | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                          | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                          | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 14| standalone mode band 66 with 106prb (SISO,FDD)               |   
-                          | 15| do-ra mode: simulated 5G NSA connection with only 5G         |
+                          | 10 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               |   
+                          | 16| do-ra mode: simulated 5G NSA connection with only 5G         |
                           |   | terminals being present                                      |                                              
-                          | 16| physical layer test with one slot assigned for downlink      |
-                          | 17| extended phy layer test with parameters changed              |
+                          | 17| physical layer test with one slot assigned for downlink      |
+                          | 18| extended phy layer test with parameters changed              |
                           |   | (parameters need to be changed directly to script code)      |      
                           -------------------------------------------------------------------
                                                  
@@ -65,8 +66,16 @@ Usage:  $0 [OPTION]... [+VALUE]
 EOF
 }
 
-
 ################## SCENARIO 1 ##############################################
+#################### SA mode band 78 51prb  ################################
+sa_band78_24prb(){
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.24PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
+--conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+}
+############################################################################
+
+################## SCENARIO 2 ##############################################
 #################### SA mode band 78 51prb  ################################
 sa_band78_51prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
@@ -75,7 +84,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.
 }
 ############################################################################
 
-################## SCENARIO 2 ##############################################
+################## SCENARIO 3 ##############################################
 #################### SA mode band 78 106prb  ###############################
 # 106 PRB - usrp n310 ######################################################
 # configuration file used also for OTA transmittion with USRP N310 SDR #####
@@ -88,7 +97,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 }
 ############################################################################
 
-################## SCENARIO 3 ##############################################
+################## SCENARIO 4 ##############################################
 ########### SA mode band 78 133 prb SISO ###################################
 sa_band78_133prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.133PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -97,7 +106,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.133PRB.usrp
 }
 ############################################################################
 
-################## SCENARIO 4 ##############################################
+################## SCENARIO 5 ##############################################
 ############# SA mode band 78 162 prb  SISO ################################
 sa_band78_162prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -106,7 +115,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.usrp
 }
 ############################################################################
 
-################## SCENARIO 5 ##############################################
+################## SCENARIO 6 ##############################################
 ######### Scenarion 17 SA mode band 78 217 prb SISO ########################
 sa_band78_217prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -115,7 +124,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrp
 }
 ############################################################################
 
-################## SCENARIO 6 ##############################################
+################## SCENARIO 7 ##############################################
 #################### SA mode band 77 273prb  ###############################
 sa_band77_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
@@ -124,7 +133,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrp
 }
 ############################################################################
 
-################## SCENARIO 7 ##############################################
+################## SCENARIO 8 ##############################################
 ##################### SA mode band 78 106prb TDD 1  ########################
 sa_band78_106prb_TDD_1(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -134,7 +143,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 ############################################################################
 
 
-################## SCENARIO 8 ##############################################
+################## SCENARIO 9 ##############################################
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_band78_106prb_TDD_2(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -143,7 +152,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 }
 ############################################################################
 
-################## SCENARIO 9 ##############################################
+################## SCENARIO 10 ##############################################
 ##################### SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_mimo_band78_106prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
@@ -152,7 +161,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.
 }
 ############################################################################
 
-################## SCENARIO 10 #############################################
+################## SCENARIO 11 #############################################
 ##################### SA mode band 78 133 prb MIMO #########################
 sa_mimo_band78_133prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -161,7 +170,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn31
 }
 ############################################################################
 
-################## SCENARIO 11 #############################################
+################## SCENARIO 12 #############################################
 ##################### SA mode band 78 162 prb  MIMO ########################
 sa_mimo_band78_162prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -170,7 +179,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.2x2.
 }
 ############################################################################
 
-################## SCENARIO 12 #############################################
+################## SCENARIO 13 #############################################
 ###################### SA mode band 78 217 prb MIMO ########################
 sa_mimo_band78_217prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -179,7 +188,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.2x2.
 }
 ############################################################################
 
-################## SCENARIO 13 #############################################
+################## SCENARIO 14 #############################################
 ######### Scenarion 18 SA mode band 77 273 prb MIMO ########################
 sa_mimo_band77_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
@@ -188,7 +197,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.
 }
 ############################################################################
 
-################## SCENARIO 14 ##############################################
+################## SCENARIO 15 ##############################################
 #################### SA mode band 66 #######################################
 sa_band66_106prb(){
 COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrpn300.conf \
@@ -202,7 +211,7 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band
 }
 ############################################################################
 
-################## SCENARIO 15 ######### ####################################
+################## SCENARIO 16 ######### ####################################
 #################### Physical do-ra mode ###################################
 dora(){
 COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.tm1.106PRB.usrpn300.conf \
@@ -210,7 +219,7 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.
 }
 ############################################################################
 
-############## SCENARIO 16 ##################################################
+############## SCENARIO 17 ##################################################
 #################### Physical layer test ###################################
 phytest(){
 # only 1 slot assigned for downlink
@@ -220,7 +229,7 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.
 }
 ############################################################################
 
-############## SCENARIO 17 ##################################################
+############## SCENARIO 18 ##################################################
 #################### Physical layer test with parameters  ##################
 phytestextended(){
 #  new parameters added

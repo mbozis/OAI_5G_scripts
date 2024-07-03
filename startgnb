@@ -21,22 +21,23 @@ Usage:  $0 [OPTION]... [+VALUE]
   -s, --scenario [value]   start gNB softmodem selecting scenario number [value]
                            value is from the following table
                           --------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                          | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 4 | standalone mode band 78 with 162prb (SISO)                   |      
-                          | 5 | standalone mode band 78 with 217prb (SISO)                   |  
-                          | 6 | standalone mode band 77 with 273prb (SISO)                   |   
-                          | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                            
+                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
+                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
+                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
+                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
                           |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
                           |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                          | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                          | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                          | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 14| standalone mode band 66 with 106prb (SISO,FDD)               |      
+                          | 10 | standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               |    
                           --------------------------------------------------------------------
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
@@ -54,12 +55,19 @@ EOF
 }
 #################################################
 
-
 ############## SCENARIO 1 ##################################################
+############## 24 PRB SA  ##################################################
+sa_band78_51prb(){
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
+############################################################################
+
+############## SCENARIO 2 ##################################################
 ############## 51 PRB SA  ##################################################
 sa_band78_51prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
- ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
 
 # --continuous-tx --MACRLCs.[0].ul_max_mcs 25 
@@ -87,53 +95,57 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.51p
 ############################################################################
 
 
-############## SCENARIO 2 ##################################################
+############## SCENARIO 3 ##################################################
 #########           106 PRB SA           ###################################
 sa_band78_106prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 
 ############################################################################
 
-######## Scenario 3 SA mode band 78 133 prb SISO #########################
+######## Scenario 4 SA mode band 78 133 prb SISO #########################
 sa_band78_133prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.133PRB.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.133PRB.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 4 SA mode band 78 162 prb  SISO ########################
+######### Scenario 5 SA mode band 78 162 prb  SISO ########################
 sa_band78_162prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 5 SA mode band 78 217 prb SISO ########################
+######### Scenario 6 SA mode band 78 217 prb SISO ########################
 sa_band78_217prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 6 SA mode band 77 273 prb  SISO ########################
+######### Scenario 7 SA mode band 77 273 prb  SISO ########################
 sa_band77_273_prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band77.fr1.273PRB.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-############## SCENARIO 7 ##################################################
+############## SCENARIO 8 ##################################################
 ##################### SA mode band 78 106prb TDD 1  ########################
 sa_band78_106prb_TDD_1(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -142,56 +154,62 @@ COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1
 ############## SCENARIO 8 ##################################################
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_band78_106prb_TDD_2(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 9 SA mode band 78 106 prb (2x2 MIMO) ###################
+######### Scenario 10 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_mimo_band78_106prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
---sa  --usrp-tx-thread-config 1 --thread-pool 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
+--sa  --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 10 SA mode band 78 133 prb (2x2 MIMO)  ###################
+######### Scenario 11 SA mode band 78 133 prb (2x2 MIMO)  ###################
 sa_mimo_band78_133prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gNB_SA_n78_133PRB.2x2_usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn310.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 11 SA mode band 78 162 prb (2x2 MIMO)  ###################
+######### Scenario 12 SA mode band 78 162 prb (2x2 MIMO)  ###################
 sa_mimo_band78_162prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.band78.sa.fr1.162PRB.2x2.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.2x2.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 12 SA mode band 78 217 prb (2x2 MIMO)  ###################
+######### Scenario 13 SA mode band 78 217 prb (2x2 MIMO)  ###################
 sa_mimo_band78_217prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band78.fr1.217PRB.2x2.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.2x2.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 13 SA mode band 77 273 prb (2x2 MIMO)  ###################
+######### Scenario 14 SA mode band 77 273 prb (2x2 MIMO)  ###################
 sa_mimo_band78_273prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
-######### Scenario 14 SA mode band 66 102 prb (SISO)  ###################
+######### Scenario 15 SA mode band 66 102 prb (SISO)  ###################
 sa_band66_106prb(){
-COMMAND="./nr-softmodem -O ${USERFOLDER}/scripts/configuration/gnb.sa.band66.fr1.106PRB.usrpn300.conf \
---sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrpn300.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
