@@ -128,7 +128,7 @@ fi
             shift 2;;     
         -r | --att_rx)
             SELECTED_RX_VALUE=$2
-            if [[ ! ${SELECTED_RX_VALUE} =~ $re ]] || [[ ${SELECTED_RX_VALUE} -gt 30 ]] || [[ ${SELECTED_RX_VALUE} -lt 0 ]] ; then
+            if [[ ! ${SELECTED_RX_VALUE} =~ $re ]] || [[ ${SELECTED_RX_VALUE} -gt 60 ]] || [[ ${SELECTED_RX_VALUE} -lt 0 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 0 to 30 \n${NOCOLOR}"
                print_help
                exit 1 

@@ -28,9 +28,9 @@ fi
 ULMAXTHROUGHPUT=0
 DLMAXTHROUGHPUT=0
 #EXT_DN_IP="195.251.38.147" # Ip of oai-ext-dn container
-PING_COUNT=40 # number of PING command iterations
+PING_COUNT=40 # default number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
-TEST_TIME=10            # time interval to perform iperf test
+TEST_TIME=10            # deafualt time interval to perform iperf test
 AMF_APP_TIME="25s"      # AMF APP reporting period for connected gNBs and UEs
 MONITOR_FILENAMES="unspecified" # default name tp use for log and png files produced from stats_monitor.py (-m argument)
 #
