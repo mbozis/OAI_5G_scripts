@@ -72,7 +72,7 @@ EOF
 ###################################### FUNCTION 3  ##########################
 # copy raw files from gNB host, to UE host execution folder for the RA process
 copy_raw_files(){
-scp ${GNB_HOST_USER}@${GNB_HOST_1GBPS_NIC_IP}:${GNB_EXEC_FOLDER}/*.raw ${GNB_EXEC_FOLDER}/
+scp ${GNB_HOST_USER}@${GNB_HOST_1GBPS_NIC_IP}:${OAI_EXEC_FOLDER}/*.raw ${OAI_EXEC_FOLDER}/
 if [[ $? -eq 0 ]] ; then
 echo -e "${G}raw Files successfully copied to destination folder ${NOCOLOR}"
 else
