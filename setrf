@@ -9,17 +9,6 @@
 # 2 --> 2.0.1
 source gnbconfig.ini
 
-VERSIONS=( "v_1_5" "v_2_0_1" )
-re='^[0-9]+$'    # integer value for selected scenario to be checked
-MODES=( "start" "stop" )
-SELECTED_VERSION=1 # default version is 1.5
-SCENARIOS=( "sa_51prb" "sa_106prb" "sa_106prb_TDD_1" "sa_106prb_TDD_2" "sa_106prb_tracer" "sa_106prb_mimo" "sa_133prb_mimo" \
- "sa_band78_133prb" "sa_band78_162prb" )
-CONF_FILES=( "gnb.sa.band78.51prb.usrpn310.conf" "gnb.band78.sa.fr1.106PRB.usrpn310.conf" "gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf" "gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf" \
- "gnb.band78.sa.fr1.106PRB.usrpn310.conf" "gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf" "gNB_SA_n78_133PRB.2x2_usrpn310.conf" "gnb.band78.sa.fr1.133PRB.usrpn310.conf" \
- "gnb.band78.sa.fr1.162PRB.usrpn310.conf" )
-PLMNS=( "PLMN_1_" "PLMN_2_" )
- # ${PLMNS["$SELECTED_PLMN"-1]}
 ###########################
 ###########################################################################
 #### FUNCTION 1 print help message  ############
@@ -46,14 +35,10 @@ EOF
 ##########       for every scenario             ###############
 view_config(){
 SCENARIO=1
-for file in ${CONF_FILES[@]}
+for file in ${CONFIGURATIONS[@]}
 do
   echo -e "${G}scenario: ${SCENARIO}${NOCOLOR}"
-#  for plmn in ${PLMNS[@]}
-#  do
-#  echo -e "${G}${plmn}${NOCOLOR}" | tr "_" " "
   grep -E 'att_tx|att_rx|sdr_addrs' ${CONFIGURATION_FOLDER}/${file}
-#  done
 ((SCENARIO++))
 echo "---------------------------------------------"
 done

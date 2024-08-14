@@ -60,7 +60,8 @@ EOF
 sa_band78_51prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+}
 ############################################################################
 
 ############## SCENARIO 2 ##################################################
@@ -68,7 +69,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.
 sa_band78_51prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 
 # --continuous-tx --MACRLCs.[0].ul_max_mcs 25 
 # -d  # uncomment the line to use scope
@@ -100,7 +101,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.
 sa_band78_106prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 
 ############################################################################
@@ -110,7 +111,7 @@ sa_band78_133prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.133PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -119,7 +120,7 @@ sa_band78_162prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -128,7 +129,7 @@ sa_band78_217prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -137,7 +138,7 @@ sa_band77_273_prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -146,7 +147,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrp
 sa_band78_106prb_TDD_1(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -156,7 +157,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 sa_band78_106prb_TDD_2(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -165,7 +166,7 @@ sa_mimo_band78_106prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
 --sa  --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -174,7 +175,7 @@ sa_mimo_band78_133prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -183,7 +184,7 @@ sa_mimo_band78_162prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.2x2.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -192,7 +193,7 @@ sa_mimo_band78_217prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.2x2.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -201,7 +202,7 @@ sa_mimo_band78_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -210,7 +211,7 @@ sa_band66_106prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrpn300.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -258,7 +259,7 @@ fi
             fi 
             ###########################################################
             # check cpu state #########################################
-            CPUCORES=$(lscpu | awk '/^CPU\(s\)\:/ {print $2}')
+            CPUCORES=$(lscpu | awk '/^CPU\(s\)/ {print $2}')
             for ((i=1; i < $CPUCORES+1 ; i++)); do
             CPU_INDEX=$(( $i -1 ))
             CURRENT_GOVERNOR=$(cat /sys/devices/system/cpu/cpu${CPU_INDEX}/cpufreq/scaling_governor)
@@ -366,6 +367,3 @@ fi
   }
 
 main "$@"
-
-
-
