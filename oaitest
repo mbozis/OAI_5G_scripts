@@ -52,20 +52,26 @@ ping -c 1 amf > /dev/null 2>&1
 CNHOST=$?
 if [ $CNHOST -eq 0 ]
   then
-   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} 2>&1 | grep '5GMM-REGISTERED' -A 5 -B 12" 2>/dev/null
+   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} 2>&1 | grep 'Connected'" >/dev/null
+   if [[ $? -eq 0 ]] ; then
+    echo -e "${G}gNB has been successfully connected to Core Network${NOCOLOR}"
+   else 
+    echo -e "${R}gNB has not been connected to Core Network${NOCOLOR}"
+   fi    
+   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} 2>&1 | grep '5GMM-REGISTERED' -A 5 -B 12" >/dev/null
    REGISTERED=$?
 #   clear (removed not to lose screen buffer data)
      if [ $REGISTERED -eq 0 ]
       then
-       echo -e "${G} UE has been registered successfully${NOCOLOR}\n"
+       echo -e "${G}UE has been registered successfully${NOCOLOR}"
        export UE_REGISTERED_FLAG=1 # flag to report successful registration to other functions
       else
-       echo -e "${R}UE has not been registered to Core Network${NOCOLOR}\n"
-       exitScript
+       echo -e "${R}UE has not been registered to Core Network${NOCOLOR}"
+       #exitScript
      fi
    else
        echo -e "${R}5G core network host is down or unreachable${NOCOLOR}\n"
-       exitScript
+       #exitScript
 fi
 # check UE IP assigned address
 ping -c 1 ${UE_HOST_IP} > /dev/null
@@ -77,16 +83,17 @@ if [ "${NRUEHOST}" -eq '0' ]
    UE_INET=$(ssh ${UE_HOST_IP} "ip a  | grep 12.1.1")
    if [ "${UE_INET}" == "" ]
      then 
-       echo -e "${R}UE has not been asigned an IP address${NOCOLOR}"
-       exitScript
+       echo -e "${R}UE IP address could not be retrieved${NOCOLOR}"
+       #exitScript
      else
        UE_IP=$(echo ${UE_INET} | tr '/' ' ' | cut -d " " -f 2)
        echo -e "${G}UE has been asigned IP address ${UE_IP}${NOCOLOR}"
      fi
    else
        echo -e "${R}UE host is down or unreachable${NOCOLOR}\n"
-       exitScript
+       #exitScript
 fi
+ssh ${CN_IP} "docker logs oai-amf | tac | sed '''/gNBs/q''' | tac" # display gNBs and UEs info
 }
 ##########################################################################
 
@@ -311,7 +318,7 @@ UPF_UP=$?
 if [ $UPF_UP -eq 0 ]
 then
    echo -e "${G}UPF container is reachable${NOCOLOR}\n"
-   docker ps | grep spgwu-tiny > /dev/null
+   docker ps | grep spgwu-tiny > /dev/null # check version of OAI core Network
    if [ $? = 0 ] ; then
    ssh ${CN_IP} "docker logs oai-spgwu-tiny 2>&1 | tac | sed '''/PFCP switch Packet Detection Rule list/q''' | tac | sed '''/info/q''' | grep -v info"
    else
@@ -356,7 +363,7 @@ display_stats(){
 ## check if needed files exist in nr-softmodem executable folder #######################################
 case "${PROTOCOL_LAYER}" in
        L1 | MAC | RRC)
-         watch -n 1 cat ${GNB_EXEC_FOLDER}nr${PROTOCOL_LAYER}_stats.log
+         watch -t -n 1 cat ${GNB_EXEC_FOLDER}nr${PROTOCOL_LAYER}_stats.log
          ;;
       *) 
          echo -e "${R} selected protocol value is left null or not supported. Select L1, MAC or RRC after --stats argument${NOCOLOR}"
@@ -381,7 +388,7 @@ fi
   do
     case "$1" in
        -c | --checkue)
-            echo "start checking UE registration to 5G network..."
+            #echo "start checking UE registration to 5G network..."
             checkUERegistration
             shift;;
        -s | --speedtest)
