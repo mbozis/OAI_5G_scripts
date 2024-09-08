@@ -2,7 +2,7 @@
 
 
 
-![gnbpanel](/home/manolis/scripts/gnbpanel.png)
+![gnbpanel](gnbpanel.png)
 
 
 
