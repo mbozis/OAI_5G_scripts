@@ -1,6 +1,10 @@
 # OAI_5G_scripts
 
-![](/home/manolis/scripts/gnbpanel.png)
+
+
+![gnbpanel](/home/manolis/scripts/gnbpanel.png)
+
+
 
 ![](./Diagram1n.png)
 
@@ -218,7 +222,7 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
                               | 19| extended phy layer test with parameters changed              |
                               |   | (parameters need to be changed directly to script code)      |      
                               -------------------------------------------------------------------
-    
+
 
 
   -p, --plmn               PLMN selection
@@ -309,7 +313,7 @@ Usage:  ./gnbconfig [OPTION]... [+VALUE]
                               | 15| standalone mode band 66 with 106prb (SISO,FDD)               | 
                               | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                           
                                ------------------------------------------------------------------
-    
+
 
  -p, --plmn                              set PLMN and TAC settings
                                                 1 (default) --> 00101  TAC --> 0001
