@@ -54,10 +54,11 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
                           | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
                           | 15| standalone mode band 66 with 106prb (SISO,FDD)               |
-                          | 16| do-ra mode: simualated 5G NSA connection with only 5G        |
+                          | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                       
+                          | 17| do-ra mode: simualated 5G NSA connection with only 5G        |
                           |   | terminals being present                                      |                      
-                          | 17| physical layer test with one slot assigned for downlink      |
-                          | 18| extended phy layer test with parameters changed              |
+                          | 18| Physical layer test with one slot assigned for downlink      |
+                          | 19| extended phy layer test with parameters changed              |
                           |   | (parameters need to be changed directly to script code)      |        
                           -------------------------------------------------------------------
   -o, --scope              use nr-scope tool
@@ -230,12 +231,32 @@ sa_band66(){
 # --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
 
 # --------------------------- BAND 66 ---------------------------------------------------------------------------------------------
-COMMAND="FSIMULATOR=127.0.0.1 LD_LIBRARY_PATH=. ./nr-uesoftmodem -r 106 --numerology 1 --band 66 -C 2169080000 --CO -400000000 --ssb 396 \
--rfsim --sa --telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+COMMAND="./nr-uesoftmodem -r 106 --numerology 1 --band 66 -C 2169080000 --CO -400000000 --ssb 378 \
+--rfsim --sa --non-stop --rfsimulator.serveraddr 192.168.0.1 \
+--telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 ############################################################################
 
-################## SCENARIO 16 ######### ####################################
+################# SCENARIO 16 ##############################################
+#################### SA mode band 71 #######################################
+sa_band71(){
+# band 71 
+# FDD
+# --numerology 0   (that means 15Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 2169080000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+
+# --------------------------- BAND 71 ---------------------------------------------------------------------------------------------
+COMMAND="./nr-uesoftmodem -r 106 --numerology 0 --band 71 -C 639540000 --CO 46000000 --ssb 456 \
+--rfsim --sa --non-stop --rfsimulator.serveraddr 192.168.0.1 \
+--telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+#  638650000
+############################################################################
+
+################## SCENARIO 17 ######### ####################################
 #################### Physical do-ra mode ###################################
 dora(){
 copy_raw_files
@@ -243,7 +264,7 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --rfsimulator.serveraddr ${G
 }
 ############################################################################
 
-############## SCENARIO 17 ##################################################-
+############## SCENARIO 18 ##################################################-
 #################### Physical layer test ###################################
 phytest(){
 # only 1 slot assigned for downlink
@@ -254,7 +275,7 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --rfsimulator.serveraddr ${G
 ############################################################################
 
 
-############## SCENARIO 18 ##################################################-
+############## SCENARIO 19 ##################################################-
 #################### Physical layer test with parameters  ##################
 phytestextended(){
 #  new parameters added on gNB side scripts (startuesim)
