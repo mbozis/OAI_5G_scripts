@@ -1,7 +1,7 @@
 #!/bin/bash
 # oai 5G testbed with USRP N310
 # UOP
-# DCS LAB Feb 2024
+# DCS LAB Sep 2024
 # Manolis Bozis
 # script to edit configuration files
 # load initial configuration values
@@ -9,16 +9,6 @@ source gnbconfig.ini
 
 ############################## VARIABLES SECTION #####################################
 
-EDITORS=( "nano" "gedit" )
-SELECTED_EDITOR=1 # default editor is nano
-re='^[0-9]+$'    # integer value for selected scenario to be checked
-PLMNS=( "PLMN_1_" "PLMN_2_" "PLMN_3_")
-SELECTED_PLMN=1 # default PLMN is 00101
-# PLMNs List ##############
-# PLMN1  --> 00101
-# PLMN1  --> 50501
-# PLMN2  --> 20295
-###########################
 START_EDITOR=0 # Flag (default value is 0 --> do not edit configuration file)
 
 ######################################################################################
@@ -34,26 +24,26 @@ the ethernet link between the host and SDR needs to be at least 10Gbps
 
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   edit gnb softmodem configuration file for a specific scenario
-                           number
-                           value is from the following table
-                           
+                           Scenarios are listed in the following table:                         
                            ------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                          | 2 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 3 | standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 4 | standalone mode band 78 with 162prb (SISO)                   |      
-                          | 5 | standalone mode band 78 with 217prb (SISO)                   |  
-                          | 6 | standalone mode band 77 with 273prb (SISO)                   |   
-                          | 7 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                       
+                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
+                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
+                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
+                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
                           |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 8 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
                           |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                          | 9 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                          | 10| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 11| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 12| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                          | 13| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 14| standalone mode band 66 with 106prb (SISO,FDD)               | 
+                          | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               | 
+                          | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                           
                            ------------------------------------------------------------------
                           
   -p, --plmn               set PLMN and TAC settings
@@ -64,13 +54,157 @@ Usage:  $0 [OPTION]... [+VALUE]
   -c, --core-net           configure network settings in gNB if Core Network is deployed in different host                         
   -e, --editor             choose editor, combined with -s argument
                            1 (default) --> nano
-                           2           --> gedit                                                        
+                           2           --> gedit     
+  -m, --mode               default mode to start the gnbpanel script
+                           1 USRP N310 device
+                           2 RF simulator  
+  -E,--external_source     specify SDR clock and time source as external
+  -I,--internal_source     specify SDR clock and time source as internal
+  -G,--gpsdo_source        specify SDR clock and time source as GPSDO  
+  -t  --att_tx [value]     specify attenuation value in dB (0 - 30) for transmitter                                
+                           example: $0 -t 10   
+  -r, --att_rx [value]     specify attenuation value in dB (0 - 30) for receiver
+                           example: $0 -r 15 
+  --max_rx_gain            specify max rx gain value in for the USRP N310 device (valid values are from 40 to 75)               
+  --pusch_snr              specify PUSCH target SNRx10 (valid values are from 100 to 500)
+  --pucch_snr              specify PUCCH target SNRx10 (valid values are from 100 to 500)
+  --ulsch_inactivity       specify ul_max_frame_inactivity value (from 0 to 20. The value of 0 achieves the best latency)             
+  -v, --view               view current values of parameters in all configuration files
+                           in conjunction with '-s' display parameters only for the selected scenario
+  -V  --view_ini           view settings in gnbconfig.ini file                                                                              
   -i, --info               show Open Air Interface software version
   -h, --help               print this help message
 EOF
 }
 #################################################
+########## view settings in configuration files ###############
+##########       for every scenario             ###############
+view_config(){
+if [[ -z "$SELECTED_SCENARIO" ]] ; then
+  #---------- view all scenarios ------------------------------
+  SCENARIO=1
+  for file in ${CONFIGURATIONS[@]}
+  do
+  echo -e "scenario: ${G}${SCENARIO} ${NOCOLOR}Configuration file: ${G}${file}${NOCOLOR}"
+  grep -E 'att_tx|att_rx|sdr_addrs|max_rxgain|plmn_list|tracking_area_code|pusch_TargetSNRx10|pucch_TargetSNRx10|ulsch_max_frame_inactivity' ${CONFIGURATION_FOLDER}/${file}
+  ((SCENARIO++))
+  echo "---------------------------------------------"
+  done
+else
+  echo -e "scenario: ${G}${SELECTED_SCENARIO} ${NOCOLOR}Configuration file: ${G}${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}${NOCOLOR}"
+  grep -E 'att_tx|att_rx|sdr_addrs|max_rxgain|plmn_list|tracking_area_code|pusch_TargetSNRx10|pucch_TargetSNRx10|ulsch_max_frame_inactivity' $CONFIGURATION_FOLDER/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}
+fi
 
+}
+###############################################################
+########## view settings in gnbconfig.ini file ################
+view_ini(){
+
+echo "----- Setitngs in gnbconfig.ini file --------"
+############################### Folders Configuration #########################################################
+echo "Scripts folder               : $USER_SCRIPTS_FOLDER"
+echo "Configuration files folder   : $CONFIGURATION_FOLDER"
+echo "Log files folder             : $LOGS_FOLDER"
+echo "capture files folder         : $CAPTURE_DIRECTORY"
+echo "gnb executables folder       : $GNB_EXEC_FOLDER"
+echo "CI scripts folder            : $CI_SCRIPTS_FOLDER"
+echo "---------------------------------------------"
+############################### Network Configuration #########################################################
+echo "Router IP                    : $ROUTER_IP"
+echo "External Data Network IP     : $EXT_DN_IP"
+echo "UPF IP                       : $UPF_IP"
+echo "Router IP                    : $UE_HOST_IP"
+echo "UE Host IP                   : $ROUTER_IP"
+echo "gNB host IP (CDR)            : $GNB_HOST_IP_CIDR"
+echo "---------------------------------------------"
+echo "UL max MCS                   : $UL_MAX_MCS"
+echo "DL max MCS                   : $DL_MAX_MCS"
+echo "Thread Pool                  : $(echo $THREAD_POOL | sed -e "s/^--thread-pool //")"
+echo "LDPC decoder iterations      : $(echo $LDPC_DECODER_ITERATIONS | cut -d' ' -f 2)"  
+if [ -z "$OAI_RA_FIX" ]; then
+echo "RF board timing advance      : Not set <--this is to compensate fix delay inside the RF board between Rx and Tx timestamps (RF board internal issues)" 
+ else
+echo "RF board timing advance      : $(echo $OAI_RA_FIX|cut -d' ' -f 2) <--this is to compensate fix delay inside the RF board between Rx and Tx timestamps (RF board internal issues)"  
+fi
+}
+###############################################################
+
+
+########## set max_rx_gain value in configuration file ########
+set_max_rx_gain(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i "/max_rxgain/c\     max_rxgain         = ${SELECTED_MAX_RX_GAIN};" ${file}
+done
+}
+###############################################################
+########## set PUSCH SNR value in configuration file ########
+set_pusch_snr(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i "/pusch_TargetSNRx10/c\     pusch_TargetSNRx10         = ${SELECTED_PUSCH_SNR};" ${file}
+done
+}
+###############################################################
+########## set PUCCH SNR value in configuration file ########
+set_pucch_snr(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i "/pucch_TargetSNRx10/c\     pucch_TargetSNRx10         = ${SELECTED_PUCCH_SNR};" ${file}
+done
+}
+###############################################################
+########## set ulsch_max_frame_inactivity value        ########
+set_ulsch_inactivity(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i "/ulsch_max_frame_inactivity/c\     ulsch_max_frame_inactivity = ${SELECTED_ULSCH_INACTIVITY};" ${file}
+done
+}
+###############################################################
+########## set att_tx value in configuration file #############
+set_att_tx(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i "/att_tx/c\     att_tx         = ${SELECTED_TX_VALUE};" ${file}
+done
+}
+###############################################################
+########## set att_rx value in configuration file #############
+set_att_rx(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i "/att_rx/c\     att_rx         = ${SELECTED_RX_VALUE};" ${file}
+done
+}
+###############################################################
+
+### set internal source for SDR in configuration file #########
+set_internal(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i 's/source=external/source=internal/g;s/source=gpsdo/source=internal/g' ${file}
+done
+}
+###############################################################
+### set external source for SDR in configuration file #########
+set_external(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i 's/source=internal/source=external/g;s/source=gpsdo/source=external/g' ${file}
+done
+}
+###############################################################
+
+###############################################################
+### set external source for SDR in configuration file #########
+set_gpsdo(){
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i 's/source=internal/source=gpsdo/g;s/source=external/source=gpsdo/g' ${file}
+done
+}
+###############################################################
 
 set_plmn(){
 case $SELECTED_PLMN in
@@ -142,6 +276,22 @@ if [ "$*" == "" ]; then
 fi
 ###########################################################
 
+function set_mode_for_panel(){
+####  write value of MODE_FOR_PANEL variable to gnbconfig.ini file ###
+case $SELECTED_MODE in
+    1)
+    sed -i "/MODE_FOR_PANEL=/c\export MODE_FOR_PANEL=\"./startgnb\"" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+    ;;
+    2)
+    sed -i "/MODE_FOR_PANEL=/c\export MODE_FOR_PANEL=\"./startgnbsim\"" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+    ;;
+    *)
+    exit
+    ;;
+esac
+
+######################################################################
+}
 # check arguments
 
   until [ -z "$1" ]
@@ -185,6 +335,16 @@ fi
 	    set_plmn
             ###########################################################
             shift 2;;   
+         -m | --mode)
+            SELECTED_MODE=$2
+            if [[ ! $SELECTED_MODE =~ $re ]] || [[ $SELECTED_MODE -gt 2 ]] || [[ $SELECTED_MODE -le 0 ]] ; then
+               echo -e "${R}selected mode is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+	    set_mode_for_panel
+            ###########################################################
+            shift 2;;               
         -c | --core-net)
             config_net_ng
             shift;;
@@ -199,6 +359,81 @@ fi
             ###########################################################
             set_ul_max_mcs
             shift 2;;
+          -t | --att_tx)
+            SELECTED_TX_VALUE=$2
+            if [[ ! ${SELECTED_TX_VALUE} =~ $re ]] || [[ ${SELECTED_TX_VALUE} -gt 60 ]] || [[ ${SELECTED_TX_VALUE} -lt 0 ]] ; then
+               echo -e "${R}selected value is not valid. Choose a value from 0 to 60 \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            set_att_tx
+            ###########################################################
+            shift 2;;     
+        -r | --att_rx)
+            SELECTED_RX_VALUE=$2
+            if [[ ! ${SELECTED_RX_VALUE} =~ $re ]] || [[ ${SELECTED_RX_VALUE} -gt 60 ]] || [[ ${SELECTED_RX_VALUE} -lt 0 ]] ; then
+               echo -e "${R}selected value is not valid. Choose a value from 0 to 30 \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            set_att_rx 
+            ###########################################################
+            shift 2;;    
+         --max_rx_gain)
+            SELECTED_MAX_RX_GAIN=$2
+            if [[ ! ${SELECTED_MAX_RX_GAIN} =~ $re ]] || [[ ${SELECTED_MAX_RX_GAIN} -gt 75 ]] || [[ ${SELECTED_MAX_RX_GAIN} -lt 40 ]] ; then
+               echo -e "${R}selected value is not valid. Choose a value from 40 to 75 for USRP N310 device \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            set_max_rx_gain 
+            ###########################################################
+            shift 2;;    
+         --pusch_snr)
+            SELECTED_PUSCH_SNR=$2
+            if [[ ! ${SELECTED_PUSCH_SNR} =~ $re ]] || [[ ${SELECTED_PUSCH_SNR} -gt 500 ]] || [[ ${SELECTED_PUSCH_SNR} -lt 100 ]] ; then
+               echo -e "${R}selected value is not valid. Choose a value from 100 to 500 \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            set_pusch_snr
+            ###########################################################
+            shift 2;; 
+         --pucch_snr)
+            SELECTED_PUCCH_SNR=$2
+            if [[ ! ${SELECTED_PUCCH_SNR} =~ $re ]] || [[ ${SELECTED_PUCCH_SNR} -gt 500 ]] || [[ ${SELECTED_PUCCH_SNR} -lt 100 ]] ; then
+               echo -e "${R}selected value is not valid. Choose a value from 100 to 500 \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            set_pucch_snr
+            ###########################################################
+            shift 2;; 
+         --ulsch_inactivity)
+            SELECTED_ULSCH_INACTIVITY=$2
+            if [[ ! ${SELECTED_ULSCH_INACTIVITY} =~ $re ]] || [[ ${SELECTED_ULSCH_INACTIVITY} -gt 30 ]] || [[ ${SELECTED_ULSCH_INACTIVITY} -lt 0 ]] ; then
+               echo -e "${R}selected value is not valid. Choose a value from 0 to 30 for ulsch_max_frame_inactivity \n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            set_ulsch_inactivity
+            ###########################################################
+            shift 2;;             
+       -E | --external_source)
+            set_external
+            shift;;
+       -I | --internal_source)
+            set_internal
+            shift;;  
+       -G | --gpsdo_source)
+            set_gpsdo
+            shift;;               
+       -v | --view)
+            VIEW_PARAMS=1 # Flag to denote viewing parameters instead of editing the whole configuration file            
+            shift;; 
+       -V | --view_ini)
+            view_ini
+            exit 0;;                              
 	-h | --help)
             print_help
             exit 0;;
@@ -207,13 +442,19 @@ fi
             ;;
     esac
   done
-if [[ $START_EDITOR -eq 1 ]] ; then   
+if [[ $START_EDITOR -eq 1 ]] && [[ $VIEW_PARAMS -ne 1 ]]; then   
 # edit configuration file of the selected scenario
 #${SCENARIOS["$SELECTED_SCENARIO"-1]}
 ${EDITORS["$SELECTED_EDITOR"-1]}  ${CONFIGURATION_FOLDER}/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}
 fi 
 # end of script
-  }
+
+if [[ "$VIEW_PARAMS" -eq 1 ]]; then   
+# view configuration file of the selected scenario
+#${SCENARIOS["$SELECTED_SCENARIO"-1]}
+view_config 
+fi   
+}
 
 main "$@"
 
