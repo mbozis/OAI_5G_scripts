@@ -54,11 +54,15 @@ Usage:  $0 [OPTION]... [+VALUE]
 EOF
 }
 #################################################
-
+################# write to gnbconfig.ini file the selected scenario ########
+write_selected_scenario(){
+sed -i "/export SELECTED_SCENARIO/c\export SELECTED_SCENARIO=${SELECTED_SCENARIO}" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+}
+############################################################################
 ############## SCENARIO 1 ##################################################
 ############## 24 PRB SA  ##################################################
-sa_band78_51prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
+sa_band78_24prb(){
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.24PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
@@ -208,7 +212,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.
 
 ######### Scenario 15 SA mode band 66 102 prb (SISO)  ###################
 sa_band66_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrpn300.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
@@ -353,7 +357,8 @@ EOF
             gnome-terminal --working-directory=${GNB_EXEC_FOLDER} -- bash -c 'echo -e "${MESSAGE} sudo $COMMAND" ; bash'         
 else
 # check if script is run with sudo privilages    
-# start execution of nr-softmodem for the selected scenario and PLMN   
+# start execution of nr-softmodem for the selected scenario and PLMN 
+            write_selected_scenario # update value of SELECTED_SCENARIO in gnbconfig.ini file  
             cd ${GNB_EXEC_FOLDER}
             cat ${USER_SCRIPTS_FOLDER}/COMMAND | sudo bash  # execute command from clipboard     
 fi    
@@ -363,6 +368,11 @@ cd ${LOGS_FOLDER}
 sudo chown ${USER} gnb_log_${LOG_FILE_TIMESTAMP}.txt
 sudo chgrp ${USER} gnb_log_${LOG_FILE_TIMESTAMP}.txt
 fi
+###################################################################
+### set null value in SELECTED_SCENARIO var in gnbconfig.ini file #
+echo "reseting selected scenario variable in gnbconfig.ini file.."
+SELECTED_SCENARIO=""
+write_selected_scenario
 ###################################################################
   }
 
