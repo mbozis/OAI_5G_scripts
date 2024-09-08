@@ -1,4 +1,7 @@
 # OAI_5G_scripts
+
+![](/home/manolis/scripts/gnbpanel.png)
+
 ![](./Diagram1n.png)
 
 Scripts and configuration files for Open Air Interface SA testbed with two hosts.
@@ -191,7 +194,7 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
                            
 
                                ------------------------------------------------------------------
-                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                             
+                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                            
                               | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
                               | 3 | standalone mode band 78 with 106prb (SISO)                   |
                               | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
@@ -202,18 +205,20 @@ Usage:  ./startgnbsim [OPTION]... [+VALUE]
                               |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
                               | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
                               |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                              | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                              | 10 | standalone mode band 78 with 106prb (2x2 MIMO)               |
                               | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
                               | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
                               | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
                               | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |    
-                              | 16| do-ra mode: simulated 5G NSA connection with only 5G         |
-                              |   | terminals being present                                      |                                   
-                              | 17| physical layer test with one slot assigned for downlink      |
-                              | 18| extended phy layer test with parameters changed              |
+                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |
+                              | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                        
+                              | 17| do-ra mode: simulated 5G NSA connection with only 5G         |
+                              |   | terminals being present                                      |              
+                              | 18| physical layer test with one slot assigned for downlink      |
+                              | 19| extended phy layer test with parameters changed              |
                               |   | (parameters need to be changed directly to script code)      |      
                               -------------------------------------------------------------------
+    
 
 
   -p, --plmn               PLMN selection
@@ -272,36 +277,6 @@ Usage:  ./5gcn [OPTION]... [+VALUE]
 
 
 
-**./setrf**
-
-tool for configuring RF parameters in Open Air Interface gNB
-
-Usage:  ./setrf  [OPTION]... [+VALUE] 
-
-
-
-  -e, --external_source        specify SDR clock and time source as external     
-
-
-  -i, --internal_source        specify SDR clock and time source as internal       
-
-
-  -t  --att_tx [value]         specify attenuation value in dB (0 - 30) for transmitter           
-
-
-​                                         example: ./setrf -t 10   
-
-  -r, --att_rx [value]         specify attenuation value in dB (0 - 30) for receiver
-
-​                                         example: ./setrf -r 15   
-
-  -v, --view                   view current configuration parameters           
-
-
-  -h, --help                   print this help message
-
-
-
 **./gnbconfig**
 
 Tool to edit configuration files for a particular scenario
@@ -315,7 +290,7 @@ Usage:  ./gnbconfig [OPTION]... [+VALUE]
                            value is from the following table
 
                                ------------------------------------------------------------------
-                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                             
+                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                       
                               | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
                               | 3 | standalone mode band 78 with 106prb (SISO)                   |
                               | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
@@ -331,33 +306,39 @@ Usage:  ./gnbconfig [OPTION]... [+VALUE]
                               | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
                               | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
                               | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |   
+                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               | 
+                              | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                           
                                ------------------------------------------------------------------
+    
 
-
-  -p, --plmn               set PLMN and TAC settings
-
-​                           1 (default) --> 00101  TAC --> 0001
-
-​                           2           --> 50501  TAC --> 0001 
-
-​                           3           --> 20295  TAC --> 40960 
-
-  --ul_max_mcs             set max MCS in Uplink                         
-
-  -c, --core-net           configure network settings in gNB if Core Network is deployed in different host                         
-
-  -e, --editor             choose editor, combined with -s argument
-
-​                            1 (default) --> nano
-
-​                            2                 --> gedit                                                        
-
-  -i, --info               show Open Air Interface software version
-
-  -h, --help               print this help message
-
-
+ -p, --plmn                              set PLMN and TAC settings
+                                                1 (default) --> 00101  TAC --> 0001
+                                                2                --> 50501  TAC --> 0001 
+                                                3                --> 20295  TAC --> 40960 
+  --ul_max_mcs                      set max MCS in Uplink                         
+  -c, --core-net                       configure network settings in gNB if Core Network is deployed in different host                         
+  -e, --editor                           choose editor, combined with -s argument
+                                               1 (default) --> nano
+                                               2           --> gedit     
+  -m, --mode                         default mode to start the gnbpanel script
+                                               1 USRP N310 device
+                                               2 RF simulator  
+  -E,--external_source         specify SDR clock and time source as external
+  -I,--internal_source           specify SDR clock and time source as internal
+  -G,--gpsdo_source            specify SDR clock and time source as GPSDO  
+  -t  --att_tx [value]              specify attenuation value in dB (0 - 30) for transmitter                                
+                                              example: ./gnbconfig -t 10   
+  -r, --att_rx [value]             specify attenuation value in dB (0 - 30) for receiver
+                                              example: ./gnbconfig -r 15 
+  --max_rx_gain                   specify max rx gain value in for the USRP N310 device (valid values are from 40 to 75)               
+  --pusch_snr                       specify PUSCH target SNRx10 (valid values are from 100 to 500)
+  --pucch_snr                       specify PUCCH target SNRx10 (valid values are from 100 to 500)
+  --ulsch_inactivity              specify ul_max_frame_inactivity value (from 0 to 20. The value of 0 achieves the best latency)             
+  -v, --view                            view current values of parameters in all configuration files
+                                             in conjunction with '-s' display parameters only for the selected scenario
+  -V  --view_ini                     view settings in gnbconfig.ini file                                                                              
+  -i, --info                             show Open Air Interface software version
+  -h, --help                           print this help message
 
 **./capture**
 
