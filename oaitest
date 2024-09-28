@@ -27,7 +27,6 @@ CN_IP=$(hostname --ip-address | awk '{print $1}')
 fi
 ULMAXTHROUGHPUT=0
 DLMAXTHROUGHPUT=0
-#EXT_DN_IP="195.251.38.147" # Ip of oai-ext-dn container
 PING_COUNT=40 # default number of PING command iterations
 TCP_WINDOW_SIZE=119MB   # 119MB is the max
 TEST_TIME=10            # deafualt time interval to perform iperf test
@@ -48,13 +47,14 @@ exit 1
 ############################### FUNCTION 2 Check UE Registration to 5G Network #####
 checkUERegistration(){
 # check first if 5gcn is reachable 
-ping -c 1 amf > /dev/null 2>&1
+ping -c 1 ${AMF_IP} > /dev/null 2>&1
 CNHOST=$?
 if [ $CNHOST -eq 0 ]
   then
    ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} 2>&1 | grep 'Connected'" >/dev/null
    if [[ $? -eq 0 ]] ; then
-    echo -e "${G}gNB has been successfully connected to Core Network${NOCOLOR}"
+    CN_VERSION=$(ssh $CN_IP "docker ps" | grep oai-amf | cut -d':' -f 2 | cut -d' ' -f 1)
+    echo -e "${G}gNB has been successfully connected to Core Network. Core Network version is ${CN_VERSION}${NOCOLOR}"
    else 
     echo -e "${R}gNB has not been connected to Core Network${NOCOLOR}"
    fi    
@@ -63,14 +63,15 @@ if [ $CNHOST -eq 0 ]
 #   clear (removed not to lose screen buffer data)
      if [ $REGISTERED -eq 0 ]
       then
-       echo -e "${G}UE has been registered successfully${NOCOLOR}"
+       #echo -e "${G}UE has been registered successfully${NOCOLOR}"
        export UE_REGISTERED_FLAG=1 # flag to report successful registration to other functions
       else
-       echo -e "${R}UE has not been registered to Core Network${NOCOLOR}"
+       echo -e "${R}no UE has been registered to Core Network${NOCOLOR}"
        #exitScript
      fi
    else
-       echo -e "${R}5G core network host is down or unreachable${NOCOLOR}\n"
+       echo -e "${R}5G core network host is down or unreachable${NOCOLOR}"
+       NO_CHECKS=1
        #exitScript
 fi
 # check UE IP assigned address
@@ -83,18 +84,23 @@ if [ "${NRUEHOST}" -eq '0' ]
    UE_INET=$(ssh ${UE_HOST_IP} "ip a  | grep 12.1.1")
    if [ "${UE_INET}" == "" ]
      then 
-       echo -e "${R}UE IP address could not be retrieved${NOCOLOR}"
+       echo -e "${Y}OAI UE IP address could not be retrieved or no OAI UE has been connected${NOCOLOR}"
        #exitScript
      else
        UE_IP=$(echo ${UE_INET} | tr '/' ' ' | cut -d " " -f 2)
-       echo -e "${G}UE has been asigned IP address ${UE_IP}${NOCOLOR}"
+       echo -e "${G}OAI UE has been connected with IP ${UE_IP}${NOCOLOR}"
      fi
    else
-       echo -e "${R}UE host is down or unreachable${NOCOLOR}\n"
+       echo -e "${R}OAI UE host is down or unreachable${NOCOLOR}\n"
        #exitScript
 fi
-ssh ${CN_IP} "docker logs oai-amf | tac | sed '''/gNBs/q''' | tac" # display gNBs and UEs info
+ASSIGNED_UE_IPS=$(check_PDU_session | grep 12. | cut -d'|' -f 9 | cut -d' ' -f 1 | uniq | tr '\n' ', ') 
+if [ ! -z "${ASSIGNED_UE_IPS}" ]; then
+echo -e "${G}Core network has assigned so far IPs: ${ASSIGNED_UE_IPS::-1}${NOCOLOR}"
+fi
+ssh ${CN_IP} "docker logs oai-amf | tac | sed '''/UEs/q''' | tac" # display gNBs and UEs info
 }
+
 ##########################################################################
 
 #### FUNCTION 3 RTT Tests with ping command ###################
@@ -106,7 +112,7 @@ ssh ${UE_HOST_IP} "ping ${ROUTER_IP} -c ${PING_COUNT} -I oaitun_ue1"
 
 #  ping test from oai-ext-dn container to UE
 echo -e "${G}start pinging from core network to UE${NOCOLOR}\n"
-ssh ${CN_IP} "docker exec oai-ext-dn ping $UE_IP -c ${PING_COUNT}"
+ssh ${CN_IP} "docker exec oai-ext-dn ping ${UE_IP} -c ${PING_COUNT}"
 }
 ##########################################################################
 #### FUNCTION 4 Throughput Test with iperf command in Downlink ###########
@@ -130,14 +136,12 @@ fi
    echo -e "iperf server didn't start on UE side\n"
    exitScript
   fi
-
-
 #
 # ssh to 5gcn VM and create traffic from ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
 echo -e "${G}Sending DOWNLINK traffic at ${DOWNLINK_SPEED_TEST}bps${NOCOLOR}"
-ssh ${CN_IP} "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -B ${EXT_DN_IP} -i1 -b ${DOWNLINK_SPEED_TEST} -c ${UE_IP} -fm"
+ssh ${CN_IP} "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -B ${OAI_EXT_DN_IP} -i1 -b ${DOWNLINK_SPEED_TEST} -c ${UE_IP} -fm"
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
 ssh ${UE_HOST_IP} "pkill iperf"
@@ -157,7 +161,7 @@ then
  ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
  sleep 2
 fi
- ssh ${CN_IP} "docker exec oai-ext-dn iperf -s -D -u -i1 -B 192.168.70.135"
+ ssh ${CN_IP} "docker exec oai-ext-dn iperf -s -D -u -i1 -B ${OAI_EXT_DN_IP}"
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -166,13 +170,12 @@ fi
    echo -e "iperf server didn't start on oai-ext-dn container\n"
    exitScript
   fi
-
 # 
 # ssh to UE host and create traffic from UE to oai-ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G UPLINK${NOCOLOR}"
 echo -e "${G}Sending UPLINK traffic at ${UPLINK_SPEED_TEST}bps${NOCOLOR}"
-ssh ${UE_HOST_IP} "iperf -u -t ${TEST_TIME} -i1 -fm -B ${UE_IP} -b ${UPLINK_SPEED_TEST} -c ${EXT_DN_IP}"
+ssh ${UE_HOST_IP} "iperf -u -t ${TEST_TIME} -i1 -fm -B ${UE_IP} -b ${UPLINK_SPEED_TEST} -c ${OAI_EXT_DN_IP}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
 ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
@@ -181,7 +184,7 @@ sleep 2
 ###########################################################################
 #### FUNCTION 6 Bandwidth Graph with Speedometer Test on 5G oaitun_ue1 interface  ############
 speedometer(){
-ssh -X ue  "~/scripts/speedometer" 2> /dev/null
+ssh -X $UE_HOST_IP  "~/scripts/speedometer" 2> /dev/null
 }
 ###########################################################################
 #### FUNCTION 7 print help message  ############
@@ -242,7 +245,7 @@ fi
 # ssh to 5gcn VM and create traffic from ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
-ssh ${CN_IP} "docker exec oai-ext-dn iperf -B ${EXT_DN_IP} -c ${UE_IP} -t ${TEST_TIME} "
+ssh ${CN_IP} "docker exec oai-ext-dn iperf -B ${OAI_EXT_DN_IP} -c ${UE_IP} -t ${TEST_TIME} "
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
 ssh ${UE_HOST_IP} "pkill iperf"
@@ -253,7 +256,6 @@ sleep 2
 ###########################################################################
 
 ######### Function 9 Uplink throughput ###################################
-
 checkUplinkThroughput(){
 ssh ${CN_IP} "docker exec oai-ext-dn pgrep iperf >/dev/null"
 iperf_RUNNING=$?
@@ -264,7 +266,7 @@ then
  ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
  sleep 2
 fi
- ssh ${CN_IP} "docker exec oai-ext-dn iperf -s -D -B 192.168.70.135"
+ ssh ${CN_IP} "docker exec oai-ext-dn iperf -s -D -B ${OAI_EXT_DN_IP}"
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -278,34 +280,33 @@ fi
 # ssh to UE host and create traffic from UE to oai-ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G UPLINK${NOCOLOR}"
-ssh ${UE_HOST_IP} "iperf -B ${UE_IP} -c ${EXT_DN_IP} -t ${TEST_TIME}"
+ssh ${UE_HOST_IP} "iperf -B ${UE_IP} -c ${OAI_EXT_DN_IP} -t ${TEST_TIME}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
 ssh ${CN_IP} "docker exec oai-ext-dn pkill -KILL iperf"
 sleep 2
-
 }
 ###########################################################################
 
 ###################### Funcion 10 Check connection of gNB to 5GCN #########
 # check if core network is up
 check_NGI(){
-ping -c 1 amf >/dev/null
+ping -c 1 ${AMF_IP} >/dev/null
 AMF_UP=$?
 if [ $AMF_UP -eq 0 ]
 then
-   echo -e "${G}AMF container is reachable${NOCOLOR}\n"
-   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} | grep 'Connected' -A 2 -B 2" 2>/dev/null
+   echo -e "${G}AMF container is reachable${NOCOLOR}"
+   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} | grep 'Connected' -A 2 -B 2" >/dev/null
    NGI_CONNECTED=$?
    if [ $NGI_CONNECTED -eq 0 ]
    then
-   echo -e "${G}gNB succesfully established a connection to AMF${NOCOLOR}\n"
+   echo -e "${G}gNB succesfully established a connection to AMF${NOCOLOR}"
    else
-   echo -e "${R}gNB could not establish a connection to AMF. Check you configuration files${NOCOLOR}\n"
+   echo -e "${R}gNB could not establish a connection to AMF. Check you configuration files${NOCOLOR}"
    exitScript
    fi
 else
-   echo -e "${R}AMF container is not accesible. Have you deployed 5GCN containers?${NOCOLOR}\n"
+   echo -e "${R}AMF container is not accesible. Have you deployed 5GCN containers?${NOCOLOR}"
    exitScript
 fi
 }
@@ -329,8 +330,8 @@ else
    exitScript
 fi
 }
-#docker logs oai-upf 2>&1 |grep "PFCP switch Packet Detection Rule list" -A 6 -B 2 | tail -n 8
 ########################################################################################################
+
 ###################### Funcion 12 monitor L1, MAC and RRC rpoducing stats ##############################
 monitor(){
 ## check if needed files exist in nr-softmodem executable folder #######################################
@@ -407,7 +408,7 @@ fi
        --umax)
             if [ ${UE_REGISTERED_FLAG} -ne 1 ]
             then
-            checkUERegistration       
+            checkUERegistration  > /dev/null # check ue registration with no output  
             fi
             ULMAXTHROUGHPUT=1 # flag to execute checkUplinkThroughput
             shift;;
@@ -415,14 +416,14 @@ fi
             UPLINK_SPEED_TEST=$2
             if [ ${UE_REGISTERED_FLAG} -ne 1 ]
             then
-            checkUERegistration       
+            checkUERegistration > /dev/null # check ue registration with no output        
             fi
             DOIPERFTESTUL=1
             shift 2;;
        -r | --rtt)
             if [ ${UE_REGISTERED_FLAG} -ne 1 ]
             then
-            checkUERegistration       
+            checkUERegistration  > /dev/null # check ue registration with no output       
             fi
             pingtests
             shift;;
@@ -449,7 +450,7 @@ fi
        --dmax)
             if [ ${UE_REGISTERED_FLAG} -ne 1 ]
             then
-            checkUERegistration       
+            checkUERegistration  > /dev/null # check ue registration with no output       
             fi
             DLMAXTHROUGHPUT=1 # flag to execute checkDownlinkThroughput
             shift;;
@@ -457,7 +458,7 @@ fi
             DOWNLINK_SPEED_TEST=$2
             if [ ${UE_REGISTERED_FLAG} -ne 1 ]
             then
-            checkUERegistration       
+            checkUERegistration  > /dev/null # check ue registration with no output       
             fi        
             DOIPERFTESTDL=1
             shift 2;;
