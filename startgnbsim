@@ -6,7 +6,9 @@
 # scripts MUST run with root privillages
 # 
 source gnbconfig.ini
-
+# configure core network ips ###
+./gnbconfig -a
+################################
 ######################################################################################
 ######### FUCTIONS ############
 #### FUNCTION 1 Exit Script ###

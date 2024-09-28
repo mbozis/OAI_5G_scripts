@@ -8,7 +8,9 @@
 source gnbconfig.ini
 
 ######################################################################################
-
+# configure core network ips ###
+./gnbconfig -a
+################################
 #### FUNCTION 1 print help message  ############
 print_help(){
 cat <<EOF
@@ -37,7 +39,8 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
                           | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
                           | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               |    
+                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               | 
+                          | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                              
                           --------------------------------------------------------------------
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
@@ -124,7 +127,7 @@ sa_band78_162prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -138,7 +141,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrp
 ############################################################################
 
 ######### Scenario 7 SA mode band 77 273 prb  SISO ########################
-sa_band77_273_prb(){
+sa_band77_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
@@ -156,7 +159,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 ############################################################################
 
 
-############## SCENARIO 8 ##################################################
+############## SCENARIO 9 ##################################################
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_band78_106prb_TDD_2(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
@@ -202,7 +205,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.2x2.
 ############################################################################
 
 ######### Scenario 14 SA mode band 77 273 prb (2x2 MIMO)  ###################
-sa_mimo_band78_273prb(){
+sa_mimo_band77_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf \
 --sa --usrp-tx-thread-config 1 \
 --gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
@@ -219,6 +222,16 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrp
 }
 ############################################################################
 
+################## SCENARIO 16 ##############################################
+#################### SA mode band 66 #######################################
+sa_band71_106prb(){
+
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band71.fr1.106PRB.usrpn310.conf \
+--sa --usrp-tx-thread-config 1 \
+--gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+}
+############################################################################
 
 ######################## MAIN FUNCTION #####################################
 function main() {
@@ -253,7 +266,7 @@ fi
             ###########################################################
 	    # check if core network is up, executing a ping to AMF ####
             echo -e "checking connection to AMF..."
-            ping amf -c 1 > /dev/null
+            ping ${AMF_IP} -c 1 > /dev/null
             if [ $? -ne 0 ]; then
             echo -e "${R}\nNo connection to AMF\n"
             echo -e "start 5G core network prior to executing RAN ${NOCOLOR}\n"
@@ -272,7 +285,7 @@ fi
             fi
             done
             if [[ ${WARNING_FLAG} -eq 1 ]] ; then
-            echo -e "${Y}WARNING:CPU governor not set to performance. COnsider running ${G}sudo ./cpustress${Y} to set maximum performance for all CPUs${NOCOLOR}"
+            echo -e "${Y}WARNING:CPU governor not set to performance. Consider running ${G}sudo ./cpustress${Y} to set maximum performance for all CPUs${NOCOLOR}"
             fi
             shift 2;;
          -p | --plmn)
