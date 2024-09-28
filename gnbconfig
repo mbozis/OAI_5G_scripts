@@ -10,13 +10,18 @@ source gnbconfig.ini
 ############################## VARIABLES SECTION #####################################
 
 START_EDITOR=0 # Flag (default value is 0 --> do not edit configuration file)
-
+if [ -z "${CN_IP}" ]; then
+# Core Network Ip set to gnb host ip in the following line
+CN_IP=$(hostname --ip-address | awk '{print $1}')
+# if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
+# CN host in the config.ini file
+fi
 ######################################################################################
 
 #### FUNCTION 1 print help message  ############
 print_help(){
 cat <<EOF
-UOP - DCS LAB author Manolis Bozis 2023
+UOP - DCS LAB author Manolis Bozis Sep 2024
 Tool to edit configuration files for a particular scenario
 using USRP N310 SDR device
 or 2 hosts running OAI nrUE and nrgNB respectively.
@@ -46,6 +51,7 @@ Usage:  $0 [OPTION]... [+VALUE]
                           | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                           
                            ------------------------------------------------------------------
                           
+  -a, --amf                detect host and container IPs  
   -p, --plmn               set PLMN and TAC settings
                            1 (default) --> 00101  TAC --> 0001
                            2           --> 50501  TAC --> 0001 
@@ -77,8 +83,9 @@ Usage:  $0 [OPTION]... [+VALUE]
 EOF
 }
 #################################################
+
 ########## view settings in configuration files ###############
-##########       for every scenario             ###############
+########## for current or every scenario        ###############
 view_config(){
 if [[ -z "$SELECTED_SCENARIO" ]] ; then
   #---------- view all scenarios ------------------------------
@@ -86,17 +93,18 @@ if [[ -z "$SELECTED_SCENARIO" ]] ; then
   for file in ${CONFIGURATIONS[@]}
   do
   echo -e "scenario: ${G}${SCENARIO} ${NOCOLOR}Configuration file: ${G}${file}${NOCOLOR}"
-  grep -E 'att_tx|att_rx|sdr_addrs|max_rxgain|plmn_list|tracking_area_code|pusch_TargetSNRx10|pucch_TargetSNRx10|ulsch_max_frame_inactivity' ${CONFIGURATION_FOLDER}/${file}
+  grep -E 'att_tx|att_rx|max_rxgain|plmn_list|tracking_area_code|pusch_TargetSNRx10|pucch_TargetSNRx10|ulsch_max_frame_inactivity' ${CONFIGURATION_FOLDER}/${file}
   ((SCENARIO++))
   echo "---------------------------------------------"
   done
 else
   echo -e "scenario: ${G}${SELECTED_SCENARIO} ${NOCOLOR}Configuration file: ${G}${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}${NOCOLOR}"
-  grep -E 'att_tx|att_rx|sdr_addrs|max_rxgain|plmn_list|tracking_area_code|pusch_TargetSNRx10|pucch_TargetSNRx10|ulsch_max_frame_inactivity' $CONFIGURATION_FOLDER/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}
+  grep -E 'att_tx|att_rx|max_rxgain|plmn_list|tracking_area_code|pusch_TargetSNRx10|pucch_TargetSNRx10|ulsch_max_frame_inactivity' $CONFIGURATION_FOLDER/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}
 fi
 
 }
 ###############################################################
+
 ########## view settings in gnbconfig.ini file ################
 view_ini(){
 
@@ -205,7 +213,7 @@ sed -i 's/source=internal/source=gpsdo/g;s/source=external/source=gpsdo/g' ${fil
 done
 }
 ###############################################################
-
+################## change plmn and tac for all configuration files ########
 set_plmn(){
 case $SELECTED_PLMN in
     1)
@@ -235,9 +243,6 @@ done
 
 
 config_net_ng(){
-################## change plmn and tac for all configuration files ########    
-
-
 if [[ -z "${CN_IP}" || -z "${GNB_NIC_TO_CN}" ]]; then
  for file in ${CONFIGURATION_FOLDER}/*
  do
@@ -261,20 +266,11 @@ fi
 ############################################################################
 }
 
-
+############################################################################
 set_ul_max_mcs(){
 sed -i "/export UL_MAX_MCS/c\export UL_MAX_MCS=${SELECTED_UL_MAX_MCS}" gnbconfig.ini
 }
-
-######################## MAIN FUNCTION #####################################
-function main() {
-
-if [ "$*" == "" ]; then
-    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
-    print_help
-    exit 1
-fi
-###########################################################
+############################################################################
 
 function set_mode_for_panel(){
 ####  write value of MODE_FOR_PANEL variable to gnbconfig.ini file ###
@@ -289,14 +285,74 @@ case $SELECTED_MODE in
     exit
     ;;
 esac
-
-######################################################################
 }
+######################################################################
+
+###########################################################
+function set_ip_addrs(){
+#### Update LAN IP Addreesses of gNB and UE hosts ####################
+ping -c 1 -b ${LAN_B_ADDR} >/dev/null # ping broadcast address to update arp table
+UE_HOST_IP=$(arp -n | grep ${UE_HOST_MAC} | awk '{print $1}')
+sed -i "/export UE_HOST_IP=/c\export UE_HOST_IP=\"${UE_HOST_IP}\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+echo -e "UE host ip set to: ${G}${UE_HOST_IP}${NOCOLOR}"
+GNB_HOST_IP=$(ip -br addr show | grep eno1 | awk '{print $3}' | cut -d'/' -f 1)
+sed -i "/export GNB_HOST_IP=/c\export GNB_HOST_IP=\"${GNB_HOST_IP}\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+echo -e "GNB host ip set to: ${G}${GNB_HOST_IP}${NOCOLOR}"
+######################################################################
+
+####  find amf IP in oai-amf container ###############################
+CN_DEPLOYED=$(ssh $CN_IP "docker ps" | wc -l)
+if [ "$CN_DEPLOYED" = "1" ]; then
+echo -e "${R}Core network containers are not deployed${NOCOLOR}"
+exit 1
+fi
+AMF_IP=$(ssh $CN_IP "docker exec oai-amf ifconfig" | grep '''inet 192.168.''' | awk '{print $2}')
+for file in ${CONFIGURATION_FOLDER}/*
+do
+sed -i "/amf_ip_address/c\     amf_ip_address         = ( { ipv4       = \"$AMF_IP\";" ${file}
+done
+echo -e "AMF ip set to ${G}$AMF_IP${NOCOLOR} in all configuration files"
+CN_VERSION=$(ssh $CN_IP "docker ps" | grep oai-amf | cut -d':' -f 2 | cut -d' ' -f 1)
+echo -e "OAI Core Network version is: ${G}$CN_VERSION${NOCOLOR}"
+# change the UPF IP and the oai-ext-dn container ip in gnbconfig.ini file based on the running 5G core network version
+if [ $CN_VERSION = "v1.5.1" ]; then
+sed -i "/export UPF_IP=/c\export UPF_IP=\"192.168.70.134\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+sed -i "/export OAI_EXT_DN_IP=/c\export OAI_EXT_DN_IP=\"192.168.70.135\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+sed -i "/export AMF_IP=/c\export AMF_IP=\"192.168.70.132\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+else
+sed -i "/export UPF_IP=/c\export UPF_IP=\"192.168.70.133\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+sed -i "/export OAI_EXT_DN_IP=/c\export OAI_EXT_DN_IP=\"192.168.70.131\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+sed -i "/export AMF_IP=/c\export AMF_IP=\"192.168.70.134\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+fi
+}
+######################################################################
+
+
+
+
+
+######################## MAIN FUNCTION #####################################
+function main() {
+
+if [ "$*" == "" ]; then
+    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
+    print_help
+    exit 1
+fi
+###########################################################
+
+
 # check arguments
 
   until [ -z "$1" ]
   do
     case "$1" in
+        -a | --amf)
+            echo "configuring ip addresses of hosts and containers..."
+            sleep 1
+            set_ip_addrs       
+            exit 0;
+            shift;;
        -i | --info)
             echo "getting the version of OAI software..."
             sleep 1
@@ -445,7 +501,11 @@ esac
 if [[ $START_EDITOR -eq 1 ]] && [[ $VIEW_PARAMS -ne 1 ]]; then   
 # edit configuration file of the selected scenario
 #${SCENARIOS["$SELECTED_SCENARIO"-1]}
-${EDITORS["$SELECTED_EDITOR"-1]}  ${CONFIGURATION_FOLDER}/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}
+ if [[ "$SELECTED_EDITOR" -eq 2 ]]; then 
+    ${EDITORS["$SELECTED_EDITOR"-1]}  ${CONFIGURATION_FOLDER}/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]} &
+ else
+    ${EDITORS["$SELECTED_EDITOR"-1]}  ${CONFIGURATION_FOLDER}/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]} 
+ fi
 fi 
 # end of script
 

@@ -2,15 +2,19 @@
 # uop dcs lab
 # Manolis Bozis 
 # Jul 2023
+source gnbconfig.ini
 
 ################### VARIABLES SECTION ####################################
 # Version list
 # 1 --> 1.5
-# 2 --> 2.0.1
+# 2 --> 2.1.0
+if [ -z "${CN_IP}" ]; then
+# Core Network Ip set to gnb host ip in the following line
+CN_IP=$(hostname --ip-address | awk '{print $1}')
+# if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
+# CN host in the config.ini file
+fi
 
-VERSIONS=( "v_1_5" "v_2_0_1" )
-PLMNS=( "00101" "50501" "20895" )
-re='^[0-9]+$'    # integer value for selected scenario to be checked
 MODES=( "start" "stop" )
 SELECTED_VERSION=1 # default version is 1.5
 SELECTED_PLMN=1 # default PLMN id is 00101
@@ -26,9 +30,11 @@ tool for deploying Open Air Interface 5G core Network in containers
 Usage:  $0 [OPTION]... [+VALUE] 
   -d, --deploy             start 5G Core Network containers 
   -s, --stop               stop 5G Core Network containers
+  -c, --clear              purge all containers that have started (in case you encounter errors starting up the containers)
+  -i, --info               display version of OAI Core Network 
   -v, --version [value]    specify version of containers to deploy or stop
                            1. version 1.51
-                           2. version 2.0.1
+                           2. version 2.1.0
                            example: $0 -d -v 2
   -p, --plmn [value]       specify PLMN id (valid only for version 1.51) 
                            1. PLMN ---> 00101
@@ -70,7 +76,7 @@ set_cpu_affinity $ # after docker compose command
 }
 #######################################################
 
-########### stop 5G CN v1.5 of containers #############
+########### stop 5G CN v1.5 containers #############
 stop_v_1_5(){
 cd ~/oai-cn5g
 docker compose down
@@ -78,8 +84,8 @@ docker compose down
 #######################################################
 
 
-########## start 5G core network v 2.0.1 ##############
-start_v_2_0_1() {
+########## start 5G core network v 2.1.0 ##############
+start_v_2_1_0() {
 cd ~/oai-cn5g-fed/docker-compose
 #case ${SELECTED_PLMN} in
 #   1)
@@ -104,19 +110,32 @@ set_cpu_affinity $ # after docker compose command
 }
 #######################################################
 
-########### stop 5G core network v 2.0.1 ##############
+########### stop 5G core network v 2.1.0 ##############
 
-stop_v_2_0_1() {
+stop_v_2_1_0() {
 cd ~/oai-cn5g-fed/docker-compose
 # type Basic Deployment
 # Scenario with NRF ("1")
 python3 core-network.py --type stop-basic
 }
 #######################################################
-
-
-
-
+########### stop all running containers ##############
+purge(){
+docker ps -aq | xargs docker stop | xargs docker rm
+}
+#######################################################
+#######################################################
+### display info on running OAI 5GCN containers #######
+info(){
+CN_DEPLOYED=$(ssh $CN_IP "docker ps" | wc -l)
+if [ "$CN_DEPLOYED" = "1" ]; then
+echo -e "${R}Core network containers are not deployed${NOCOLOR}"
+else
+CN_VERSION=$(ssh $CN_IP "docker ps" | grep oai-amf | cut -d':' -f 2 | cut -d' ' -f 1)
+echo -e "OAI Core Network version is: ${G}$CN_VERSION${NOCOLOR}"
+fi  
+}
+#######################################################
 function main() {
 ###########################################################
 if [ "$*" == "" ]; then
@@ -125,6 +144,7 @@ if [ "$*" == "" ]; then
     exit 1
 fi
 ###########################################################
+
  until [ -z "$1" ]
   do
     case "$1" in
@@ -151,7 +171,13 @@ fi
             shift;;
        -s | --stop)
             SELECTED_MODE="stop"
-            shift;;       
+            shift;;   
+       -c | --clear)
+            purge
+            exit 0;;    
+       -i | --info)
+            info
+            exit 0;;                
        -h | --help)
             print_help
             exit 0;;

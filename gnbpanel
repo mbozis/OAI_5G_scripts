@@ -27,18 +27,18 @@ fi
 
 ##### gNB and AMG log Interface #########################
 # create panes
-tmux split-window -v -l 18
-tmux split-window -v 
-tmux split-window -v -l 14
+tmux split-window -v -l 10
+tmux split-window -v -l 10
+tmux split-window -v -l 10
 tmux split-window -h 
 
 tmux rename-window -t 0 "gNB_&_AMF_log"
+tmux send-keys -t 0 "tmux display-panes -d 2000" Enter
 tmux send-keys -t 0 "${MODE_FOR_PANEL} ${ARGS_FOR_STARTGNBSIM}" Enter # execute startgnb or startgnbsim script with provided arguments
 tmux send-keys -t 1 "watch -t -n 5 -c ./oaitest -c" Enter                # view AMF log tail
 tmux send-keys -t 2 "./oaitest --stats MAC" Enter # send command to startgnb
 tmux send-keys -t 3 "./oaitest --stats L1" Enter # send command to startgnb
-tmux send-keys -t 0 "tmux display-panes -d 2000" Enter
-tmux send-keys -t 4 "watch -t -n 20 -c ./gnbconfig -v" Enter       # display configration for selected scenario
+tmux send-keys -t 4 '''watch -t -n 20 -c "clear; ./gnbconfig -v"''' Enter       # display configration for selected scenario
 
 
 tmux select-pane -t 0 -T "gNB" -P # 'fg=black,bg=colour190'  # switch to nr-softmodem panel to enter password for sudo 

@@ -14,32 +14,37 @@ To explore the use cases and measurements performed with this testbed you can re
 
 https://ieeexplore.ieee.org/document/10497086
 
-This branch contains the files for gNB and 5G core network host.
+and the extended paper titled "Enhancing 5G performance: A standalone system platform with customizable features"
+
+https://www.sciencedirect.com/science/article/pii/S1434841124004011
+
+
+This branch contains the scripts and congifuration files for gNB and 5G core network host.
 The files for the UE host are in the **master_ue** branch.
 
 Start by installing the Open Air Interface software following the tutorial in the following link:
 
 https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/doc/NR_SA_Tutorial_OAI_nrUE.md?ref_type=heads
 
-To pull the 2.0.1 version of OAI 5GCN containers  follow the guidelines form the following link:
+To pull the 2.1.0 version of OAI 5GCN containers  follow the guidelines form the following link:
 
 https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed/-/blob/master/docs/RETRIEVE_OFFICIAL_IMAGES.md?ref_type=heads
 
 **Start by editing gnb config.ini file in your gNB host and make all necessary changes to be in line with your network setup. Add to gnbconfig.ini file the correct IP assignments for the oaiue host and 5gcn host (it is the same ip as gnbhost if gnb and core network run on the same host) . You can deploy 5G core network containers in a different host. For this you need to make all necessary changes to gnbconfig.ini and then run ./gnbconfig -c to set these changes to all gNB configuration files **
 
-Prerequisite packets are **openssh-server, iperf, speedometer, okla speedtest-cli, xclip, cpufreq-info, linux-tools-common, ethtool ** and **sensors**.
+Prerequisite packets are **openssh-server, iperf, speedometer, okla speedtest-cli, xclip, cpufreq-info, linux-tools-common, tmux, ethtool ** and **sensors**.
 
 Scripts have been tested in **Ubuntu 22.04 LTS** environment. 
 
 Use **./5gcn** to deploy core network containers, then run script **./startgnb** or **./startgnbsim** to start gNB with SDR device or RF simulator respectively. Finally run **./startue** or **./startuesim** in the UE host to connect to gNB. The **./oaitest** script is for testing the interconnection of software modules and to perform measurements of throughput and RTT values and other. 
 
-**The default PLMN value for Core Network v1.51 and 2.0.1 is 00101 and 20295 respectively. To use different PLMN values (command argument -p in 5gcn script you need to make several changes to the OAI CN files. **
+**The default PLMN value for Core Network v1.51 and 2.1.0 is 00101 and 20295 respectively. To use different PLMN values (command argument -p in 5gcn script you need to make several changes to the OAI CN files. **
 
 **For CN v.1.51:**
 
 - **open file docker-compose.yml in oai-cn5g folder and change values for MCC, PLMN_SUPPORT_MCC, PLMN_SUPPORT_MNC to be in line with those of gNB configuration files. Save every different PLMN file using names like docker-compose_00101.yml,   docker-compose_50501.yml for PLMNs 00101 and 50501 respectively. Change the file oai_db.sql  found in oai-cn5g/database folder to be in line with the different UE sim settings  and save each version to the same folder again using names like oai_db_00101.sql, oai_db_50501.sql, e.t.c.** 
 
-**For CN v.2.0.1:**
+**For CN v.2.1.0:**
 
 **Add the following lines in the section plmn_support_list of amf container in file oai-cn5g-fed/docker-compose/conf/basic_nrf_config.yaml**
 
@@ -72,11 +77,11 @@ Use **./5gcn** to deploy core network containers, then run script **./startgnb**
 
 **Change the file oai_db2.sql  found in oai-cn5g-fed/docker-compose/database folder to be in line with the different UE sim settings  and save the file with the same name**
 
-**To start CN v1.51 with different PLMN setting you should specify it using the argument -p . For example ./5gcn -d -v 1 -p 1 for PLMN 00101. CN v2.0.1 can support multiple PLMNs so if you make the above changes to yaml and sql files you can start CN supporting all configured PLMNs without using -p argument in 5gcn script. For example ./5gcn -d -v 2**
+**To start CN v1.51 with different PLMN setting you should specify it using the argument -p . For example ./5gcn -d -v 1 -p 1 for PLMN 00101. CN v2.1.0 can support multiple PLMNs so if you make the above changes to yaml and sql files you can start CN supporting all configured PLMNs without using -p argument in 5gcn script. For example ./5gcn -d -v 2**
 
-To change the attenuation parameter for tx and rx use **./setrf -t** or **./setrf -r** respectively. You may find this useful for example when you want to switch from RF cables to OTA transmission. You may also want to switch between external and internal source for your SDR device using **-e** or **-i** arguments with **setrf**. The configuration made with **setrf** script is done in all configuration files and for both PLMN options. 
+To change the attenuation parameter for tx and rx use **./gnbconfig -t** or **./gnbconfig -r** respectively. You may find this useful for example when you want to switch from RF cables to OTA transmission. You may also want to switch between external and internal source for your SDR device using **-e** or **-i** arguments with **gnbconfig**. The configuration made with **gnbconfig** script is done in all configuration files and for all PLMN options. When you make changes to host ips or switch from core network v 1.5.1 to v 2.1.0 you need to run **gnbconfig -a** to reconfigure the ip addresses in gnbconfig.ini file and conf files in tje folder configuration. 
 
-Finally if you to make changes to a configuration file for a specific scenario use **./gnbconfig** script.
+Finally if you to make changes to a configuration file for a specific scenario use **./gnbconfig -s <scenario number>** script.
 
 **./oaitest**
 
@@ -152,7 +157,8 @@ Usage:  ./startgnb [OPTION]... [+VALUE]
                               | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
                               | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
                               | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |      
+                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               | 
+                              | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                                      
                               --------------------------------------------------------------------
 
 
@@ -252,30 +258,33 @@ Tool to deploy and stop OAI Core Network containers
 Usage:  ./5gcn [OPTION]... [+VALUE] 
 
 
+  -d, --deploy             start 5G Core Network containers 
 
-  -d, --deploy                  start 5G Core Network containers 
+  -s, --stop               stop 5G Core Network containers
 
-  -s, --stop                       stop 5G Core Network containers
+  -c, --clear              purge all containers that have started (in case you encounter errors starting up the containers)
+
+  -i, --info               display version of OAI Core Network 
 
   -v, --version [value]    specify version of containers to deploy or stop
-                                          [value]=1  version 1.51
 
-​                                          [value]=2  version 2.0.1
+                           1. version 1.51
 
-​                                           example: ./5gcn  -d -v 2
+                           2. version 2.1.0
+
+                           example: $0 -d -v 2
 
   -p, --plmn [value]       specify PLMN id (valid only for version 1.51) 
 
-​                                          [value]=1  PLMN ---> 00101
+                           1. PLMN ---> 00101
 
-​                                          [value]=2  PLMN ---> 50501
+                           2. PLMN ---> 50501
 
-​                                          [value]=3  PLMN ---> 20895
+                           3. PLMN ---> 20895
 
-​                                          example: ./5gcn -d -v 1 -p 2               
+                           example: $0 -d -v 1 -p 2                                 
 
-
-  -h, --help                      print this help message
+  -h, --help               print this help message
 
 
 
@@ -314,8 +323,9 @@ Usage:  ./gnbconfig [OPTION]... [+VALUE]
                               | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                           
                                ------------------------------------------------------------------
 
+  -a, --amf                detect host and container IPs  
 
- -p, --plmn                              set PLMN and TAC settings
+  -p, --plmn                              set PLMN and TAC settings
                                                 1 (default) --> 00101  TAC --> 0001
                                                 2                --> 50501  TAC --> 0001 
                                                 3                --> 20295  TAC --> 40960 
@@ -356,9 +366,9 @@ creates pcap file to be analyzed with wireshark
 
   -i, --interface [value]                         select [value]=1 for loopback (deafult)
 
-​                                                                                         2 for demo-oai 
+​                                                                 2 for demo-oai 
 
 
-  -t, --time [value]                                 capture traffic for [value] seconds (can be decimal values like 0.1 up to 480)
+  -t, --time [value]                              capture traffic for [value] seconds (can be decimal values like 0.1 up to 480)
 
- -h, --help                                              print this help message
+ -h, --help                                        print this help message

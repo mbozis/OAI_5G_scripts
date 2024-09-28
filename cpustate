@@ -10,13 +10,11 @@ G='\033[0;32m'   #'0;32' is Green's ANSI color code
 NOCOLOR='\033[0m'
 ############ Multiline Message Variable ########
 MESSAGE=$(cat << END
-UOP - DCS LAB author Manolis Bozis 2023\n
-CPU state monitoring tool\n
-Display combined info from lscpu, cpufreq and sensors utilities
+UOP - DCS LAB author Manolis Bozis 2023\nCPU state monitoring tool\nDisplay combined info from lscpu, cpufreq and sensors utilities
 END
 )
 
-CPUCORES=$(lscpu | awk '/^CPU\(s\)\:/ {print $2}')
+CPUCORES=$(lscpu | awk '/^CPU\(s\):/ {print $2}')
 echo -e $MESSAGE
 echo -e "Your system has ${G} "$CPUCORES" ${NOCOLOR} cores"
 printf '%-7s  %-12s %-12s %s\n' "CPU ID" "CURRENT FREQ" "CURRENT TEMP" "CURRENT GOVERNOR"
