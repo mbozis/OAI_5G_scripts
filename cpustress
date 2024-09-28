@@ -4,8 +4,7 @@
 # DCS LAB Oct 2023
 # Manolis Bozis
 # scripts MUST run with root privillages
-NICNAME_1="enp1s0f0"
-NICNAME_2="enp1s0f1"
+source gnbconfig.ini # load congfiguratiom
 
 # change mtu value to 9000 fir 10gbps network interface controllers
 ip link set dev ${NICNAME_1} mtu 9000
@@ -17,19 +16,27 @@ for ((i=0;i<$(nproc --all);i++)); do cpufreq-set -c $i -r -g performance; done
 #Adjust Network Buffers
 #This applies to USRP devices connected via Ethernet, such as the N200, N210, N300, N310, N320, N321, X300, X310, E320. 
 #Note that these settings will not persist across a reboot.
-sysctl -w net.core.wmem_max=33554432
-sysctl -w net.core.rmem_max=33554432
-sysctl -w net.core.wmem_default=33554432
-sysctl -w net.core.rmem_default=33554432
+#sysctl -w net.core.wmem_max=33554432
+#sysctl -w net.core.rmem_max=33554432
+#sysctl -w net.core.wmem_default=33554432
+#sysctl -w net.core.rmem_default=33554432
+sudo sysctl -w net.core.wmem_max=62500000
+sudo sysctl -w net.core.rmem_max=62500000
+sudo sysctl -w net.core.wmem_default=62500000
+sudo sysctl -w net.core.rmem_default=62500000
 
 #Adjust Ethernet MTU
 # can be done from GUI once for the 10Gbps NIC MTU is set to 9000
 
-#Increasing Ring Buffers
-#This applies to Ethernet connected USRPs using a 10 Gb interface (X3xx, N3xx, E320). 
+################# Increasing Ring Buffers ########################################################
+#This applies to Ethernet connected USRPs using a 10 Gb interface (X3xx, N3xx, E320).           
 #Increasing the Ring Buffers on the NIC may help prevent flow control errors at higher rates. 
-ethtool -G ${NICNAME_1} tx 4096 rx 4096
-ethtool -G ${NICNAME_2} tx 4096 rx 4096
+# For the intel 
+ethtool -G ${NICNAME_0} tx 4096 rx 4096
+ethtool -G ${NICNAME_1} tx 2047 rx 2047         
+ethtool -G ${NICNAME_2} tx 2047 rx 2047
+
+##################################################################################################
 
 
 # install linux-tools packet for the current kernel version before running cpupower
