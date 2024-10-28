@@ -1,0 +1,23 @@
+#!/bin/bash
+# Manolis Bozis Aug 2023
+# relax CPU frequencies whan Open Air Interface doesn't run
+# set back to ondemand governor
+
+#  SCRIPT NEEDS TO RUN WITH SUDO PRIVILAGES !!!!
+source gnbconfig.ini
+
+for ((i=0;i<$(nproc --all);i++)); do 
+sudo cpufreq-set -c $i -r -g powersave;
+done
+if [ $? -eq 0 ]; then
+echo -e "${G}governor set to powersave successfully for all CPUs${NOCOLOR}"
+else  
+echo -e "${R}governor could not be set to powersave {NOCOLOR}"
+fi
+
+sudo cpupower idle-set -E 0 > /dev/null
+if [ $? -eq 0 ]; then
+echo -e "${G}idlestates 0 to 4 enabled for all CPUs${NOCOLOR}"
+else  
+echo -e "${R}idlestates 0 to 4 could not be enabled{NOCOLOR}"
+fi

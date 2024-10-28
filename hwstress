@@ -1,0 +1,74 @@
+#!/bin/bash
+# oai 5G testbed with USRP N310
+# 
+# DCS LAB Oct 2023
+# Manolis Bozis
+# scripts MUST run with root privillages
+source gnbconfig.ini # load congfiguratiom
+
+# change mtu value to 9000 fir 10gbps network interface controllers  ############
+sudo ip link set dev ${NICNAME_0} mtu 9000                                      #
+sudo ip link set dev ${NICNAME_1} mtu 9000                                      #
+sudo ip link set dev ${NICNAME_2} mtu 9000                                      #
+#################################################################################
+
+######### To set the CPU governor to performance for all cores: ################# 
+for ((i=0;i<$(nproc --all);i++)); do                                            #
+sudo cpufreq-set -c $i -r -g performance >/dev/null                            #
+done                                                                            #
+if [ $? -eq 0 ]; then                                                           #
+echo -e "${G}governor set to performance successfully for all CPUs${NOCOLOR}"   #
+else                                                                            #
+echo -e "${R}governor could not be set to performance {NOCOLOR}"                #
+fi                                                                              #
+#################################################################################
+
+############## Adjust Network Buffers ###########################################
+#This applies to USRP devices connected via Ethernet,                           #            
+# such as the N200, N210, N300, N310, N320, N321, X300, X310, E320.             #
+#Note that these settings will not persist across a reboot.                     #    
+#sysctl -w net.core.wmem_max=33554432                                           #
+#sysctl -w net.core.rmem_max=33554432                                           #
+#sysctl -w net.core.wmem_default=33554432                                       #
+#sysctl -w net.core.rmem_default=33554432                                       #
+sudo sysctl -w net.core.wmem_max=134217728                                      #
+sudo sysctl -w net.core.rmem_max=134217728                                      #
+sudo sysctl -w net.core.wmem_default=134217728                                  #
+sudo sysctl -w net.core.rmem_default=134217728                                  #
+#################################################################################
+
+#Adjust Ethernet MTU ############################################################
+# can be done from GUI once for the 10Gbps NIC MTU is set to 9000               #
+#################################################################################
+
+################# Increasing Ring Buffers ############################################################ 
+#This applies to Ethernet connected USRPs using a 10 Gb interface                                    #
+# (X3xx, N3xx, E320).                                                                                #
+#Increasing the Ring Buffers on the NIC may help prevent flow control errors                         #
+# at higher rates. For the intel:                                                                    #
+# find preset maximumxs for all NICS                                                                 #
+NIC0_TXMAX=$(ethtool -g ${NICNAME_0} | grep "Pre-set maximums" -A 4 | grep "TX:" | awk '{print $2}') #
+NIC0_RXMAX=$(ethtool -g ${NICNAME_0} | grep "Pre-set maximums" -A 4 | grep "RX:" | awk '{print $2}') # 
+sudo ethtool -G ${NICNAME_0} tx ${NIC0_TXMAX} rx ${NIC0_RXMAX}                                       #
+NIC1_TXMAX=$(ethtool -g ${NICNAME_1} | grep "Pre-set maximums" -A 4 | grep "TX:" | awk '{print $2}') #
+NIC1_RXMAX=$(ethtool -g ${NICNAME_1} | grep "Pre-set maximums" -A 4 | grep "RX:" | awk '{print $2}') # 
+sudo ethtool -G ${NICNAME_1} tx ${NIC1_TXMAX} rx ${NIC1_RXMAX}                                       #
+NIC2_TXMAX=$(ethtool -g ${NICNAME_2} | grep "Pre-set maximums" -A 4 | grep "TX:" | awk '{print $2}') #
+NIC2_RXMAX=$(ethtool -g ${NICNAME_2} | grep "Pre-set maximums" -A 4 | grep "RX:" | awk '{print $2}') # 
+sudo ethtool -G ${NICNAME_2} tx ${NIC2_TXMAX} rx ${NIC2_RXMAX}                                       #
+######################################################################################################
+
+
+# install linux-tools packet for the current kernel version #####################
+# before running cpupower                                                       #
+# uncomment the following line in case of cpupower not finding                  # 
+# cpupower the specific kenrel version                                          #
+echo -e "${G}installing prerequisite packets if needed..${NOCOLOR}"             #
+sudo apt install -y linux-tools-common linux-tools-`uname -r`                   #
+#enable performance mode and display current frequency for all CPUs             # 
+sudo cpupower idle-set -D 0                                                     #         
+echo -e "${G}displaying CPU frequencies...${NOCOLOR}"                              #
+cpufreq-info | awk '/analyzing CPU/ || /current CPU frequency is/ {print}'      #
+#################################################################################
+
+

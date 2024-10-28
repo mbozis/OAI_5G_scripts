@@ -118,7 +118,7 @@ ssh ${CN_IP} "docker exec oai-ext-dn ping ${UE_IP} -c ${PING_COUNT}"
 #### FUNCTION 4 Throughput Test with iperf command in Downlink ###########
 iperftestDL(){
 # start iperf server deamon on UE side
-ssh ${UE_HOST_IP} "pgrep iperf >/dev/null"
+ssh ${UE_HOST_IP} "pgrep iperf3 >/dev/null"
 iperf_RUNNING=$?
 if [ ${iperf_RUNNING} -eq 0 ]
 then
@@ -127,7 +127,7 @@ then
  ssh ${UE_HOST_IP} "pkill iperf"
  sleep 2
 fi
- ssh ${UE_HOST_IP} "iperf -s -D -u -i1 -B ${UE_IP}"
+ ssh ${UE_HOST_IP} "iperf -s -D -u -i1 -B ${UE_IP}" #
  iperf_SERVER=$?
   if [ $iperf_SERVER -eq 0 ]
   then
@@ -141,7 +141,7 @@ fi
 # 
 echo -e "${G}Starting transmitting data on 5G DOWNLINK${NOCOLOR}"
 echo -e "${G}Sending DOWNLINK traffic at ${DOWNLINK_SPEED_TEST}bps${NOCOLOR}"
-ssh ${CN_IP} "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -B ${OAI_EXT_DN_IP} -i1 -b ${DOWNLINK_SPEED_TEST} -c ${UE_IP} -fm"
+ssh ${CN_IP} "docker exec oai-ext-dn iperf -u -t ${TEST_TIME} -B ${OAI_EXT_DN_IP} -i1 -b ${DOWNLINK_SPEED_TEST} -c ${UE_IP} -fm --pacing-timer 1000000"
 echo -e "transmission stoped in 5G DOWNLINK"
 # -stop iperf server on UE side
 ssh ${UE_HOST_IP} "pkill iperf"
@@ -187,7 +187,7 @@ speedometer(){
 ssh -X $UE_HOST_IP  "~/scripts/speedometer" 2> /dev/null
 }
 ###########################################################################
-#### FUNCTION 7 print help message  ############
+#### FUNCTION 7 print help message ########################################
 print_help(){
 cat <<EOF
 UOP - DCS LAB author Manolis Bozis 2023
@@ -291,12 +291,12 @@ sleep 2
 ###################### Funcion 10 Check connection of gNB to 5GCN #########
 # check if core network is up
 check_NGI(){
-ping -c 1 ${AMF_IP} >/dev/null
+ping -c 1 ${AMF_IP}  >/dev/null
 AMF_UP=$?
 if [ $AMF_UP -eq 0 ]
 then
    echo -e "${G}AMF container is reachable${NOCOLOR}"
-   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} | grep 'Connected' -A 2 -B 2" >/dev/null
+   ssh ${CN_IP} "docker logs oai-amf --since ${AMF_APP_TIME} | grep 'Connected' -A 2 -B 2"
    NGI_CONNECTED=$?
    if [ $NGI_CONNECTED -eq 0 ]
    then
