@@ -30,33 +30,16 @@ the ethernet link between the host and SDR needs to be at least 10Gbps
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   edit gnb softmodem configuration file for a specific scenario
                            Scenarios are listed in the following table:                         
-                           ------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                       
-                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
-                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
-                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
-                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                          | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
-                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               | 
-                          | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                           
-                           ------------------------------------------------------------------
+EOF
+print_scenarios # print scenario descriptions (function is in gnbconfig.ini file)
+cat <<EOF
                           
   -a, --amf                detect host and container IPs  
   -p, --plmn               set PLMN and TAC settings
                            1 (default) --> 00101  TAC --> 0001
                            2           --> 50501  TAC --> 0001 
                            3           --> 20295  TAC --> 40960 
-  --ul_max_mcs             set max MCS in Uplink                         
+  --ul-max-mcs             set max MCS in Uplink                         
   -c, --core-net           configure network settings in gNB if Core Network is deployed in different host                         
   -e, --editor             choose editor, combined with -s argument
                            1 (default) --> nano
@@ -64,20 +47,20 @@ Usage:  $0 [OPTION]... [+VALUE]
   -m, --mode               default mode to start the gnbpanel script
                            1 USRP N310 device
                            2 RF simulator  
-  -E,--external_source     specify SDR clock and time source as external
-  -I,--internal_source     specify SDR clock and time source as internal
-  -G,--gpsdo_source        specify SDR clock and time source as GPSDO  
-  -t  --att_tx [value]     specify attenuation value in dB (0 - 30) for transmitter                                
+  -E,--external-source     specify SDR clock and time source as external
+  -I,--internal-source     specify SDR clock and time source as internal
+  -G,--gpsdo-source        specify SDR clock and time source as GPSDO  
+  -t  --att-tx [value]     specify attenuation value in dB (0 - 30) for transmitter                                
                            example: $0 -t 10   
-  -r, --att_rx [value]     specify attenuation value in dB (0 - 30) for receiver
+  -r, --att-rx [value]     specify attenuation value in dB (0 - 30) for receiver
                            example: $0 -r 15 
-  --max_rx_gain            specify max rx gain value in for the USRP N310 device (valid values are from 40 to 75)               
-  --pusch_snr              specify PUSCH target SNRx10 (valid values are from 100 to 500)
-  --pucch_snr              specify PUCCH target SNRx10 (valid values are from 100 to 500)
-  --ulsch_inactivity       specify ul_max_frame_inactivity value (from 0 to 20. The value of 0 achieves the best latency)             
+  --max-rxgain            specify max rx gain value in for the USRP N310 device (valid values are from 40 to 75)               
+  --pusch-snr              specify PUSCH target SNRx10 (valid values are from 100 to 500)
+  --pucch-snr              specify PUCCH target SNRx10 (valid values are from 100 to 500)
+  --ulsch-inactivity       specify ul_max_frame_inactivity value (from 0 to 20. The value of 0 achieves the best latency)             
   -v, --view               view current values of parameters in all configuration files
                            in conjunction with '-s' display parameters only for the selected scenario
-  -V  --view_ini           view settings in gnbconfig.ini file                                                                              
+  -V  --view-ini           view settings in gnbconfig.ini file                                                                              
   -i, --info               show Open Air Interface software version
   -h, --help               print this help message
 EOF
@@ -98,8 +81,8 @@ if [[ -z "$SELECTED_SCENARIO" ]] ; then
   echo "---------------------------------------------"
   done
 else
-  echo -e "scenario: ${G}${SELECTED_SCENARIO} ${NOCOLOR}Configuration file: ${G}${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}${NOCOLOR}"
-  grep -E 'att_tx|att_rx|max_rxgain|plmn_list|tracking_area_code|pusch_TargetSNRx10|pucch_TargetSNRx10|ulsch_max_frame_inactivity' $CONFIGURATION_FOLDER/${CONFIGURATIONS["$SELECTED_SCENARIO"-1]}
+  echo -e "scenario: ${G}${SELECTED_SCENARIO} ${NOCOLOR}Configuration file: ${G}${CONFIGURATIONS[${SELECTED_SCENARIO}-1]}${NOCOLOR}"
+  grep -E 'att_tx|att_rx|max_rxgain|plmn_list|tracking_area_code|pusch_TargetSNRx10|pucch_TargetSNRx10|ulsch_max_frame_inactivity' $CONFIGURATION_FOLDER/${CONFIGURATIONS[${SELECTED_SCENARIO}-1]}
 fi
 
 }
@@ -110,7 +93,7 @@ view_ini(){
 
 echo "----- Setitngs in gnbconfig.ini file --------"
 ############################### Folders Configuration #########################################################
-echo "Scripts folder               : $USER_SCRIPTS_FOLDER"
+echo "Scripts folder               : $USER_SCRIPTS_FODER"
 echo "Configuration files folder   : $CONFIGURATION_FOLDER"
 echo "Log files folder             : $LOGS_FOLDER"
 echo "capture files folder         : $CAPTURE_DIRECTORY"
@@ -135,7 +118,7 @@ echo "RF board timing advance      : Not set <--this is to compensate fix delay 
 echo "RF board timing advance      : $(echo $OAI_RA_FIX|cut -d' ' -f 2) <--this is to compensate fix delay inside the RF board between Rx and Tx timestamps (RF board internal issues)"  
 fi
 }
-###############################################################
+##################################################L#############
 
 
 ########## set max_rx_gain value in configuration file ########
@@ -192,7 +175,9 @@ set_internal(){
 for file in ${CONFIGURATION_FOLDER}/*
 do
 sed -i 's/source=external/source=internal/g;s/source=gpsdo/source=internal/g' ${file}
-done
+done   
+sed -i "/export FREQUENCY_SOURCE/c\export FREQUENCY_SOURCE=0" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+sed -i "/export ONE_PPS_SOURCE/c\export ONE_PPS_SOURCE=0" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 }
 ###############################################################
 ### set external source for SDR in configuration file #########
@@ -201,6 +186,8 @@ for file in ${CONFIGURATION_FOLDER}/*
 do
 sed -i 's/source=internal/source=external/g;s/source=gpsdo/source=external/g' ${file}
 done
+sed -i "/export FREQUENCY_SOURCE/c\export FREQUENCY_SOURCE=1" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+sed -i "/export ONE_PPS_SOURCE/c\export ONE_PPS_SOURCE=1" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 }
 ###############################################################
 
@@ -211,6 +198,8 @@ for file in ${CONFIGURATION_FOLDER}/*
 do
 sed -i 's/source=internal/source=gpsdo/g;s/source=external/source=gpsdo/g' ${file}
 done
+sed -i "/export FREQUENCY_SOURCE/c\export FREQUENCY_SOURCE=2" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+sed -i "/export ONE_PPS_SOURCE/c\export ONE_PPS_SOURCE=2" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 }
 ###############################################################
 ################## change plmn and tac for all configuration files ########
@@ -243,7 +232,7 @@ done
 
 
 config_net_ng(){
-if [[ -z "${CN_IP}" || -z "${GNB_NIC_TO_CN}" ]]; then
+if [[ "${CN_IP}" = "${GNB_HOST_IP}" ]]; then
  for file in ${CONFIGURATION_FOLDER}/*
  do
   sed -i "/GNB_INTERFACE_NAME_FOR_NG_AMF/c\        GNB_INTERFACE_NAME_FOR_NG_AMF            = \"demo-oai\";" ${file}
@@ -255,9 +244,9 @@ else
  for file in ${CONFIGURATION_FOLDER}/*
  do
   sed -i "/GNB_INTERFACE_NAME_FOR_NG_AMF/c\        GNB_INTERFACE_NAME_FOR_NG_AMF            = \"${GNB_NIC_TO_CN}\";" ${file}
-  sed -i "/GNB_IPV4_ADDRESS_FOR_NG_AMF/c\          GNB_IPV4_ADDRESS_FOR_NG_AMF            = \"${GNB_HOST_IP_CIDR}\";" ${file}
+  sed -i "/GNB_IPV4_ADDRESS_FOR_NG_AMF/c\          GNB_IPV4_ADDRESS_FOR_NG_AMF            = \"${GNB_NIC_TO_CN_CDR}\";" ${file}
   sed -i "/GNB_INTERFACE_NAME_FOR_NGU/c\           GNB_INTERFACE_NAME_FOR_NGU            = \"${GNB_NIC_TO_CN}\";" ${file}
-  sed -i "/GNB_IPV4_ADDRESS_FOR_NGU/c\             GNB_IPV4_ADDRESS_FOR_NGU            = \"${GNB_HOST_IP_CIDR}\";" ${file}
+  sed -i "/GNB_IPV4_ADDRESS_FOR_NGU/c\             GNB_IPV4_ADDRESS_FOR_NGU            = \"${GNB_NIC_TO_CN_CDR}\";" ${file}
  done
 fi
 
@@ -291,6 +280,8 @@ esac
 ###########################################################
 function set_ip_addrs(){
 #### Update LAN IP Addreesses of gNB and UE hosts ####################
+echo -e "${Y}configuring ip addresses of hosts...${NOCOLOR}"
+sleep 1
 ping -c 1 -b ${LAN_B_ADDR} >/dev/null # ping broadcast address to update arp table
 UE_HOST_IP=$(arp -n | grep ${UE_HOST_MAC} | awk '{print $1}')
 sed -i "/export UE_HOST_IP=/c\export UE_HOST_IP=\"${UE_HOST_IP}\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
@@ -301,6 +292,8 @@ echo -e "GNB host ip set to: ${G}${GNB_HOST_IP}${NOCOLOR}"
 ######################################################################
 
 ####  find amf IP in oai-amf container ###############################
+echo -e "${Y}configuring ip addresses of containers...${NOCOLOR}"
+sleep 1
 CN_DEPLOYED=$(ssh $CN_IP "docker ps" | wc -l)
 if [ "$CN_DEPLOYED" = "1" ]; then
 echo -e "${R}Core network containers are not deployed${NOCOLOR}"
@@ -319,10 +312,23 @@ if [ $CN_VERSION = "v1.5.1" ]; then
 sed -i "/export UPF_IP=/c\export UPF_IP=\"192.168.70.134\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 sed -i "/export OAI_EXT_DN_IP=/c\export OAI_EXT_DN_IP=\"192.168.70.135\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 sed -i "/export AMF_IP=/c\export AMF_IP=\"192.168.70.132\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+echo -e "UPF container ip set to ${G}192.168.70.134${NOCOLOR} in gnbconfig.ini file"
+echo -e "OAI_EXT_DN container ip set to ${G}192.168.70.135${NOCOLOR} in gnbconfig.ini file"
 else
-sed -i "/export UPF_IP=/c\export UPF_IP=\"192.168.70.133\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+sed -i "/export UPF_IP=/c\export UPF_IP=\"192.168.70.135\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 sed -i "/export OAI_EXT_DN_IP=/c\export OAI_EXT_DN_IP=\"192.168.70.131\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 sed -i "/export AMF_IP=/c\export AMF_IP=\"192.168.70.134\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+echo -e "UPF container ip set to ${G}192.168.70.133${NOCOLOR} in gnbconfig.ini file"
+echo -e "OAI_EXT_DN container ip set to ${G}192.168.70.131${NOCOLOR} in gnbconfig.ini file"
+fi
+####  find USRP device IP ###############################
+echo -e "${Y}trying to configure management IP of USRP N310 SDR device...${NOCOLOR}"
+GNB_USRP_MGMT_IP=$(uhd_find_devices --args="serial=${GNB_USRP_SERIAL}" | grep addr | grep -v mgmt_addr | awk '{print $2}' | tr -d '\n')
+if [ ! -z "${GNB_USRP_MGMT_IP}" ]; then
+sed -i "/export GNB_USRP_MGMT_IP=/c\export GNB_USRP_MGMT_IP=\"${GNB_USRP_MGMT_IP}\"  # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+echo -e "USRP N310 mgmt IP ip set to ${G}${GNB_USRP_MGMT_IP}${NOCOLOR} in gnbconfig.ini file"
+else
+echo -e "${Y}WARNING: USRP N310 device could not be detected${NOCOLOR}"
 fi
 }
 ######################################################################
@@ -348,8 +354,6 @@ fi
   do
     case "$1" in
         -a | --amf)
-            echo "configuring ip addresses of hosts and containers..."
-            sleep 1
             set_ip_addrs       
             exit 0;
             shift;;
@@ -363,7 +367,7 @@ fi
        -s | --scenario)
 	    # check if scenario value is valid
             SELECTED_SCENARIO=$2
-            if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${OTA_SCENARIOS} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
+            if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${#SCENARIOS[@]} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
                echo -e "${R}selected senario is not valid\n${NOCOLOR}"
                print_help
                exit 1 
@@ -404,7 +408,7 @@ fi
         -c | --core-net)
             config_net_ng
             shift;;
-        --ul_max_mcs)
+        --ul-max-mcs)
             # check if selected UL max MCS is valid
             SELECTED_UL_MAX_MCS=$2
             if [[ ! $SELECTED_UL_MAX_MCS =~ $re ]] || [[ ${SELECTED_UL_MAX_MCS} -gt 27 ]] || [[ ${SELECTED_UL_MAX_MCS} -le 0 ]] ; then
@@ -415,7 +419,7 @@ fi
             ###########################################################
             set_ul_max_mcs
             shift 2;;
-          -t | --att_tx)
+          -t | --att-tx)
             SELECTED_TX_VALUE=$2
             if [[ ! ${SELECTED_TX_VALUE} =~ $re ]] || [[ ${SELECTED_TX_VALUE} -gt 60 ]] || [[ ${SELECTED_TX_VALUE} -lt 0 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 0 to 60 \n${NOCOLOR}"
@@ -425,7 +429,7 @@ fi
             set_att_tx
             ###########################################################
             shift 2;;     
-        -r | --att_rx)
+        -r | --att-rx)
             SELECTED_RX_VALUE=$2
             if [[ ! ${SELECTED_RX_VALUE} =~ $re ]] || [[ ${SELECTED_RX_VALUE} -gt 60 ]] || [[ ${SELECTED_RX_VALUE} -lt 0 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 0 to 30 \n${NOCOLOR}"
@@ -435,7 +439,7 @@ fi
             set_att_rx 
             ###########################################################
             shift 2;;    
-         --max_rx_gain)
+         --max-rxgain)
             SELECTED_MAX_RX_GAIN=$2
             if [[ ! ${SELECTED_MAX_RX_GAIN} =~ $re ]] || [[ ${SELECTED_MAX_RX_GAIN} -gt 75 ]] || [[ ${SELECTED_MAX_RX_GAIN} -lt 40 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 40 to 75 for USRP N310 device \n${NOCOLOR}"
@@ -445,7 +449,7 @@ fi
             set_max_rx_gain 
             ###########################################################
             shift 2;;    
-         --pusch_snr)
+         --pusch-snr)
             SELECTED_PUSCH_SNR=$2
             if [[ ! ${SELECTED_PUSCH_SNR} =~ $re ]] || [[ ${SELECTED_PUSCH_SNR} -gt 500 ]] || [[ ${SELECTED_PUSCH_SNR} -lt 100 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 100 to 500 \n${NOCOLOR}"
@@ -455,7 +459,7 @@ fi
             set_pusch_snr
             ###########################################################
             shift 2;; 
-         --pucch_snr)
+         --pucch-snr)
             SELECTED_PUCCH_SNR=$2
             if [[ ! ${SELECTED_PUCCH_SNR} =~ $re ]] || [[ ${SELECTED_PUCCH_SNR} -gt 500 ]] || [[ ${SELECTED_PUCCH_SNR} -lt 100 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 100 to 500 \n${NOCOLOR}"
@@ -465,7 +469,7 @@ fi
             set_pucch_snr
             ###########################################################
             shift 2;; 
-         --ulsch_inactivity)
+         --ulsch-inactivity)
             SELECTED_ULSCH_INACTIVITY=$2
             if [[ ! ${SELECTED_ULSCH_INACTIVITY} =~ $re ]] || [[ ${SELECTED_ULSCH_INACTIVITY} -gt 30 ]] || [[ ${SELECTED_ULSCH_INACTIVITY} -lt 0 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 0 to 30 for ulsch_max_frame_inactivity \n${NOCOLOR}"
@@ -475,19 +479,19 @@ fi
             set_ulsch_inactivity
             ###########################################################
             shift 2;;             
-       -E | --external_source)
+       -E | --external-source)
             set_external
             shift;;
-       -I | --internal_source)
+       -I | --internal-source)
             set_internal
             shift;;  
-       -G | --gpsdo_source)
+       -G | --gpsdo-source)
             set_gpsdo
             shift;;               
        -v | --view)
             VIEW_PARAMS=1 # Flag to denote viewing parameters instead of editing the whole configuration file            
             shift;; 
-       -V | --view_ini)
+       -V | --view-ini)
             view_ini
             exit 0;;                              
 	-h | --help)

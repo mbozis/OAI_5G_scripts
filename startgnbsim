@@ -6,8 +6,8 @@
 # scripts MUST run with root privillages
 # 
 source gnbconfig.ini
-# configure core network ips ###
-./gnbconfig -a
+# configure core network ips only if you change core network version or DHCP host IPs chenge ###
+# run ./gnbconfig -a before running this script
 ################################
 ######################################################################################
 ######### FUCTIONS ############
@@ -31,31 +31,9 @@ the ethernet link between the 2 hosts  needs to be at least 10Gbps
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   start gnb softmodem executing scenario number [value]
                            value is from the following table
-                           ------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                            
-                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
-                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
-                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
-                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                          | 10 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               |
-                          | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                        
-                          | 17| do-ra mode: simulated 5G NSA connection with only 5G         |
-                          |   | terminals being present                                      |                                              
-                          | 18| physical layer test with one slot assigned for downlink      |
-                          | 19| extended phy layer test with parameters changed              |
-                          |   | (parameters need to be changed directly to script code)      |      
-                          -------------------------------------------------------------------
+EOF
+print_scenarios # print scenario descriptions (function is in gnbconfig.ini file)
+cat <<EOF
                                                  
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
@@ -76,8 +54,8 @@ sed -i "/export SELECTED_SCENARIO/c\export SELECTED_SCENARIO=${SELECTED_SCENARIO
 ################## SCENARIO 1 ##############################################
 #################### SA mode band 78 51prb  ################################
 sa_band78_24prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.24PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -85,8 +63,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.24PRB.usrpn
 ################## SCENARIO 2 ##############################################
 #################### SA mode band 78 51prb  ################################
 sa_band78_51prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -96,8 +74,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.
 # 106 PRB - usrp n310 ######################################################
 # configuration file used also for OTA transmittion with USRP N310 SDR #####
 sa_band78_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 # add --telnetsrv \ # for telnet server in gnb
 # add --MACRLCs.[0].ul_max_mcs # to select maximum mcs in uplink (default value is 9)
@@ -107,8 +85,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 ################## SCENARIO 4 ##############################################
 ########### SA mode band 78 133 prb SISO ###################################
 sa_band78_133prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.133PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -116,8 +94,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.133PRB.usrp
 ################## SCENARIO 5 ##############################################
 ############# SA mode band 78 162 prb  SISO ################################
 sa_band78_162prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -125,8 +103,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.usrp
 ################## SCENARIO 6 ##############################################
 ######### Scenarion 17 SA mode band 78 217 prb SISO ########################
 sa_band78_217prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -134,7 +112,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrp
 ################## SCENARIO 7 ##############################################
 #################### SA mode band 77 273prb  ###############################
 sa_band77_273prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
 --rfsimulator.serveraddr server --rfsimulator.serverport 4043 --usrp-tx-thread-config 1 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
@@ -143,8 +121,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrp
 ################## SCENARIO 8 ##############################################
 ##################### SA mode band 78 106prb TDD 1  ########################
 sa_band78_106prb_TDD_1(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -153,8 +131,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 ################## SCENARIO 9 ##############################################
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_band78_106prb_TDD_2(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -162,8 +140,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 ################## SCENARIO 10 ##############################################
 ##################### SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_mimo_band78_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -171,8 +149,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.
 ################## SCENARIO 11 #############################################
 ##################### SA mode band 78 133 prb MIMO #########################
 sa_mimo_band78_133prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -180,8 +158,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn31
 ################## SCENARIO 12 #############################################
 ##################### SA mode band 78 162 prb  MIMO ########################
 sa_mimo_band78_162prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -189,8 +167,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.2x2.
 ################## SCENARIO 13 #############################################
 ###################### SA mode band 78 217 prb MIMO ########################
 sa_mimo_band78_217prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -198,8 +176,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.2x2.
 ################## SCENARIO 14 #############################################
 ######### Scenarion 18 SA mode band 77 273 prb MIMO ########################
 sa_mimo_band77_273prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -207,8 +185,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.
 ################## SCENARIO 15 ##############################################
 #################### SA mode band 66 #######################################
 sa_band66_106prb(){
-COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrpn310.conf \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --sa \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 # --rfsimulator.options chanmod --rfsimulator.modelname AWGN \
@@ -220,8 +198,8 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band
 ################## SCENARIO 16 ##############################################
 #################### SA mode band 66 #######################################
 sa_band71_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band71.fr1.106PRB.usrpn310.conf \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --sa \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 # --rfsimulator.options chanmod --rfsimulator.modelname AWGN \
@@ -233,7 +211,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band71.fr1.106PRB.usrp
 ################## SCENARIO 17 ######### ####################################
 #################### Physical do-ra mode ###################################
 dora(){
-COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.tm1.106PRB.usrpn300.conf \
+COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --do-ra --rfsimulator.serveraddr server --gNBs.[0].min_rxtxtime 6"
 }
 ############################################################################
@@ -242,8 +220,8 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.
 #################### Physical layer test ###################################
 phytest(){
 # only 1 slot assigned for downlink
-COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.tm1.106PRB.usrpn300.conf \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --phy-test --gNBs.[0].min_rxtxtime 6"
 }
 ############################################################################
@@ -258,25 +236,45 @@ phytestextended(){
 # Selections are MCS=27 PRBs=106  
 # and Bitmap of slots = 126 decimal = 01111110 binary that coresponds to slots 1,2,3,4,5 and 6
 # at the UE side we see the number of HACKs are 6 times greater than in 1st scenario
-COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.tm1.106PRB.usrpn300.conf \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --phy-test -m 27 -M 106 -D 126 --gNBs.[0].min_rxtxtime 6"
 }
 ############################################################################
 
+############## SCENARIO 20 ##################################################
+#################### band 66, 25PRB, SCS=15KHz FDD ############################
+band66_25prb(){
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+}
+###############################################################################
+############## SCENARIO 21 ##################################################
+#################### GEO_satellite emulation  ###############################
+geo_sat_emulation(){
+# GEO satellite emulation --rfsimulator.prop_delay 238.74
+# up to 16us (--rfsimulator.prop_delay 0.016) the UE receives the RAR and 
+# completes the RAR proccess successfuly.
+# This scenario is for transparent GEO satellite
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--rfsimulator.prop_delay 238.74 \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+}
+###############################################################################
 
-
-
-##################### SA mode band 78 tracer  ##############################
-sa_106prb_tracer(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---conTinuous-tx --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---T_stdout 2 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} \
-#> ~/gnb.log 2>&1"
-# Tracer util usage with:--T_stdout 2
+################## SCENARIO 22 ##############################################
+#################### SA mode band 3 #######################################
+sa_band3_52prb(){
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--parallel-config PARALLEL_SINGLE_THREAD --rfsim --sa \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
+
+
 
 ######################## MAIN FUNCTION #####################################
 function main() {
@@ -319,7 +317,7 @@ fi
             fi
 	    # check if core network is up, executing a ping to AMF ####
             echo -e "checking connection to AMF...\n"
-            ping amf -c 1 > /dev/null
+            ping ${AMF_IP} -c 1 > /dev/null
             if [ $? -ne 0 ]; then
             echo -e "${R} No connection to AMF\n"
             echo -e "start 5G core network prior to executing RAN ${NOCOLOR}\n"
@@ -401,6 +399,6 @@ SELECTED_SCENARIO=""
 write_selected_scenario
 ###################################################################
 # end of script
-  }
+}
 
 main "$@"

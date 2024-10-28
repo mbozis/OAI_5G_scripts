@@ -8,13 +8,13 @@
 source gnbconfig.ini
 
 ######################################################################################
-# configure core network ips ###
-./gnbconfig -a
+#  configure core network ips only if you change core network version or DHCP host IPs chenge ###
+#./gnbconfig -a
 ################################
 #### FUNCTION 1 print help message  ############
 print_help(){
 cat <<EOF
-UOP - DCS LAB author Manolis Bozis 2023
+UOP - DCS LAB author Manolis Bozis 2024
 Tool to start gnb softmodem for a particular scenorio using USRP N310 SDR device
 or 2 hosts running OAI nrUE and nrgNB respectively.
 the ethernet link between the host and SDR needs to be at least 10Gbps 
@@ -22,26 +22,9 @@ the ethernet link between the host and SDR needs to be at least 10Gbps
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   start gNB softmodem selecting scenario number [value]
                            value is from the following table
-                          --------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                            
-                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
-                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
-                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
-                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                          | 10 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               | 
-                          | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                              
-                          --------------------------------------------------------------------
+EOF
+print_scenarios # print scenario descriptions (function is in gnbconfig.ini file)
+cat <<EOF
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
                            2           --> 50501
@@ -65,8 +48,9 @@ sed -i "/export SELECTED_SCENARIO/c\export SELECTED_SCENARIO=${SELECTED_SCENARIO
 ############## SCENARIO 1 ##################################################
 ############## 24 PRB SA  ##################################################
 sa_band78_24prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.24PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
@@ -74,8 +58,9 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.24PRB.usrpn
 ############## SCENARIO 2 ##################################################
 ############## 51 PRB SA  ##################################################
 sa_band78_51prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 
 # --continuous-tx --MACRLCs.[0].ul_max_mcs 25 
@@ -93,7 +78,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.
 #  To avoid their use or shift them away from the center to use more UL spectrum,
 #  use the --tune-offset <Hz> command line switch, where <Hz> is ideally half 
 # the bandwidth, or possibly less.
-# --gNBs.[0].min_rxtxtime 6
+# ${MIN_RXTXTIME}
 # uncomment the following line to mitigate uplink issues rellated to noise 
 # on the DC carriers
 #--tune-offset <Hz>
@@ -106,45 +91,50 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.51prb.usrpn310.
 ############## SCENARIO 3 ##################################################
 #########           106 PRB SA           ###################################
 sa_band78_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 
 ############################################################################
 
 ######## Scenario 4 SA mode band 78 133 prb SISO #########################
 sa_band78_133prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.133PRB.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 5 SA mode band 78 162 prb  SISO ########################
 sa_band78_162prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 6 SA mode band 78 217 prb SISO ########################
 sa_band78_217prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 7 SA mode band 77 273 prb  SISO ########################
 sa_band77_273prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
@@ -152,8 +142,9 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.usrp
 ############## SCENARIO 8 ##################################################
 ##################### SA mode band 78 106prb TDD 1  ########################
 sa_band78_106prb_TDD_1(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_1.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
@@ -162,62 +153,69 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrp
 ############## SCENARIO 9 ##################################################
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_band78_106prb_TDD_2(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 10 SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_mimo_band78_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf  \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]}  \
 --sa  --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 11 SA mode band 78 133 prb (2x2 MIMO)  ###################
 sa_mimo_band78_133prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gNB_SA_n78_133PRB.2x2_usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 12 SA mode band 78 162 prb (2x2 MIMO)  ###################
 sa_mimo_band78_162prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.band78.sa.fr1.162PRB.2x2.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 13 SA mode band 78 217 prb (2x2 MIMO)  ###################
 sa_mimo_band78_217prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band78.fr1.217PRB.2x2.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 14 SA mode band 77 273 prb (2x2 MIMO)  ###################
 sa_mimo_band77_273prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band77.fr1.273PRB.2x2.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
 ######### Scenario 15 SA mode band 66 102 prb (SISO)  ###################
 sa_band66_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
@@ -226,12 +224,79 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band66.fr1.106PRB.usrp
 #################### SA mode band 66 #######################################
 sa_band71_106prb(){
 
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/gnb.sa.band71.fr1.106PRB.usrpn310.conf \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --sa --usrp-tx-thread-config 1 \
---gNBs.[0].min_rxtxtime 6 ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
+
+################## SCENARIO 17 ######### ####################################
+#################### Physical do-ra mode ###################################
+dora(){
+COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--parallel-config PARALLEL_SINGLE_THREAD --do-ra --gNBs.[0].min_rxtxtime 6"
+}
+############################################################################
+
+############## SCENARIO 18 ##################################################
+#################### Physical layer test ###################################
+phytest(){
+# only 1 slot assigned for downlink
+COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--parallel-config PARALLEL_SINGLE_THREAD --phy-test --gNBs.[0].min_rxtxtime 6"
+}
+############################################################################
+
+############## SCENARIO 19 ##################################################
+#################### Physical layer test with parameters  ##################
+phytestextended(){
+#  new parameters added
+# -m     MCS (Modulation Coding Scheme)
+# -M     number of resource blocks asigned
+# -D     Bitmap of slots in downlink
+# Selections are MCS=27 PRBs=106  
+# and Bitmap of slots = 126 decimal = 01111110 binary that coresponds to slots 1,2,3,4,5 and 6
+# at the UE side we see the number of HACKs are 6 times greater than in 1st scenario
+COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--parallel-config PARALLEL_SINGLE_THREAD --phy-test -m 27 -M 106 -D 126 --gNBs.[0].min_rxtxtime 6"
+}
+############################################################################
+
+
+
+################## SCENARIO 20 ##############################################
+#################### SA mode band 66 35prb ####################################################
+band66_25prb(){                                                                               
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \    
+--sa --usrp-tx-thread-config 1 \                                                              
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \                                      
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \                           
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"                             
+}                                                                                             
+###############################################################################################
+################## SCENARIO 21 ################################################################
+#################### GEO sat emulation band 66 ################################################
+geo_sat_emulation(){                                                                          
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \   
+--sa --usrp-tx-thread-config 1 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \  
+--rfsimulator.prop_delay 238.74 \                                                                                                  
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \                           
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"                             
+}                                                                                             
+###############################################################################################
+################## SCENARIO 22 ##############################################
+#################### SA mode band 3 #######################################
+sa_band3_52prb(){
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--sa --usrp-tx-thread-config 1 \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+}
+############################################################################
+
 
 ######################## MAIN FUNCTION #####################################
 function main() {
@@ -242,7 +307,15 @@ if [ "$*" == "" ]; then
     exit 1
 fi
 ###########################################################
+# check if script is run with sudo privilages #############
 
+SCRIPTUSER=$(whoami)
+if [[ $SCRIPTUSER = "root" ]] ; then 
+               echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
+               echo -e "${R}when using the -c parameter \n${NOCOLOR}"               
+    exit 1
+fi
+###########################################################
 # check arguments
 
   until [ -z "$1" ]
@@ -256,7 +329,8 @@ fi
             exit 0;
             shift;;
        -s | --scenario)
-	    # check if scenario value is valid
+	    # check if scenario value is valid./nr-softmodem -O /home/manolis/scripts/configuration/gnb.band78.sa.fr1.106PRB.usrpn310_TDD_2.conf --sa --usrp-tx-thread-config 1 --gNBs.[0].min_rxtxtime 6 -A 45 --L1s.[0].max_ldpc_iterations 20 --clock-source 1 --time-source 1 --MACRLCs.[0].ul_max_mcs 28  --thread-pool 0-7
+
             SELECTED_SCENARIO=$2
             if [[ ! $SELECTED_SCENARIO =~ $re ]] || [[ $SELECTED_SCENARIO -gt ${OTA_SCENARIOS} ]] || [[ $SELECTED_SCENARIO -le 0 ]] ; then
                echo -e "${R}selected senario is not valid\n${NOCOLOR}"
@@ -327,6 +401,7 @@ fi
             ;;
     esac
   done
+
 ############# compose command with arguments for the specific scenario ####
 ${SCENARIOS["$SELECTED_SCENARIO"-1]}  
 ##### write to log file ################################################### 
@@ -347,14 +422,7 @@ echo -e "$COMMAND" > COMMAND
 # switch to softmodem binary file folder ##################
 cd ${USERFOLDER}/openairinterface5g 
 source oaienv
-# check if script is run with sudo privilages #############################
 
-SCRIPTUSER=$(whoami)
-if [[ $SCRIPTUSER = "root" ]] ; then 
-               echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
-               echo -e "${R}when using the -c parameter \n${NOCOLOR}"               
-    exit 1
-fi
 ############# check if command is to be executed inside the script ########
 #############   or copied to clipboard                          ###########
 if [[ ${CL} -eq 1 ]]; then
@@ -383,7 +451,7 @@ sudo chgrp ${USER} gnb_log_${LOG_FILE_TIMESTAMP}.txt
 fi
 ###################################################################
 ### set null value in SELECTED_SCENARIO var in gnbconfig.ini file #
-echo "reseting selected scenario variable in gnbconfig.ini file.."
+echo -e "${G}reseting selected scenario variable in gnbconfig.ini file..${NOCOLOR}"
 SELECTED_SCENARIO=""
 write_selected_scenario
 ###################################################################
