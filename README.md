@@ -1,14 +1,21 @@
-# OAI_5G_scripts
+# Scripts and configuration files for Open Air Interface SA testbed with two hosts.
 
+## Introduction
 
-
-![gnbpanel](gnbpanel.png)
-
-
+**OAI_5G_scripts** is a set of bash scripts that run in two PCs which host the Open Air interface software and implement the gNB and UE respectively. The purpose of using the scripts is to organize your tests and the respective configurations, perform quickly the nesessary network checks and modifications to your setup. In this collection of scripts there are scripts to configure your PC for realtime performance, to deploy and stop the 5G core network containers, to measure the throughput and latency of the end-to-end conneciton, to startup the gNB with the specific scenario settings and to modify parameters for all or for a specific scenario.
+The following picture depicts the testbed that exploits the Open Air Interface software alongside with the set of scripts in this repository.
+There are basically three ways to connect UE to gNB (A-C, figure 1). The first one is to use the RFsimulator and the 10Gbps network conneciton among the two hosts. The second one is to use the SDR devices (USRP N310 in our case) to ttransmit the RF signal either by RF cables and attenuators or wirelessly using antennas. Finally the third way is to use a COTS UE to connect to the gNB. In this case best performance results can be achieved if Core NetworK containers are deployed in the UE host, and thus releasing computational resources from gNB host.
 
 ![](./Diagram1n.png)
+<p align="center">Figure 1</p>
 
-Scripts and configuration files for Open Air Interface SA testbed with two hosts.
+There is also the **gnbpanel** script that combines the functionallity of several other scripts creating a control panel for viewing the status of gNB, Core Network and connected UE devices. The script exploites the well known tmux tool. The following figure depicts a screenshot of this script 
+in action.
+
+![gnbpanel](gnbpanel.png)
+<p align="center">Figure 2</p>
+
+
 
 To explore the use cases and measurements performed with this testbed you can read the paper "A Versatile 5G Standalone Testbed Based On Commodity Hardware" under the following link 
 
@@ -18,9 +25,14 @@ and the extended paper titled "Enhancing 5G performance: A standalone system pla
 
 https://www.sciencedirect.com/science/article/pii/S1434841124004011
 
+A collection of videos with measurements performed with this 5G testbed can be found at:
+ https://www.youtube.com/channel/UCO9M366I1N8OAOqTLJGdwLA
+
 
 This branch contains the scripts and congifuration files for gNB and 5G core network host.
 The files for the UE host are in the **master_ue** branch.
+
+## Getting started
 
 Start by installing the Open Air Interface software following the tutorial in the following link:
 
@@ -79,13 +91,18 @@ Use **./5gcn** to deploy core network containers, then run script **./startgnb**
 
 **To start CN v1.51 with different PLMN setting you should specify it using the argument -p . For example ./5gcn -d -v 1 -p 1 for PLMN 00101. CN v2.1.0 can support multiple PLMNs so if you make the above changes to yaml and sql files you can start CN supporting all configured PLMNs without using -p argument in 5gcn script. For example ./5gcn -d -v 2**
 
+## Changing parameters
+
 To change the attenuation parameter for tx and rx use **./gnbconfig -t** or **./gnbconfig -r** respectively. You may find this useful for example when you want to switch from RF cables to OTA transmission. You may also want to switch between external and internal source for your SDR device using **-e** or **-i** arguments with **gnbconfig**. The configuration made with **gnbconfig** script is done in all configuration files and for all PLMN options. When you make changes to host ips or switch from core network v 1.5.1 to v 2.1.0 you need to run **gnbconfig -a** to reconfigure the ip addresses in gnbconfig.ini file and conf files in the folder configuration. 
+Before running **./startgnb** or **./startgnbsim** scripts run **./hwstress** to configure CPUs and NIC interfaces for better realtime performance. Run **./hwrelax** to return back to normal settings.
+
+## Deploying core network containers on a different host
 
 If you want to run core network in a different host from gNB host, edit the variables **CN_IP** , **GNB_NIC_TO_CN** , **GNB_NIC_TO_CN_IP** and **CN_HOST_IP** in **gnbconfig.ini** file to configure an separate network interface between Core Network Host and gNB host. This connection works better at 10gbps speed. After saving changes to gnbconfig.ini file run **./gnbconfig -c** to change the network settings of NGI interface in all configuration files.
 
 Finally if you to make changes to a configuration file for a specific scenario use **./gnbconfig -s <scenario number>** script.
 
-Before running **./startgnb** or **./startgnbsim** scripts run **./hwstress** to configure CPUs and NIC interfaces for better realtime performance. Run **./hwrelax** to return back to normal settings.
+## Main scripts and their functionality
 
 The main scripts are the following (run them without sudo privilages):
 

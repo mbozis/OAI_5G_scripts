@@ -270,8 +270,8 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURA
 #################### SA mode band 66 35prb ####################################################
 band66_25prb(){                                                                               
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \    
---sa --usrp-tx-thread-config 1 \                                                              
-${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \                                      
+--sa --usrp-tx-thread-config 1 ${MIN_./nr-softmodem -O /home/manolis/scripts/configuration/gnb.sa.band66.fr1.25PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  --rfsimulator.serveraddr server --rfsimulator.serverport 4043 --MACRLCs.[0].ul_max_mcs 28 
+RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \                                      
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \                           
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"                             
 }                                                                                             

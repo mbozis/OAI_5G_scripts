@@ -31,10 +31,11 @@ fi                                                                              
 #sysctl -w net.core.rmem_max=33554432                                           #
 #sysctl -w net.core.wmem_default=33554432                                       #
 #sysctl -w net.core.rmem_default=33554432                                       #
-sudo sysctl -w net.core.wmem_max=134217728                                      #
-sudo sysctl -w net.core.rmem_max=134217728                                      #
-sudo sysctl -w net.core.wmem_default=134217728                                  #
-sudo sysctl -w net.core.rmem_default=134217728                                  #
+echo -e "${G}setting up network buffer sizes to ${NETWORK_BUFFER}${NOCOLOR}"    #
+sudo sysctl -n -e -q -w net.core.wmem_max=${NETWORK_BUFFER}                     #
+sudo sysctl -n -e -q -w net.core.rmem_max=${NETWORK_BUFFER}                     #
+sudo sysctl -n -e -q -w net.core.wmem_default=${NETWORK_BUFFER}                 #
+sudo sysctl -n -e -q -w net.core.rmem_default=${NETWORK_BUFFER}                 #
 #################################################################################
 
 #Adjust Ethernet MTU ############################################################

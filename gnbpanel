@@ -31,7 +31,13 @@ tmux split-window -v -l 10
 tmux split-window -v -l 10
 tmux split-window -v -l 10
 tmux split-window -h 
-
+####### set colors for panes ####################
+tmux select-pane -t:.0 -P 'fg=black,bg=gray' 
+tmux select-pane -t:.1 -P 'fg=black,bg=white'    
+tmux select-pane -t:.2 -P 'fg=blue,bg=white'
+tmux select-pane -t:.3 -P 'fg=blue,bg=white'
+tmux select-pane -t:.4 -P 'fg=black,bg=white'
+#################################################
 tmux rename-window -t 0 "gNB_&_AMF_log"
 tmux send-keys -t 0 "tmux display-panes -d 2000" Enter
 tmux send-keys -t 0 "${MODE_FOR_PANEL} ${ARGS_FOR_STARTGNBSIM}" Enter # execute startgnb or startgnbsim script with provided arguments

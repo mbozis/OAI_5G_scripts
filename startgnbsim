@@ -257,11 +257,13 @@ geo_sat_emulation(){
 # up to 16us (--rfsimulator.prop_delay 0.016) the UE receives the RAR and 
 # completes the RAR proccess successfuly.
 # This scenario is for transparent GEO satellite
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+# max MCS is set to 9 for both DL and UL (maximum modulation order of 2 - QPSK)
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
 --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---rfsimulator.prop_delay 238.74 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.prop_delay 238.74 --MACRLCs.[0].ul_harq_round_max 1 \
+--MACRLCs.[0].ul_max_mcs 9 --MACRLCs.[0].dl_max_mcs 9 ${NRSCOPE}"
 }
+# --gNBs.[0].um_on_default_drb 1 --MACRLCs.[0].ul_harq_round_max 1 --MACRLCs.[0].dl_harq_round_max 1
 ###############################################################################
 
 ################## SCENARIO 22 ##############################################
@@ -305,9 +307,11 @@ fi
                echo -e "${R}selected senario is not valid\n${NOCOLOR}"
                print_help
                exit 1 
-	    fi
+            else
+            write_selected_scenario # update value of SELECTED_SCENARIO in gnbconfig.ini filecenario   
+	          fi
             ###########################################################
-            write_selected_scenario
+            
 	     # check if script is run with sudo privilages
 	    SCRIPTUSER=$(whoami) 
             if [[ $SCRIPTUSER = "root" ]] ; then 
@@ -380,7 +384,8 @@ echo -e "${COMMAND}" | xclip
 ########## copy command to file COMMAND ###################################
 echo ${COMMAND} > COMMAND
 # switch to softmodem binary file folder ##################
-echo ${USERFOLDER}
+
+# echo ${USERFOLDER}
 cd ${USERFOLDER}/openairinterface5g
 source oaienv
 cd ${GNB_EXEC_FOLDER}
