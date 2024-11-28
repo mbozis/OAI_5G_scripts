@@ -30,12 +30,60 @@ Usage:  $0 [OPTION]... [+VALUE]
                            3           --> 20895 
   -e, --editor             choose editor
                            1 (default) --> nano
-                           2           --> gedit                                                        
+                           2           --> gedit  
+  -c, --clock              sets a clock reference (0:internal, 1:external, 2:gpsdo)
+  -t, --time               sets a time reference (0:internal, 1:external, 2:gpsdo) 
+  -a,                      detect host and container IPs and set them in ueconfig.ini file                                                              
   -i, --info               show Open Air Interface software version
   -h, --help               print this help message
 EOF
 }
 
+#### FUNCTION 3 sets time source  ############
+set_time_source(){
+sed -i "/export ONE_PPS_SOURCE/c\export ONE_PPS_SOURCE=${SELECTED_TIME_SOURCE}" ueconfig.ini
+}
+
+#### FUNCTION 4 sets clock source  ############
+set_clock_source(){
+sed -i "/export FREQUENCY_SOURCE/c\export FREQUENCY_SOURCE=${SELECTED_CLOCK_SOURCE}" ueconfig.ini
+}
+
+############################################################################################################################
+function set_ip_addrs(){
+#### Update LAN IP Addreesses of gNB and UE hosts ####################
+echo -e "${Y}configuring ip addresses of hosts...${NOCOLOR}"
+sleep 1
+ping -c 1 -b ${LAN_B_ADDR} >/dev/null # ping broadcast address to update arp table
+GNB_HOST_IP=$(arp -n | grep ${GNB_HOST_MAC} | awk '{print $1}')
+sed -i "/export GNB_HOST_IP=/c\export GNB_HOST_IP=\"${GNB_HOST_IP}\"; # controlled by ueconfig -a" ${USER_SCRIPTS_FOLDER}/ueconfig.ini
+echo -e "GNB host ip set to: ${G}${GNB_HOST_IP}${NOCOLOR}"
+export UE_HOST_IP=$(ip -br addr show | grep "${NICNAME_4}" | awk '{print $3}' | cut -d'/' -f 1)
+sed -i "/export UE_HOST_IP=/c\export UE_HOST_IP=\"${UE_HOST_IP}\"; # controlled by ueconfig -a" ${USER_SCRIPTS_FOLDER}/ueconfig.ini
+echo -e "UE host ip set to: ${G}${UE_HOST_IP}${NOCOLOR}"
+######################################################################
+
+####  find amf IP in oai-amf container ###############################
+echo -e "${Y}checking core network containers...${NOCOLOR}"
+sleep 1
+CN_DEPLOYED=$(ssh $CN_IP "docker ps" | wc -l)
+if [ "$CN_DEPLOYED" = "1" ]; then
+  echo -e "${R}Core network containers are not deployed${NOCOLOR}"
+else
+     echo -e "${G}Core network containers have been deployed${NOCOLOR}"
+fi
+
+####  find USRP device IP ###############################
+echo -e "${Y}trying to configure management IP of USRP N310 SDR device...${NOCOLOR}"
+GNB_USRP_MGMT_IP=$(uhd_find_devices --args="serial=${GNB_USRP_SERIAL}" | grep addr | grep -v mgmt_addr | awk '{print $2}' | tr -d '\n')
+if [ ! -z "${GNB_USRP_MGMT_IP}" ]; then
+sed -i "/export GNB_USRP_MGMT_IP=/c\export GNB_USRP_MGMT_IP=\"${GNB_USRP_MGMT_IP}\"  # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+echo -e "USRP N310 mgmt IP ip set to ${G}${GNB_USRP_MGMT_IP}${NOCOLOR} in gnbconfig.ini file"
+else
+echo -e "${Y}WARNING: USRP N310 device could not be detected${NOCOLOR}"
+fi
+}
+######################################################################
 
 
 ######################## MAIN FUNCTION #####################################
@@ -57,7 +105,7 @@ fi
             echo "getting the version of OAI software..."
             sleep 1
             cd ${OAI_FOLDER}
-            echo -e "The version of the Open Air Interface is: $(git show | grep 'Merge branch' | cut -d "'" -f 2)\n"
+            echo -e "The version of the Open Air Interface is: ${G} $(git show | grep 'Merge branch' | cut -d "'" -f 2)${NOCOLOR}\n"
             exit 0
             shift;;
         -p | --plmn)
@@ -66,7 +114,8 @@ fi
                echo -e "${R}selected PLMN is not valid\n${NOCOLOR}"
                print_help
                exit 1 
-	    fi
+	          fi
+            EDIT_FLAG=1 # Flag to denote that scripts should edit a UE configuration file
             ###########################################################
             shift 2;;  
         -e | --editor)
@@ -76,9 +125,35 @@ fi
                echo -e "${R}selected editor is not valid\n${NOCOLOR}"
                print_help
                exit 1 
-	    fi
+	          fi
             ###########################################################
            shift 2;;           
+        -t | --time)
+	    # check if time source is valid
+            SELECTED_TIME_SOURCE=$2
+            if [[ ! $SELECTED_TIME_SOURCE =~ $re ]] || [[ $SELECTED_TIME_SOURCE -gt 2 ]] || [[ $SELECTED_TIME_SOURCE -lt 0 ]] ; then
+               echo -e "${R}selected time source is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	          fi
+            set_time_source
+            ###########################################################
+           shift 2;;       
+        -c | --clock)
+	    # check if clock source is valid
+            SELECTED_CLOCK_SOURCE=$2
+            if [[ ! $SELECTED_CLOCK_SOURCE =~ $re ]] || [[ $SELECTED_CLOCK_SOURCE -gt 2 ]] || [[ $SELECTED_CLOCK_SOURCE -lt 0 ]] ; then
+               echo -e "${R}selected time source is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	          fi
+            set_clock_source
+            ###########################################################
+           shift 2;;   
+         -a)
+            set_ip_addrs;
+            exit 0;
+            shift;;           
 	-h | --help)
             print_help
             exit 0;;
@@ -87,9 +162,14 @@ fi
             ;;    
     esac
   done
-# start nr=uesoftmodem program with selected parameters
+
+#### start nr=uesoftmodem program with selected parameters ########
+if [[ "$EDIT_FLAG" -eq 1 ]] ; then
 cd ${CONFIGURATION_FOLDER}
 ${EDITORS["$SELECTED_EDITOR"-1]} ${PLMNS["$SELECTED_PLMN"-1]}ue.conf
+fi
+####################################################################
+
 # end of script
   }
  
