@@ -4,8 +4,10 @@
 # DCS LAB Apr 2024
 # Manolis Bozis
 # do not run script with root privillages !!
-####################### load platform initial configuration ##########################
-source gnbconfig.ini
+# load initial configuration values ###########
+REL_PATH=$(echo $0 | sed 's/\/[^/]*$//')      #
+source ${REL_PATH}/gnbconfig.ini              #
+###############################################
 
 ######################################################################################
 #  configure core network ips only if you change core network version or DHCP host IPs chenge ###
@@ -94,7 +96,7 @@ sa_band78_106prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
 }
 
 ############################################################################
@@ -105,7 +107,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -125,7 +127,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -135,7 +137,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -145,7 +147,7 @@ sa_band78_106prb_TDD_1(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -156,7 +158,7 @@ sa_band78_106prb_TDD_2(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -166,7 +168,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa  --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -176,7 +178,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -186,7 +188,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -196,7 +198,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -206,7 +208,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -216,7 +218,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -228,7 +230,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 
@@ -264,16 +266,14 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURA
 }
 ############################################################################
 
-
-
 ################## SCENARIO 20 ##############################################
 #################### SA mode band 66 35prb ####################################################
 band66_25prb(){                                                                               
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \    
---sa --usrp-tx-thread-config 1 ${MIN_./nr-softmodem -O /home/manolis/scripts/configuration/gnb.sa.band66.fr1.25PRB.usrpn310.conf --gNBs.[0].min_rxtxtime 6 --rfsim --sa  --rfsimulator.serveraddr server --rfsimulator.serverport 4043 --MACRLCs.[0].ul_max_mcs 28 
-RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \                                      
---clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \                           
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"                             
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--sa --usrp-tx-thread-config 1 \
+${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"                        
 }                                                                                             
 ###############################################################################################
 ################## SCENARIO 21 ################################################################
@@ -283,7 +283,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \  
 --rfsimulator.prop_delay 238.74 \                                                                                                  
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \                           
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"                             
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"                             
 }                                                                                             
 ###############################################################################################
 ################## SCENARIO 22 ##############################################
@@ -293,7 +293,7 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
 }
 ############################################################################
 

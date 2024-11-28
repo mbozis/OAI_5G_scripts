@@ -1,0 +1,36 @@
+#!/bin/bash
+# DCS LAB
+# UOP
+# Manolis Bozis
+# Mar 2023
+# Configuration to reach the 5g core network on a VM in another host
+# Execute it with root privilages (sudo)
+
+# export CORE_NETWORK_IP="195.251.38.145"
+# rUn these commands to core network host
+#echo -e "enabling ipv4 forwarding...\n"
+#sysctl net.ipv4.conf.all.forwarding=1
+#iptables -P FORWARD ACCEPT
+#sleep 2
+
+source gnbconfig.ini
+#IP=${CN_HOST_IP}
+IP=${CN_IP}
+#INTERFACE=${GNB_NIC_TO_CN}
+INTERFACE=${NICNAME_4}
+
+echo -e "setting up connection to core network"
+echo -e "UE Host IP: ${UE_HOST_IP}"
+echo -e "GNB NIC name to connect to Core Network : ${GNB_NIC_TO_CN}"
+ip route show | grep "192.168.70.128" > /dev/null
+ROUTE_EXISTS=$?
+if [[ ${ROUTE_EXISTS} -eq 0 ]] ; then
+echo -e "${R}a route to Core Network already exists"
+echo -e "Deleting the old one before adding new route...${NOCOLOR}"
+sudo ip route del 192.168.70.128/26
+fi
+sudo ip route add 192.168.70.128/26 via ${IP} dev ${INTERFACE}
+ROUTE_EXISTS=$?
+if [[ ${ROUTE_EXISTS} -eq 0 ]] ; then
+echo -e "${G}new route to Core Network added successfully${NOCOLOR}"
+fi

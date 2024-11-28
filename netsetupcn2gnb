@@ -1,0 +1,24 @@
+#!/bin/bash
+# DCS LAB
+# UOP
+# Manolis Bozis
+# Mar 2023
+# Configuration to reach the 5g core network on containers deployed on the same host
+# Execute it with root privilages (sudo)
+echo -e "enabling ipv4 forwarding...\n"
+sudo sysctl net.ipv4.conf.all.forwarding=1
+sudo iptables -P FORWARD ACCEPT
+sleep 2
+
+######## configure route to CN containers in gNB host #############
+ip route show | grep "192.168.70.128" > /dev/null
+ROUTE_EXISTS=$?
+if [[ ${ROUTE_EXISTS} -eq 0 ]] ; then
+echo -e "${R}a route to Core Network already exists"
+echo -e "Deleting the old one before adding new route...${NOCOLOR}"
+sudo ip route del 192.168.70.128/26
+fi
+sudo ip route add 192.168.70.128/26 via 192.168.70.129 dev demo-oai
+if [[ $? -eq 0 ]] ; then
+echo -e "${G}new route to Core Network containers added successfully${NOCOLOR}"
+fi

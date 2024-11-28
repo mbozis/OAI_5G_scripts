@@ -15,8 +15,10 @@
 # 5gcn VM or actual host needs to have ssh HOST keys installed
 # so that to accept password less ssh connections
 # ----------------------------
-# Load initial configuration values
-source gnbconfig.ini
+# load initial configuration values ###########
+REL_PATH=$(echo $0 | sed 's/\/[^/]*$//')      #
+source ${REL_PATH}/gnbconfig.ini              #
+###############################################
 
 ######################## VARIABLES SECTION ###############################
 if [ -z "${CN_IP}" ]; then
@@ -281,7 +283,7 @@ fi
 # ssh to UE host and create traffic from UE to oai-ext-dn container
 # 
 echo -e "${G}Starting transmitting data on 5G UPLINK${NOCOLOR}"
-ssh ${CN_IP} "docker exec oai-ext-dn iperf -c ${UE_IP} -R -p 5001 -t ${TEST_TIME}"
+ssh ${CN_IP} "docker exec oai-ext-dn iperf -B ${OAI_EXT_DN_IP} -c ${UE_IP} -R -p 5001 -t ${TEST_TIME}"
 echo -e "transmission stoped in 5G UPLINK"
 # -stop iperf server on UE side
 ssh ${UE_HOST_IP} "pkill -KILL iperf"
