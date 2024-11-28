@@ -1,8 +1,12 @@
 # Scripts and configuration files for Open Air Interface SA testbed with two hosts.
 
+paper: "Enhancing 5G performance: A standalone system platform with customizable features"
+
+https://www.sciencedirect.com/science/article/pii/S1434841124004011
+
 ## Introduction
 
-**OAI_5G_scripts** is a set of bash scripts that run in two PCs which host the Open Air interface software and implement the gNB and UE respectively. The purpose of using the scripts is to organize your tests and the respective configurations, perform quickly the nesessary network checks and modifications to your setup. In this collection of scripts there are scripts to configure your PC for realtime performance, to deploy and stop the 5G core network containers, to measure the throughput and latency of the end-to-end conneciton, to startup the gNB with the specific scenario settings and to modify parameters for all or for a specific scenario.
+**OAI_5G_scripts** is a set of bash scripts that run in two PCs which host the Open Air interface software and implement the gNB and UE respectively. But why to use these scripts instead of running the nr-uesoftmodem and nr-softmodem commands directly? The answer to this question is that using these scripts you can easily move the CN setup from one host to the other, run different configurations without having to execute many bash commands with different arguments each time. Furthermore, the purpose of using the scripts is to organize your tests and the respective configurations and speed up all the nesessary network checks and modifications to your setup. In this collection of scripts there are scripts to configure your PC for realtime performance, to deploy and stop the 5G core network containers, to measure the throughput and latency of the end-to-end conneciton, to startup the gNB with the specific scenario settings and to modify parameters for all or for a specific scenario.
 The following picture depicts the testbed that exploits the Open Air Interface software alongside with the set of scripts in this repository.
 There are basically three ways to connect UE to gNB (A-C, figure 1). The first one is to use the RFsimulator and the 10Gbps network conneciton among the two hosts. The second one is to use the SDR devices (USRP N310 in our case) to ttransmit the RF signal either by RF cables and attenuators or wirelessly using antennas. Finally the third way is to use a COTS UE to connect to the gNB. In this case best performance results can be achieved if Core NetworK containers are deployed in the UE host, and thus releasing computational resources from gNB host.
 
@@ -91,20 +95,38 @@ Use **./5gcn** to deploy core network containers, then run script **./startgnb**
 
 **To start CN v1.51 with different PLMN setting you should specify it using the argument -p . For example ./5gcn -d -v 1 -p 1 for PLMN 00101. CN v2.1.0 can support multiple PLMNs so if you make the above changes to yaml and sql files you can start CN supporting all configured PLMNs without using -p argument in 5gcn script. For example ./5gcn -d -v 2**
 
+Edit gnbconfig.ini and ueconfig.ini files to setup the appropriate values of the parameters for your network in gNb and UE host repsectively. After deploying the core network containers run **./gnbconfig -a** and **ueconfig -a** to automatically set up the rest of the network parameters. The parameters that need to be set manually are enclosed in hashtags in the gnbconfig.ini and ueconfig.ini files found in gNB and UE host respectively.
+Scripts use ssh command to run commands on the other host. A good practice is to create ssh keys and use ssh-copy-id command to copy the keys in the other host, so that you do not have to type your password each time a script uses ssh.
+
 ## Changing parameters
 
 To change the attenuation parameter for tx and rx use **./gnbconfig -t** or **./gnbconfig -r** respectively. You may find this useful for example when you want to switch from RF cables to OTA transmission. You may also want to switch between external and internal source for your SDR device using **-e** or **-i** arguments with **gnbconfig**. The configuration made with **gnbconfig** script is done in all configuration files and for all PLMN options. When you make changes to host ips or switch from core network v 1.5.1 to v 2.1.0 you need to run **gnbconfig -a** to reconfigure the ip addresses in gnbconfig.ini file and conf files in the folder configuration. 
 Before running **./startgnb** or **./startgnbsim** scripts run **./hwstress** to configure CPUs and NIC interfaces for better realtime performance. Run **./hwrelax** to return back to normal settings.
+Finally if you to make changes to a configuration file for a specific scenario use **./gnbconfig -s <scenario number>** script.
 
 ## Deploying core network containers on a different host
 
-If you want to run core network in a different host from gNB host, edit the variables **CN_IP** , **GNB_NIC_TO_CN** , **GNB_NIC_TO_CN_IP** and **CN_HOST_IP** in **gnbconfig.ini** file to configure an separate network interface between Core Network Host and gNB host. This connection works better at 10gbps speed. After saving changes to gnbconfig.ini file run **./gnbconfig -c** to change the network settings of NGI interface in all configuration files.
+On gNB host:
+If you want to run core network in a different host from gNB host, edit the variables **CN_IP** , **GNB_NIC_TO_CN** , **GNB_NIC_TO_CN_IP** and **CN_HOST_IP** in **gnbconfig.ini** file to configure a separate network interface between Core Network Host and gNB host. This connection works better at 10gbps speed. After saving changes to gnbconfig.ini file run **./gnbconfig -a** and then **./gnbconfig -c** to change the network settings of NGI interface in all configuration files.Finally run **./netsetupcn2gnb** or **./netsetupcn2ue** if you run Core Network on gNB or UE host respectively.
 
-Finally if you to make changes to a configuration file for a specific scenario use **./gnbconfig -s <scenario number>** script.
+On Core Network Host:
+Run **./5gcn -d -v <selected version> -p <selected PLMN>**
+and then **./netsetupcn2gnb** or **./netsetupcn2ue** if you run Core Network on gNB or UE host respectively.
+If you use a COTS UE to connect to gNB, it is better to run core network on UE host side, as you maximize the performance of gNB. 
+
+
+
+
+## Creating a new scenario
+
+There are 22 scenarios so far. To create a new scenario :
+1) Insert a new element in SCENARIOS and CONFIGURATIONS tables in gnbconfig.ini file in gNB host. The SCENARIOS table contains the names of the functions implementing your scenario (the syntax of the nr-uesoftmodem command with all the parameters). CONFIGURATIONS table contains the names of the gNB configuration files for each scenario.
+2) Update print_scenarios function that contains the description of each scenario in gnbconfig.ini and ueconfig.ini files found in gNB and UE host respectively.
+3) write the new function that implemets your scenario and add it in startgnb, startgnbsim, startue and startuesim script files. 
 
 ## Main scripts and their functionality
 
-The main scripts are the following (run them without sudo privilages):
+The main scripts are the following (run them **without sudo** privilages, if sudo is needed script prompts for user password):
 
 **./oaitest**
 
