@@ -29,25 +29,9 @@ Tool to start UE softmodem for a particular scenario using Open Air Interface
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   start UE softmodem selecting scenario number [value]
                            value is from the following table
-                           ------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                           
-                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
-                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
-                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
-                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                          | 10 | standalone mode band 78 with 106prb (2x2 MIMO)              |
-                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               |      
-                          -------------------------------------------------------------------
+EOF
+print_scenarios;
+cat <<EOF
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
                            2           --> 50501
@@ -69,7 +53,8 @@ EOF
 sa_band78_24prb(){
 COMMAND="./nr-uesoftmodem \
 -r 24 --numerology 1 --band 78 -C 3604800000 --ssb 24 --ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -84,7 +69,8 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_51prb(){
 COMMAND="./nr-uesoftmodem \
 -r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 --ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -98,13 +84,14 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_106prb(){
 #################  106 PRB ######################################################
 COMMAND="./nr-uesoftmodem \
--r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 --ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+-r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 --ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 
-#-d
-# --ue-fo-compensation --log_config.global_log_options level,nocolor,time
+
+#  --log_config.global_log_options level,nocolor,time
 # -O ~/scripts/configuration/ue.conf 
 # the above are other parameters you may need
 #  --continuous-tx --d
@@ -125,8 +112,9 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_133prb(){
 COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 
@@ -138,8 +126,9 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_162prb(){
 COMMAND="./nr-uesoftmodem \
 -r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
  --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
  -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 # --dlsch-parallel 3
@@ -152,8 +141,9 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_217prb(){
 COMMAND="./nr-uesoftmodem \
 -r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -164,8 +154,9 @@ COMMAND="./nr-uesoftmodem \
 sa_band77_273prb(){
 COMMAND="./nr-uesoftmodem \
 -r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
  --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
  -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -177,12 +168,13 @@ COMMAND="./nr-uesoftmodem \
 ############################################################################
 
 ############## SCENARIO 10 ##################################################-
-sa_mimo_106prb(){
+sa_mimo_band78_106prb(){
 #################  106 PRB (2x2 MIMO) #########################################
 COMMAND="./nr-uesoftmodem \
 -r 106 --numerology 1 --band 78 -C 3319680000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation  \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION}  \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -193,8 +185,9 @@ sa_mimo_133prb(){
 #################  133 PRB (2x2 MIMO) #####################################
 COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -204,9 +197,10 @@ COMMAND="./nr-uesoftmodem \
 sa_mimo_band78_162prb(){
 COMMAND="./nr-uesoftmodem \
 -r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
- --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+ --usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
  -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 # --dlsch-parallel 3
 }
@@ -218,8 +212,9 @@ COMMAND="./nr-uesoftmodem \
 sa_mimo_band78_217prb(){
 COMMAND="./nr-uesoftmodem \
 -r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -230,8 +225,9 @@ COMMAND="./nr-uesoftmodem \
 sa_mimo_band77_273prb(){
 COMMAND="./nr-uesoftmodem \
 -r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
  --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
  -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -250,14 +246,91 @@ sa_band66(){
 # --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
 
 COMMAND="./nr-uesoftmodem \
--r 106 --numerology 1 --band 66 -C 2169080000 --CO -400000000 --ssb 396 \
---ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} --ue-fo-compensation \
---sa --usrp-args "addr=${USRP_ADDR_IP},clock_source=${FREQUENCY_SOURCE},time_source=${ONE_PPS_SOURCE}" ${OAI_RA_FIX} \
+-r 106 --numerology 1 --band 66 -C 2169080000 --CO -400000000 --ssb 378 \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
  --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 ############################################################################
+################# SCENARIO 16 ##############################################
+#################### SA mode band 71 #######################################
+sa_band71(){
+# band 71 
+# FDD
+# --numerology 0   (that means 15Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 2169080000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+# --------------------------- BAND 71 ---------------------------------------------------------------------------------------------
+COMMAND="./nr-uesoftmodem -r 106 --numerology 0 --band 71 -C 639540000 --CO 46000000 --ssb 456 \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
 
+################# SCENARIO 20 ##############################################
+#################### SA mode band 66 #######################################
+band66_25prb(){
+# band 66 
+# FDD
+# --numerology 0   (that means 15Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 2169080000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+
+COMMAND="./nr-uesoftmodem -r 25 --numerology 0 --band 66 -C 2152680000 --CO -400000000 --ssb 48 \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+ --usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
+ --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+
+################# SCENARIO 21 ##############################################
+#################### GEO Sat emulation #######################################
+geo_sat_emulation(){
+# band 66 
+# FDD
+# --numerology 0   (that means 15Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 2169080000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+
+COMMAND="./nr-uesoftmodem -r 25 --numerology 0 --band 66 -C 2152680000 --CO -400000000 --ssb 48 \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+ --usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2},time_source=external,clock_source=external" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
+ --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+ --ntn-koffset 478 --ntn-ta-common 477.48 \
+-O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+################ SCENARIO 22 ##############################################
+band3_52prb(){
+# band 66 
+# FDD
+# --numerology 0   (that means 15Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 1837480000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+
+# --------------------------- BAND 3 ---------------------------------------------------------------------------------------------
+COMMAND="./nr-uesoftmodem --band 3 -r 52 --numerology 0 -C 1837480000 --CO -95000000 --ssb 190 \
+--ue-txgain ${OPTIMAL_OTA_UE_TX_GAIN} --ue-rxgain ${OPTIMAL_OTA_UE_RX_GAIN} ${UE_FO_COMPENSATION} \
+ --usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2},time_source=external,clock_source=external" ${OAI_RA_FIX} \
+--clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
+ --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
+ -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+
+############################################################################
 ######################## MAIN FUNCTION #####################################
 function main() {
 
@@ -289,17 +362,6 @@ fi
                exit 1 
 	    fi
             ###########################################################
-	    # check if core network is up, executing a ping to AMF ####
-            #echo -e "checking connection to AMF..."
-            #ping amf -c 1 > /dev/null
-            #if [ $? -ne 0 ]; then
-            #echo -e "${R}\nNo connection to AMF\n"
-            #echo -e "start 5G core network prior to executing RAN ${NOCOLOR}\n"
-            #exit 1
-            #else 
-            #echo -e "${G}OK...${NOCOLOR}"
-            #fi 
-            ###########################################################
             # check cpu state #########################################
             CPUCORES=$(lscpu | awk '/^CPU\(s\)\:/ {print $2}')
             for ((i=1; i < $CPUCORES+1 ; i++)); do
@@ -312,12 +374,6 @@ fi
             if [[ ${WARNING_FLAG} -eq 1 ]] ; then
             echo -e "${Y}WARNING:CPU governor not set to performance. COnsider running ${G}sudo ./cpustress${Y} to set maximum performance for all CPUs${NOCOLOR}"
             fi
-            ###########################################################
-            # switch to softmodem binary file folder ##################
-            cd ${USERFOLDER}/openairinterface5g 
-            source oaienv
-            cd cmake_targets/ran_build/build
-            OAI_FOLDER=$(pwd)
             ###########################################################
             shift 2;;
         -p | --plmn)
@@ -365,7 +421,11 @@ fi
 COMMAND="${CPU_AFFINITY}${COMMAND}"
 echo -e $COMMAND | xclip 
 echo -e $COMMAND > ${USER_SCRIPTS_FOLDER}/UE_COMMAND 
-
+# switch to softmodem binary file folder ##################
+cd ${OAI_FOLDER} 
+source oaienv
+cd ${OAI_EXEC_FOLDER}
+###########################################################
 ############# check if command is to be executed inside the script ########
 #############   or copied to clipboard                          ###########
 if [[ ${CL} -eq 1 ]]; then
@@ -376,10 +436,9 @@ $(echo -e "${G}the command to start nr-softmodem was saved in file COMMAND in th
 -To start UE softmodem copy and paste command to new terminal window in OAI binaries folder
 EOF
             export COMMAND
-            export OAI_FOLDER
-            export MESSAGE="to execute nr-softmodem copy and paste the following command to command line or type \$(xclip -o):\n "           
+            export MESSAGE="${G}to execute nr-softmodem copy and paste the following command to command line or type \$(xclip -o):${NOCOLOR}\n "           
             # execute bash in the same environment to keep the current directory
-            gnome-terminal --working-directory=${OAI_FOLDER} -- bash -c 'echo -e "${MESSAGE} sudo $COMMAND" ; bash'        
+            gnome-terminal --working-directory=${OAI_EXEC_FOLDER} -- bash -c 'echo -e "${MESSAGE} sudo $COMMAND" ; bash'        
 else  
             # start execution of nr-softmodem for the selected scenario and PLMN   
             echo -e $(xclip -o) | sudo bash # execute command from clipboard     

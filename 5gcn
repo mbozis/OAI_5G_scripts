@@ -1,0 +1,211 @@
+#!/bin/bash
+# uop dcs lab
+# Manolis Bozis 
+# Jul 2023
+source ueconfig.ini
+
+################### VARIABLES SECTION ####################################
+# Version list
+# 1 --> 1.5
+# 2 --> 2.1.0
+# execute only if CN_IP is null (first execution)
+if [ -z "${CN_IP}" ]; then
+export CN_IP=${UE_HOST_IP}
+fi
+
+MODES=( "start" "stop" )
+SELECTED_VERSION=1 # default version is 1.5
+SELECTED_PLMN=1 # default PLMN id is 00101
+SELECTED_MODE="start"  # default mode is start
+CPU_AFFINITY="taskset --cpu-list 8-15 " # select the cores you want to allocate to core network containers
+###########################
+###########################################################################
+#### FUNCTION 1 print help message  ############
+print_help(){
+cat <<EOF
+UOP - DCS LAB author Manolis Bozis 2023
+tool for deploying Open Air Interface 5G core Network in containers
+Usage:  $0 [OPTION]... [+VALUE] 
+  -d, --deploy             start 5G Core Network containers 
+  -s, --stop               stop 5G Core Network containers
+  -c, --clear              purge all containers that have started (in case you encounter errors starting up the containers)
+  -i, --info               display version of OAI Core Network 
+  -v, --version [value]    specify version of containers to deploy or stop
+                           1. version 1.51
+                           2. version 2.1.0
+                           example: $0 -d -v 2
+  -p, --plmn [value]       specify PLMN id (valid only for version 1.51) 
+                           1. PLMN ---> 00101
+                           2. PLMN ---> 50501
+                           3. PLMN ---> 20895
+                           example: $0 -d -v 1 -p 2                                 
+  -h, --help               print this help message
+EOF
+}
+
+########## CPU affinity for docker ####################
+# sets CPU affinity to CPUs 8-15 for running doecker ##
+# process                                          ##
+set_cpu_affinity(){
+DOCKERPID=$(pgrep -n docker)
+sudo taskset -cp 8-15 ${DOCKERPID} 
+}
+#######################################################
+########## start 5G CN v1.5 of containers #############
+start_v_1_5(){
+cd ~/oai-cn5g
+case ${SELECTED_PLMN} in
+   1)
+    cp docker-compose_00101.yml docker-compose.yml
+    cp ./database/oai_db_00101.sql ./database/oai_db.sql
+    ;;
+   2)
+    cp docker-compose_50501.yml docker-compose.yml
+    cp ./database/oai_db_50501.sql ./database/oai_db.sql
+    ;;
+   *)
+   echo -e "${R}Not able to start selected PLMN${NOCOLOR}"
+   exit 
+   ;;
+esac
+set_cpu_affinity # before containers are deployed
+docker compose up -d
+set_cpu_affinity $ # after docker compose command
+}
+#######################################################
+
+########### stop 5G CN v1.5 containers #############
+stop_v_1_5(){
+cd ~/oai-cn5g
+docker compose down
+}
+#######################################################
+
+
+########## start 5G core network v 2.1.0 ##############
+start_v_2_1_0() {
+cd ~/oai-cn5g-fed/docker-compose
+#case ${SELECTED_PLMN} in
+#   1)
+#    cp ./database/oai_db2_00101.sql ./database/oai_db2.sql
+#    ;;
+#   2)
+#    cp ./database/oai_db2_50501.sql ./database/oai_db2.sql
+#    ;;
+#   3)
+#    cp ./database/oai_db2_20895.sql ./database/oai_db2.sql
+#    ;;
+#   *)
+#   echo -e "${R}Not able to start selected PLMN${NOCOLOR}"
+#   exit 
+#   ;;
+# esac
+# type Basic Deployment
+# Scenario with NRF ("1")
+set_cpu_affinity # before containers are deployed
+python3 core-network.py --type start-basic --scenario 1
+set_cpu_affinity $ # after docker compose command
+}
+#######################################################
+
+########### stop 5G core network v 2.1.0 ##############
+
+stop_v_2_1_0() {
+cd ~/oai-cn5g-fed/docker-compose
+# type Basic Deployment
+# Scenario with NRF ("1")
+python3 core-network.py --type stop-basic
+}
+#######################################################
+########### stop all running containers ##############
+purge(){
+docker ps -aq | xargs docker stop | xargs docker rm
+}
+#######################################################
+#######################################################
+### display info on running OAI 5GCN containers #######
+info(){
+CN_DEPLOYED=$(ssh $CN_IP "docker ps" | wc -l)
+if [ "$CN_DEPLOYED" = "1" ]; then
+echo -e "${R}Core network containers are not deployed${NOCOLOR}"
+else
+CN_VERSION=$(ssh $CN_IP "docker ps" | grep oai-amf | cut -d':' -f 2 | cut -d' ' -f 1)
+echo -e "OAI Core Network version is: ${G}$CN_VERSION${NOCOLOR}"
+ if [[  =  ]]; then
+  echo -e "OAI Core Network containers are deployed on ${G}gNB${NOCOLOR} host" 
+ elif [[  =  ]] 
+  then
+  echo -e "OAI Core Network containers are deployed on ${G}UE${NOCOLOR} host" 
+ else
+  echo -e "OAI Core Network containers are deployed on other host "
+ fi
+fi  
+}
+#######################################################
+function main() {
+###########################################################
+if [ "$*" == "" ]; then
+    >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
+    print_help
+    exit 1
+fi
+###########################################################
+
+ until [ -z "$1" ]
+  do
+    case "$1" in
+        -v | --version)
+            SELECTED_VERSION=$2
+            if [[ ! $SELECTED_VERSION =~ $re ]] || [[ "$SELECTED_VERSION" -gt "${#VERSIONS[@]}" ]] || [[ $SELECTED_VERSION -le 0 ]] ; then
+               echo -e "${R}selected version is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+            shift 2;;   
+        -p | --plmn)
+            SELECTED_PLMN=$2
+            if [[ ! $SELECTED_PLMN =~ $re ]] || [[ "$SELECTED_PLMN" -gt "${#PLMNS[@]}" ]] || [[ $SELECTED_PLMN -le 0 ]] ; then
+               echo -e "${R}selected PLMN id is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	    fi
+            ###########################################################
+            shift 2;;                   
+       -d | --deploy)
+            export CN_IP=${UE_HOST_IP}
+            # write CN_IP to ueconfig.ini file
+            sed -i "/export CN_IP=/c\export CN_IP=\"${CN_IP}\"; # controlled by ueconfig -a" ${USER_SCRIPTS_FOLDER}/ueconfig.ini
+            # write CN_IP to gnbconfig.ini file
+            ssh ${GNB_HOST_IP} "sed -i '''/export CN_IP=/c\export CN_IP=\"${CN_IP}\"; # last written by ueconfig -a''' ${USER_SCRIPTS_FOLDER}/gnbconfig.ini"
+            # if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
+            # CN host in the config.ini file
+            SELECTED_MODE="start"
+            shift;;
+       -s | --stop)
+            SELECTED_MODE="stop"
+            shift;;   
+       -c | --clear)
+            purge
+            exit 0;;    
+       -i | --info)
+            info
+            exit 0;;                
+       -h | --help)
+            print_help
+            exit 0;;
+        *) 
+            exit
+            ;;    
+    esac
+  done
+  
+  
+ # start execution of nr-softmodem for the selected scenario and PLMN  
+${SELECTED_MODE}_${VERSIONS["$SELECTED_VERSION"-1]} 
+  }
+
+main "$@"
+
+
+ 

@@ -1,0 +1,28 @@
+#!/bin/bash
+# DCS LAB
+# UOP
+# Manolis Bozis
+# Mar 2023
+# Configuration to reach the 5g core network on a VM in another host
+
+source ueconfig.ini
+echo -e "desabling ipv4 forwarding...\n"
+sudo sysctl net.ipv4.conf.all.forwarding=0
+sleep 2
+# delete previous route
+ip route show | grep "192.168.70.128" >/dev/null
+ROUTE_EXISTS=$?
+if [[ "$ROTE_EXISTS" -eq 0 ]] ; then
+echo -e "${R}a route to core network already exists"
+echo -e "deleting the old route before applying the new one...${NOCOLOR}"
+sudo ip route del 192.168.70.128/26
+fi
+#
+# find gnb ip address
+#GNB_IP=$(host pc-i9-3.cst.uop.gr | awk '{print $4}')
+CN_IP=${GNB_HOST_IP}
+#
+# add new route to amf
+sudo ip route add 192.168.70.128/26 via ${CN_IP} dev enp0s31f6
+
+

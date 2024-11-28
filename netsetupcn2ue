@@ -1,0 +1,33 @@
+#!/bin/bash
+# DCS LAB
+# UOP
+# Manolis Bozis
+# Mar 2023
+# Configuration to reach the 5g core network on a VM in another host
+# Execute it with root privilages (sudo)
+echo -e "enabling ipv4 forwarding...\n"
+sudo sysctl net.ipv4.conf.all.forwarding=1
+sudo iptables -P FORWARD ACCEPT
+sleep 2
+
+################ Create virtual NIC #####################
+#echo -e "creating virtual NIC...\n"
+#modprobe dummy
+#ip link add veth type dummy
+#ifconfig beth hw ether C8:D7:4A:4E:47:50
+#ip addr add 192.168.45.100/24 brd + dev veth label veth:0
+#ip link set dev veth up
+#sleep 2
+#########################################################
+################# add route to amf ######################
+#echo -e "adding route to 192.168.70.128/26C...\n"
+#ip route add 192.168.70.128/26 \
+#via 192.168.45.9 \
+#dev veth metric 100
+#sleep \2
+#########################################################
+#echo -e "configuring NETFILTER with IPTABLES...\n"
+#iptables -A FORWARD -i veth -o eno1 -j ACCEPT
+
+# del virtual nic
+# ip link del veth type dummy

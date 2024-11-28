@@ -36,31 +36,9 @@ the ethernet link between the 2 hosts  needs to be at least 10Gbps
 Usage:  $0 [OPTION]... [+VALUE] 
   -s, --scenario [value]   start UE softmodem executing scenario number [value]
                            value is from the following table
-                           ------------------------------------------------------------------
-                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                           
-                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
-                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
-                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
-                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
-                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
-                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                          | 10 | standalone mode band 78 with 106prb (2x2 MIMO)               |
-                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                          | 15| standalone mode band 66 with 106prb (SISO,FDD)               |
-                          | 16| standalone mode band 71 with 106prb (SISO,FDD)               |                       
-                          | 17| do-ra mode: simualated 5G NSA connection with only 5G        |
-                          |   | terminals being present                                      |                      
-                          | 18| Physical layer test with one slot assigned for downlink      |
-                          | 19| extended phy layer test with parameters changed              |
-                          |   | (parameters need to be changed directly to script code)      |        
-                          -------------------------------------------------------------------
+EOF
+print_scenarios;
+cat <<EOF
   -o, --scope              use nr-scope tool
   -p, --plmn               PLMN selection
                            1 (default) --> 00101
@@ -89,7 +67,7 @@ sleep 2
 sa_band78_24prb(){
 COMMAND="./nr-uesoftmodem \
 -r 24 --numerology 1 --band 78 -C 3604800000 --ssb 24 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -100,7 +78,7 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_51prb(){
 COMMAND="./nr-uesoftmodem \
 -r 51 --numerology 1 --band 78 -C 3309960000 --ssb 222 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -110,11 +88,11 @@ COMMAND="./nr-uesoftmodem \
 #########  SA mode band 78 106prb  #########################################
 sa_band78_106prb(){
 # RFSIMULATOR=127.0.0.1 ./nr-uesoftmodem -O ${USERFOLDER}/scripts/ue.conf -r 106 --numerology 1 --band 78 -C 3619200000 \
-# --nokrnmod --rfsim --sa --uicc0.imsi 001010000000001 --uicc0.nssai_sd 1 \
+# --nokrnmod --rfsim  --uicc0.imsi 001010000000001 --uicc0.nssai_sd 1 \
 # -d --telnetsrv --rfsimulator.options chanmod --rfsimulator.modelname rfsimu_channel_gnb0 
 COMMAND="./nr-uesoftmodem \
 -r 106 --numerology 1 --band 78 -C 3619200000 --ssb 516 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 ################################################################################
@@ -125,7 +103,7 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_133prb(){
 COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -135,7 +113,7 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_162prb(){
 COMMAND="./nr-uesoftmodem \
 -r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -145,8 +123,8 @@ COMMAND="./nr-uesoftmodem \
 sa_band78_217prb(){
 COMMAND="./nr-uesoftmodem \
 -r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
---uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
+--uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 ############################################################################
@@ -155,7 +133,7 @@ COMMAND="./nr-uesoftmodem \
 sa_band77_273prb(){
 COMMAND="./nr-uesoftmodem \
 -r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 1 --ue-nb-ant-tx 1 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -169,7 +147,7 @@ COMMAND="./nr-uesoftmodem \
 sa_mimo_band78_106prb(){
 COMMAND="./nr-uesoftmodem \
 -r 106 --numerology 1 --band 78 -C 3319680000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 # --uicc0.nssai_sd 0xFFFFFF
@@ -180,7 +158,7 @@ COMMAND="./nr-uesoftmodem \
 sa_mimo_band78_133prb(){
 COMMAND="./nr-uesoftmodem \
 -r 133 --numerology 1 --band 78 -C 3325620000 --ssb 144 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 #-d
@@ -191,7 +169,7 @@ COMMAND="./nr-uesoftmodem \
 sa_mimo_band78_162prb(){
 COMMAND="./nr-uesoftmodem \
 -r 162 --numerology 1 --band 78 -C 3329760000 --ssb 516 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -202,7 +180,7 @@ COMMAND="./nr-uesoftmodem \
 sa_mimo_band78_217prb(){
 COMMAND="./nr-uesoftmodem \
 -r 217 --numerology 1 --band 78 -C 3339300000 --ssb 1152 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -213,7 +191,7 @@ COMMAND="./nr-uesoftmodem \
 sa_mimo_band77_273prb(){
 COMMAND="./nr-uesoftmodem \
 -r 273 --numerology 1 --band 77 -C 3949740000 --ssb 1492 --ue-nb-ant-rx 2 --ue-nb-ant-tx 2 \
---rfsim --sa --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
@@ -232,7 +210,7 @@ sa_band66(){
 
 # --------------------------- BAND 66 ---------------------------------------------------------------------------------------------
 COMMAND="./nr-uesoftmodem -r 106 --numerology 1 --band 66 -C 2169080000 --CO -400000000 --ssb 378 \
---rfsim --sa --non-stop --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --non-stop --rfsimulator.serveraddr 192.168.0.1 \
 --telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 ############################################################################
@@ -250,7 +228,7 @@ sa_band71(){
 
 # --------------------------- BAND 71 ---------------------------------------------------------------------------------------------
 COMMAND="./nr-uesoftmodem -r 106 --numerology 0 --band 71 -C 639540000 --CO 46000000 --ssb 456 \
---rfsim --sa --non-stop --rfsimulator.serveraddr 192.168.0.1 \
+--rfsim  --non-stop --rfsimulator.serveraddr 192.168.0.1 \
 --telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
 #  638650000
@@ -290,12 +268,70 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-uesoftmodem --rfsim --rfsimulator.serveraddr ${G
 }
 ############################################################################
 
+################## SCENARIO 20 ##############################################
+#################### SA mode band 66 #######################################
+band66_25prb(){
+# band 66 
+# FDD
+# --numerology 0   (that means 15Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 2169080000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+
+# --------------------------- BAND 66 ---------------------------------------------------------------------------------------------
+COMMAND="./nr-uesoftmodem -r 25 --numerology 0 --band 66 -C 2152680000 --CO -400000000 --ssb 48 \
+--rfsim --rfsimulator.serveraddr 192.168.0.1 \
+--telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
+
+################# SCENARIO 21 ##############################################
+#################### GEO emulation band 66 #################################
+geo_sat_emulation(){
+# band 66 
+# FDD
+# --numerology 0   (that means 15Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 2169080000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+# --------------------------- BAND 66 ---------------------------------------------------------------------------------------------
+COMMAND="./nr-uesoftmodem -r 25 --numerology 0 --band 66 -C 2152680000 --CO -400000000 --ssb 48 \
+--rfsim --rfsimulator.serveraddr 192.168.0.1 --ue-fo-compensation \
+--rfsimulator.prop_delay 238.74 --ntn-koffset 478 --ntn-ta-common 477.48 \
+--telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
+################ SCENARIO 22 ##############################################
+band3_52prb(){
+# band 66 
+# FDD
+# --numerology 0   (that means 15Khz subcarrier spacing)
+# -r (Number of Physical Rsource Blocks PRBs)
+# CO (Carrier Offset 400MHz)
+# Carrier Frequency 1837480000 Hz
+# --ssb (SSB subcarrier offset, substitutesthe older -s which is not valid now
+
+# --------------------------- BAND 3 ---------------------------------------------------------------------------------------------
+COMMAND="./nr-uesoftmodem --band 3 -r 52 --numerology 0 -C 1837480000 --CO -95000000 --ssb 190 \
+--rfsim  --rfsimulator.serveraddr 192.168.0.1 \
+--telnetsrv -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
+}
+############################################################################
 
 
 
 ######################## MAIN FUNCTION #####################################
 function main() {
-
+###### check if script is run with sudo privilages ######
+SCRIPTUSER=$(whoami)
+if [[ $SCRIPTUSER = "root" ]] ; then 
+echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
+echo -e "${R}remove sudo and execute again  \n${NOCOLOR}"               
+exit 1
+fi
+##########################################################
 if [ "$*" == "" ]; then
     >&2 echo -e "${R}No arguments provided. Printing help message.${NOCOLOR}"
     print_help
@@ -322,29 +358,9 @@ fi
                echo -e "${R}selected senario is not valid\n${NOCOLOR}"
                print_help
                exit 1 
-	    fi
+	          fi
             ###########################################################
-
-            # check if core network is up, executing a ping to AMF ####
-            #echo -e "checking connection to AMF...\n"
-            #ping amf -c 1
-            #if [ $? -ne 0 ]; then
-            #echo -e "${R} No connection to AMF\n"
-            #echo -e "start 5G core network prior to executing RAN\n"
-            #echo -e "or check your network settings ${NOCOLOR}\n"
-            #exit 1
-            #fi 
-            ###########################################################
-
-            # check cpu state #########################################
-            cpufreq-info | awk '/analyzing CPU/ || /current CPU frequency is/ {print}'
-            ###########################################################
-            # switch to softmodem binary file folder ##################
-            cd ${USERFOLDER}/openairinterface5g
-            source oaienv
-            cd cmake_targets/ran_build/build
-            ###########################################################
-            echo -e "Selected scenario is ${SELECTED_SCENARIO}\n"
+            echo -e "Selected scenario is ${G}${SELECTED_SCENARIO}${NOCOLOR}\n"
             shift 2;;
         -p | --plmn)
             SELECTED_PLMN=$2
@@ -352,7 +368,7 @@ fi
                echo -e "${R}selected PLMN is not valid\n${NOCOLOR}"
                print_help
                exit 1 
-	    fi
+	          fi
             ###########################################################
             shift 2;;  
         -o | --scope)
@@ -361,21 +377,27 @@ fi
 	-h | --help)
             print_help
             exit 0;;
-        *) 
+          *) 
             exit
             ;;    
     esac
   done
-# check if script is run with sudo privilages
-SCRIPTUSER=$(whoami)
-if [[ $SCRIPTUSER = "root" ]] ; then 
-echo -e "${R}you should not run script with sudo privilages\n${NOCOLOR}"
-echo -e "${R}remove sudo and execute again  \n${NOCOLOR}"               
-exit 1
-fi
+
 ############# compose command with arguments for the specific scenario ####
 ${SCENARIOS["$SELECTED_SCENARIO"-1]}  
-echo -e $COMMAND | xclip 
+###########################################################################
+# check cpu state #########################################
+#cpufreq-info | awk '/analyzing CPU/ || /current CPU frequency is/ {print}'
+###########################################################
+
+echo -e $COMMAND | xclip # copy command to xclip
+echo -e $COMMAND > UE_COMMAND # copy command to COMMAND file
+
+# switch to softmodem binary file folder ##################
+cd ${OAI_FOLDER}
+source oaienv
+cd ${OAI_EXEC_FOLDER}
+###########################################################
 # start execution of nr-softmodem for the selected scenario and PLMN   
 echo -e $(xclip -o) | sudo bash # execute command from clipboard  
 # end of script
