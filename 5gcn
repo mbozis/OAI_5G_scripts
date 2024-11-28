@@ -10,9 +10,7 @@ source gnbconfig.ini
 # 2 --> 2.1.0
 if [ -z "${CN_IP}" ]; then
 # Core Network Ip set to gnb host ip in the following line
-CN_IP=$(hostname --ip-address | awk '{print $1}')
-# if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
-# CN host in the config.ini file
+CN_IP=${GNB_HOST_IP}
 fi
 
 MODES=( "start" "stop" )
@@ -133,6 +131,14 @@ echo -e "${R}Core network containers are not deployed${NOCOLOR}"
 else
 CN_VERSION=$(ssh $CN_IP "docker ps" | grep oai-amf | cut -d':' -f 2 | cut -d' ' -f 1)
 echo -e "OAI Core Network version is: ${G}$CN_VERSION${NOCOLOR}"
+ if [[ "$CN_IP" = "$GNB_HOST_IP" ]]; then
+  echo -e "OAI Core Network containers are deployed on ${G}gNB ${NOCOLOR}host "
+ elif [[ "$CN_IP" = "$UE_HOST_IP" ]] 
+  then
+  echo -e "OAI Core Network containers are deployed on ${G}UE${NOCOLOR} host ${G}"
+ else
+  echo -e "OAI Core Network containers are deployed on other host ${G}"
+ fi
 fi  
 }
 #######################################################
@@ -167,6 +173,13 @@ fi
             ###########################################################
             shift 2;;                   
        -d | --deploy)
+            CN_IP=${GNB_HOST_IP}
+            # write CN_IP to gnbconfig.ini file
+            sed -i "/export CN_IP=/c\export CN_IP=\"${CN_IP}\"; # controlled by ueconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
+            # write CN_IP to ueconfig.ini file
+            ssh ${UE_HOST_IP} "sed -i '''/export CN_IP=/c\export CN_IP=\"${CN_IP}\"; # last written by gnbconfig -a''' ${USER_SCRIPTS_FOLDER}/ueconfig.ini"
+            # if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
+            # CN host in the config.ini file
             SELECTED_MODE="start"
             shift;;
        -s | --stop)
