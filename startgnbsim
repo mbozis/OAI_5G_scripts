@@ -4,8 +4,10 @@
 # DCS LAB Feb 2024
 # Manolis Bozis
 # scripts MUST run with root privillages
-# 
-source gnbconfig.ini
+# load initial configuration values ###########
+REL_PATH=$(echo $0 | sed 's/\/[^/]*$//')      #
+source ${REL_PATH}/gnbconfig.ini              #
+###############################################
 # configure core network ips only if you change core network version or DHCP host IPs chenge ###
 # run ./gnbconfig -a before running this script
 ################################
@@ -40,6 +42,7 @@ cat <<EOF
                            2           --> 50501
                            3           --> 20295  
   -o, --scope              use nr-scope tool  
+      --telnet             start telnet server
   -l, --log                write nr-softmodem output to a log file with date and time stamp in scripts/logs folder
   -t, --tracer             capture with T Tracer tool                        
   -i, --info               show Open Air Interface version
@@ -74,8 +77,8 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 # 106 PRB - usrp n310 ######################################################
 # configuration file used also for OTA transmittion with USRP N310 SDR #####
 sa_band78_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0 \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 # add --telnetsrv \ # for telnet server in gnb
 # add --MACRLCs.[0].ul_max_mcs # to select maximum mcs in uplink (default value is 9)
@@ -189,6 +192,7 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURA
 --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --sa \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+# 
 # --rfsimulator.options chanmod --rfsimulator.modelname AWGN \
 # uncomment previous line to define a channel model
 # --telnetsrv 
@@ -245,9 +249,10 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURA
 ############## SCENARIO 20 ##################################################
 #################### band 66, 25PRB, SCS=15KHz FDD ############################
 band66_25prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
+--gNBs.[0].min_rxtxtime 6 --rfsim --sa \
 --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
 }
 ###############################################################################
 ############## SCENARIO 21 ##################################################
@@ -258,12 +263,14 @@ geo_sat_emulation(){
 # completes the RAR proccess successfuly.
 # This scenario is for transparent GEO satellite
 # max MCS is set to 9 for both DL and UL (maximum modulation order of 2 - QPSK)
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --rfsim \
 --rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---rfsimulator.prop_delay 238.74 --MACRLCs.[0].ul_harq_round_max 1 \
---MACRLCs.[0].ul_max_mcs 9 --MACRLCs.[0].dl_max_mcs 9 ${NRSCOPE}"
+--rfsimulator.prop_delay 238.74 \
+--MACRLCs.[0].ul_min_mcs 9 --MACRLCs.[0].dl_min_mcs 9 \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
 }
 # --gNBs.[0].um_on_default_drb 1 --MACRLCs.[0].ul_harq_round_max 1 --MACRLCs.[0].dl_harq_round_max 1
+#--ntn-koffset 478 --ntn-ta-common 477.48
 ###############################################################################
 
 ################## SCENARIO 22 ##############################################
@@ -347,6 +354,9 @@ fi
 	-o | --scope)
             NRSCOPE="-d"
             shift;;  
+	--telnet)
+            TELNET=1
+            shift;;              
 	-t | --tracer)
 	    # Tracer util usage with:--T_stdout 2
             # IMPORTANT !!!!!!
@@ -369,6 +379,10 @@ fi
 
 ############# compose command with arguments for the specific scenario ####
 ${SCENARIOS["$SELECTED_SCENARIO"-1]}
+##### start telnet server #################################################
+if [[ ${TELNET} -eq 1 ]]; then
+COMMAND="${COMMAND} --telnetsrv --telnetsrv.listenaddr ${GNB_HOST_IP}"
+fi
 ##### write to log file ################################################### 
 if [[ ${LOG} -eq 1 ]] && [[ ${TRACER} -eq 0 ]]; then
 COMMAND="${COMMAND} 2>&1 |tee ${LOGS_FOLDER}/gnb_log_${LOG_FILE_TIMESTAMP}.txt"
