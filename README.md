@@ -1,4 +1,10 @@
 # OAI_5G_scripts
+paper: "Enhancing 5G performance: A standalone system platform with customizable features"
+
+https://www.sciencedirect.com/science/article/pii/S1434841124004011
+
+## Introduction
+
 Scripts and configuration files for Open Air Interface. This branch is for files to be installed in oaiue host.
 
 To explore the use cases and measurements performed with  this testbed you can read the paper "A Versatile 5G Standalone Testbed  Based On Commodity Hardware" under the following link
@@ -25,25 +31,35 @@ Usage:  ./startue [OPTION]... [+VALUE]
 
   -s, --scenario [value]   start UE softmodem executing scenario number [value]
                            
-                               ------------------------------------------------------------------
-                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                                
-                              | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                              | 3 | standalone mode band 78 with 106prb (SISO)                   |
-                              | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
-                              | 5 | standalone mode band 78 with 162prb (SISO)                   |      
-                              | 6 | standalone mode band 78 with 217prb (SISO)                   |  
-                              | 7 | standalone mode band 77 with 273prb (SISO)                   |   
-                              | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                              | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                              | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
-                              | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                              | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                              | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                              | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |        
-                              -------------------------------------------------------------------
+                           ------------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                            
+                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
+                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
+                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
+                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                          | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 15| standalone mode band 66 with 106prb (SISO,FDD, 40MHz BWP)    |
+                          | 16| standalone mode band 71 with 106prb (SISO,FDD, 20MHz BWP)    |                        
+                          | 17| do-ra mode: simulated 5G NSA connection with only 5G         |
+                          |   | terminals being present                                      |                                              
+                          | 18| physical layer test with one slot assigned for downlink      |
+                          | 19| extended phy layer test with parameters changed              |
+                          |   | (parameters need to be changed directly to script code)      |  
+                          | 20| standalone mode band 66 with 25 prb (SISO,FDD, 5MHz BWP)     | 
+                          | 21| GEO trnasparent SAT emulation                                |
+                          |   | (band 66 with 25 prb (SISO,FDD, 15KHz SCS)                   |  
+                          | 22| standalone mode band 3 with 52prb (SISO,FDD, 10MHz BWP)      |                                                  
+                          -------------------------------------------------------------------  
 
   -p, --plmn               PLMN selection
 
@@ -87,30 +103,35 @@ Usage:  ./startuesim [OPTION]... [+VALUE]
                  
                            
 
-                               ------------------------------------------------------------------
-                              | 1 | standalone mode band 78 with 24prb  (SISO)                   |                                
-                              | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
-                              | 3 | standalone mode band 78 with 106prb (SISO)                   |
-                              | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
-                              | 5 | standalone mode band 78 with 162prb (SISO)                   |      
-                              | 6 | standalone mode band 78 with 217prb (SISO)                   |  
-                              | 7 | standalone mode band 77 with 273prb (SISO)                   |   
-                              | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
-                              |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
-                              | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
-                              |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
-                              | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
-                              | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
-                              | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
-                              | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
-                              | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
-                              | 15| standalone mode band 66 with 106prb (SISO,FDD)               |    
-                              | 16| do-ra mode: simualated 5G NSA connection with only 5G        |
-                              |   | terminals being present                                      |                      
-                              | 17| physical layer test with one slot assigned for downlink      |
-                              | 18| extended phy layer test with parameters changed              |
-                              |   | (parameters need to be changed directly to script code)      |        
-                              -------------------------------------------------------------------
+                           ------------------------------------------------------------------
+                          | 1 | standalone mode band 78 with 24prb  (SISO)                   |                            
+                          | 2 | standalone mode band 78 with 51prb  (SISO)                   |                          
+                          | 3 | standalone mode band 78 with 106prb (SISO)                   |
+                          | 4 | standalone mode band 78 with 133prb (SISO)                   |                      
+                          | 5 | standalone mode band 78 with 162prb (SISO)                   |      
+                          | 6 | standalone mode band 78 with 217prb (SISO)                   |  
+                          | 7 | standalone mode band 77 with 273prb (SISO)                   |   
+                          | 8 | standalone mode band 78 with 106prb TDD 1 slot configuration |
+                          |   | with 7 DL, 2 UL, 1 FL slots, Periodicity=10 Slots            |
+                          | 9 | standalone mode band 78 with 106prb TDD 2 slot configuration |
+                          |   | with 2 DL, 1 UL, 1 FL slots, Periodicity=4 Slots             |                     
+                          | 10| standalone mode band 78 with 106prb (2x2 MIMO)               |
+                          | 11| standalone mode band 78 with 133prb (2x2 MIMO)               |
+                          | 12| standalone mode band 78 with 162prb (2x2 MIMO)               |     
+                          | 13| standalone mode band 78 with 217prb (2x2 MIMO)               |  
+                          | 14| standalone mode band 77 with 273prb (2x2 MIMO)               |
+                          | 15| standalone mode band 66 with 106prb (SISO,FDD, 40MHz BWP)    |
+                          | 16| standalone mode band 71 with 106prb (SISO,FDD, 20MHz BWP)    |                        
+                          | 17| do-ra mode: simulated 5G NSA connection with only 5G         |
+                          |   | terminals being present                                      |                                              
+                          | 18| physical layer test with one slot assigned for downlink      |
+                          | 19| extended phy layer test with parameters changed              |
+                          |   | (parameters need to be changed directly to script code)      |  
+                          | 20| standalone mode band 66 with 25 prb (SISO,FDD, 5MHz BWP)     | 
+                          | 21| GEO trnasparent SAT emulation                                |
+                          |   | (band 66 with 25 prb (SISO,FDD, 15KHz SCS)                   |  
+                          | 22| standalone mode band 3 with 52prb (SISO,FDD, 10MHz BWP)      |                                                  
+                          -------------------------------------------------------------------  
 
 
   -o, --scope              use nr-scope tool
@@ -145,18 +166,24 @@ Usage:  ./ueconfig [OPTION]... [+VALUE]
 
   -p, --plmn               PLMN selection
 
-​                           1 (default) --> 00101
+                           1 (default) --> 00101
 
-​                           2           --> 50501
+                           2           --> 50501
 
-​                           3           --> 20895 
+                           3           --> 20895 
 
   -e, --editor             choose editor
 
-​                           1 (default) --> nano
+                           1 (default) --> nano
 
-​                           2           --> gedit                                                        
+                           2           --> gedit  
+
+  -c, --clock              sets a clock reference (0:internal, 1:external, 2:gpsdo)
+
+  -t, --time               sets a time reference (0:internal, 1:external, 2:gpsdo) 
+
+  -a,                      detect host and container IPs and set them in ueconfig.ini file   
 
   -i, --info               show Open Air Interface software version
-
+  
   -h, --help               print this help message
