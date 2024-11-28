@@ -4,8 +4,10 @@
 # DCS LAB Sep 2024
 # Manolis Bozis
 # script to edit configuration files
-# load initial configuration values
-source gnbconfig.ini
+# load initial configuration values ###########
+REL_PATH=$(echo $0 | sed 's/\/[^/]*$//')      #
+source ${REL_PATH}/gnbconfig.ini              #
+###############################################
 
 ############################## VARIABLES SECTION #####################################
 
