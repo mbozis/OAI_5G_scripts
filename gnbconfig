@@ -41,7 +41,10 @@ cat <<EOF
                            1 (default) --> 00101  TAC --> 0001
                            2           --> 50501  TAC --> 0001 
                            3           --> 20295  TAC --> 40960 
-  --ul-max-mcs             set max MCS in Uplink                         
+  --ul-max-mcs             set max MCS in Uplink
+  --dl-max-mcs             set max MCS in Downlink
+  --ul-min-mcs             set min MCS in Uplink 
+  --dl-min-mcs             set min MCS in Downlink                          
   -c, --core-net           configure network settings in gNB if Core Network is deployed in different host                         
   -e, --editor             choose editor, combined with -s argument
                            1 (default) --> nano
@@ -94,8 +97,9 @@ fi
 view_ini(){
 
 echo "----- Setitngs in gnbconfig.ini file --------"
+echo -e "${G}-------------------  Folders ----------------${NOCOLOR}"
 ############################### Folders Configuration #########################################################
-echo "Scripts folder               : $USER_SCRIPTS_FODER"
+echo "Scripts folder               : $USER_SCRIPTS_FOLDER"
 echo "Configuration files folder   : $CONFIGURATION_FOLDER"
 echo "Log files folder             : $LOGS_FOLDER"
 echo "capture files folder         : $CAPTURE_DIRECTORY"
@@ -103,22 +107,32 @@ echo "gnb executables folder       : $GNB_EXEC_FOLDER"
 echo "CI scripts folder            : $CI_SCRIPTS_FOLDER"
 echo "---------------------------------------------"
 ############################### Network Configuration #########################################################
+echo -e "${G}-------------------  IP settings -------------${NOCOLOR}"
 echo "Router IP                    : $ROUTER_IP"
-echo "External Data Network IP     : $EXT_DN_IP"
+echo "External Data Network IP     : $OAI_EXT_DN_IP"
 echo "UPF IP                       : $UPF_IP"
 echo "Router IP                    : $UE_HOST_IP"
 echo "UE Host IP                   : $ROUTER_IP"
 echo "gNB host IP (CDR)            : $GNB_HOST_IP_CIDR"
 echo "---------------------------------------------"
-echo "UL max MCS                   : $UL_MAX_MCS"
+echo -e "${G}-------------------  MCS values --------------${NOCOLOR}"
 echo "DL max MCS                   : $DL_MAX_MCS"
+echo "DL min MCS                   : $DL_MIN_MCS"
+echo "UL max MCS                   : $UL_MAX_MCS"
+echo "UL min MCS                   : $UL_MIN_MCS"
+echo -e "${G}---------------  Performance settings --------${NOCOLOR}"
+if [ -z "$THREAD_POOL" ]; then
+echo "Thread Pool                  : Not set <--All cores are used"
+else
 echo "Thread Pool                  : $(echo $THREAD_POOL | sed -e "s/^--thread-pool //")"
+fi
 echo "LDPC decoder iterations      : $(echo $LDPC_DECODER_ITERATIONS | cut -d' ' -f 2)"  
 if [ -z "$OAI_RA_FIX" ]; then
 echo "RF board timing advance      : Not set <--this is to compensate fix delay inside the RF board between Rx and Tx timestamps (RF board internal issues)" 
  else
 echo "RF board timing advance      : $(echo $OAI_RA_FIX|cut -d' ' -f 2) <--this is to compensate fix delay inside the RF board between Rx and Tx timestamps (RF board internal issues)"  
 fi
+echo -e "${G}-----------------------------------------------${NOCOLOR}"
 }
 ##################################################L#############
 
@@ -257,9 +271,18 @@ fi
 ############################################################################
 }
 
-############################################################################
+################### Functions to set up min and max MCS ###################
 set_ul_max_mcs(){
 sed -i "/export UL_MAX_MCS/c\export UL_MAX_MCS=${SELECTED_UL_MAX_MCS}" gnbconfig.ini
+}
+set_dl_max_mcs(){
+sed -i "/export DL_MAX_MCS/c\export DL_MAX_MCS=${SELECTED_DL_MAX_MCS}" gnbconfig.ini
+}
+set_ul_min_mcs(){
+sed -i "/export UL_MIN_MCS/c\export UL_MIN_MCS=${SELECTED_UL_MIN_MCS}" gnbconfig.ini
+}
+set_dl_min_mcs(){
+sed -i "/export DL_MIN_MCS/c\export DL_MIN_MCS=${SELECTED_DL_MIN_MCS}" gnbconfig.ini
 }
 ############################################################################
 
@@ -410,24 +433,62 @@ fi
         -c | --core-net)
             config_net_ng
             shift;;
+
         --ul-max-mcs)
             # check if selected UL max MCS is valid
             SELECTED_UL_MAX_MCS=$2
-            if [[ ! $SELECTED_UL_MAX_MCS =~ $re ]] || [[ ${SELECTED_UL_MAX_MCS} -gt 27 ]] || [[ ${SELECTED_UL_MAX_MCS} -le 0 ]] ; then
+            if [[ ! $SELECTED_UL_MAX_MCS =~ $re ]] || [[ ${SELECTED_UL_MAX_MCS} -gt 28 ]] || [[ ${SELECTED_UL_MAX_MCS} -lt 0 ]] ; then
                echo -e "${R}selected UL max MCS is not valid\n${NOCOLOR}"
                print_help
                exit 1 
-	    fi
+	         fi
             ###########################################################
             set_ul_max_mcs
             shift 2;;
+
+         --dl-max-mcs)
+            # check if selected UL max MCS is valid
+            SELECTED_DL_MAX_MCS=$2
+            if [[ ! $SELECTED_DL_MAX_MCS =~ $re ]] || [[ ${SELECTED_DL_MAX_MCS} -gt 28 ]] || [[ ${SELECTED_DL_MAX_MCS} -lt 0 ]] ; then
+               echo -e "${R}selected DL max MCS is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	         fi
+            ###########################################################
+            set_dl_max_mcs
+            shift 2;;
+
+        --ul-min-mcs)
+            # check if selected UL max MCS is valid
+            SELECTED_UL_MIN_MCS=$2
+            if [[ ! $SELECTED_UL_MIN_MCS =~ $re ]] || [[ ${SELECTED_UL_MIN_MCS} -gt 28 ]] || [[ ${SELECTED_UL_MIN_MCS} -lt 0 ]] ; then
+               echo -e "${R}selected UL min MCS is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	         fi
+            ###########################################################
+            set_ul_min_mcs
+            shift 2;;
+
+         --dl-min-mcs)
+            # check if selected UL max MCS is valid
+            SELECTED_DL_MIN_MCS=$2
+            if [[ ! $SELECTED_DL_MIN_MCS =~ $re ]] || [[ ${SELECTED_DL_MIN_MCS} -gt 28 ]] || [[ ${SELECTED_DL_MIN_MCS} -lt 0 ]] ; then
+               echo -e "${R}selected DL min MCS is not valid\n${NOCOLOR}"
+               print_help
+               exit 1 
+	         fi
+            ###########################################################
+            set_dl_min_mcs
+            shift 2;;
+
           -t | --att-tx)
             SELECTED_TX_VALUE=$2
             if [[ ! ${SELECTED_TX_VALUE} =~ $re ]] || [[ ${SELECTED_TX_VALUE} -gt 60 ]] || [[ ${SELECTED_TX_VALUE} -lt 0 ]] ; then
                echo -e "${R}selected value is not valid. Choose a value from 0 to 60 \n${NOCOLOR}"
                print_help
                exit 1 
-	    fi
+	         fi
             set_att_tx
             ###########################################################
             shift 2;;     
