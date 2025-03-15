@@ -131,9 +131,9 @@ echo -e "${R}Core network containers are not deployed${NOCOLOR}"
 else
 CN_VERSION=$(ssh $CN_IP "docker ps" | grep oai-amf | cut -d':' -f 2 | cut -d' ' -f 1)
 echo -e "OAI Core Network version is: ${G}$CN_VERSION${NOCOLOR}"
- if [[  =  ]]; then
+ if [[  ${CN_IP} = ${GNB_HOST_IP} ]]; then
   echo -e "OAI Core Network containers are deployed on ${G}gNB${NOCOLOR} host" 
- elif [[  =  ]] 
+ elif [[  ${CN_IP} = ${UE_HOST_IP}  ]] 
   then
   echo -e "OAI Core Network containers are deployed on ${G}UE${NOCOLOR} host" 
  else

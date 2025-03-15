@@ -58,6 +58,7 @@ COMMAND="./nr-uesoftmodem \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
+# --usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
 # -A 45: Sometimes, the nrUE would keep repeating RA procedure because of Msg3 failure at the gNB. If it happens, add the -A option at the nrUE and/or gNB side, e.g., -A 45.
 #This modifies the timing advance (in samples). Adjust +/-5 if the issue persists.
 #################################################################################
@@ -74,6 +75,7 @@ COMMAND="./nr-uesoftmodem \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
+# \
 # -A 45: Sometimes, the nrUE would keep repeating RA procedure because of Msg3 failure at the gNB. If it happens, add the -A option at the nrUE and/or gNB side, e.g., -A 45.
 #This modifies the timing advance (in samples). Adjust +/-5 if the issue persists.
 #################################################################################
@@ -89,7 +91,7 @@ COMMAND="./nr-uesoftmodem \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports1.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
-
+# --usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
 
 #  --log_config.global_log_options level,nocolor,time
 # -O ~/scripts/configuration/ue.conf 
@@ -178,6 +180,7 @@ COMMAND="./nr-uesoftmodem \
 --uecap_file ${CONFIGURATION_FOLDER}/uecap/uecap_ports2.xml \
 -O ${CONFIGURATION_FOLDER}/${PLMNS["$SELECTED_PLMN"-1]}ue.conf ${NRSCOPE}"
 }
+#--usrp-args "addr=${USRP_ADDR_IP_1},second_addr=${USRP_ADDR_IP_2}" ${OAI_RA_FIX} \
 ############################################################################
 
 ############## SCENARIO 11 ##################################################-

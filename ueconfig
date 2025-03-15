@@ -75,7 +75,7 @@ fi
 
 ####  find USRP device IP ###############################
 echo -e "${Y}trying to configure management IP of USRP N310 SDR device...${NOCOLOR}"
-GNB_USRP_MGMT_IP=$(uhd_find_devices --args="serial=${GNB_USRP_SERIAL}" | grep addr | grep -v mgmt_addr | awk '{print $2}' | tr -d '\n')
+GNB_USRP_MGMT_IP=$(uhd_find_devices --args="serial=${UE_USRP_SERIAL}" | grep addr | grep -v mgmt_addr | awk '{print $2}' | tr -d '\n')
 if [ ! -z "${GNB_USRP_MGMT_IP}" ]; then
 sed -i "/export GNB_USRP_MGMT_IP=/c\export GNB_USRP_MGMT_IP=\"${GNB_USRP_MGMT_IP}\"  # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 echo -e "USRP N310 mgmt IP ip set to ${G}${GNB_USRP_MGMT_IP}${NOCOLOR} in gnbconfig.ini file"
