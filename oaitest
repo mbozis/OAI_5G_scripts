@@ -217,6 +217,8 @@ Usage:  $0 [OPTION]... [+VALUE]
                              [PROTOCOL] can be L1, MAC or RRC                                                    
   -h, --help                 print this help message
   --cpu                      show cpu and mem usage for nr-softmodem threads
+  --power                    write CPU power consumption values in power.txt file
+                             (measurements are taken every 1 s during performed tests)   
   --dmax                     get downlink throughput
   --umax                     get uplink throughput 
 EOF
@@ -468,6 +470,9 @@ fi
        --cpu)
             htop -p $(pgrep -d',' -f "nr-softmodem")
             shift;;
+       --power)
+            WATT_MEASUREMENT=1
+            shift;;     
        -t | --time)
             TEST_TIME=$2
             shift 2;;       
@@ -482,6 +487,12 @@ fi
     esac
   done
 # run uplink and downlink if selected 
+if [[ ${WATT_MEASUREMENT} == 1 ]] ; then
+# start meausuring CPU watts in backround
+echo "${Y}you may be asjed to enter your paasword for executing --power option${NOCOLOR}"
+sudo -v
+${USER_SCRIPTS_FOLDER}/watt power.txt &
+fi
 if [ ${DOIPERFTESTDL} == 1 ]
 then
 iperftestDL
@@ -499,6 +510,9 @@ then
 checkUplinkThroughput
 fi
 #
+if [[ ${WATT_MEASUREMENT} == 1 ]] ; then
+sudo pkill watt # stop meausuring CPU watts
+fi 
   }
   
   main "$@"

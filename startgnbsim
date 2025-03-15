@@ -57,17 +57,19 @@ sed -i "/export SELECTED_SCENARIO/c\export SELECTED_SCENARIO=${SELECTED_SCENARIO
 ################## SCENARIO 1 ##############################################
 #################### SA mode band 78 51prb  ################################
 sa_band78_24prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
 ################## SCENARIO 2 ##############################################
 #################### SA mode band 78 51prb  ################################
 sa_band78_51prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
@@ -79,7 +81,9 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 sa_band78_106prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim \
 --rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 # add --telnetsrv \ # for telnet server in gnb
 # add --MACRLCs.[0].ul_max_mcs # to select maximum mcs in uplink (default value is 9)
 }
@@ -88,18 +92,22 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 ################## SCENARIO 4 ##############################################
 ########### SA mode band 78 133 prb SISO ###################################
 sa_band78_133prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
 ################## SCENARIO 5 ##############################################
 ############# SA mode band 78 162 prb  SISO ################################
 sa_band78_162prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
@@ -107,8 +115,10 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 ######### Scenarion 17 SA mode band 78 217 prb SISO ########################
 sa_band78_217prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
@@ -116,8 +126,10 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 #################### SA mode band 77 273prb  ###############################
 sa_band77_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 --usrp-tx-thread-config 1 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0 \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
@@ -125,8 +137,10 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 ##################### SA mode band 78 106prb TDD 1  ########################
 sa_band78_106prb_TDD_1(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
@@ -135,17 +149,20 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 ##################### SA mode band 78 106prb TDD 2  ########################
 sa_band78_106prb_TDD_2(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
 ################## SCENARIO 10 ##############################################
 ##################### SA mode band 78 106 prb (2x2 MIMO) ###################
 sa_mimo_band78_106prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} ${NRSCOPE} "
 }
 ############################################################################
 
@@ -153,8 +170,10 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 ##################### SA mode band 78 133 prb MIMO #########################
 sa_mimo_band78_133prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+"
 }
 ############################################################################
 
@@ -162,8 +181,10 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 ##################### SA mode band 78 162 prb  MIMO ########################
 sa_mimo_band78_162prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
@@ -171,8 +192,10 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 ###################### SA mode band 78 217 prb MIMO ########################
 sa_mimo_band78_217prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
@@ -180,8 +203,10 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 ######### Scenarion 18 SA mode band 77 273 prb MIMO ########################
 sa_mimo_band77_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --gNBs.[0].min_rxtxtime 6 --rfsim --sa  \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
@@ -189,9 +214,11 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 #################### SA mode band 66 #######################################
 sa_band66_106prb(){
 COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --sa \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 # 
 # --rfsimulator.options chanmod --rfsimulator.modelname AWGN \
 # uncomment previous line to define a channel model
@@ -203,9 +230,11 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURA
 #################### SA mode band 66 #######################################
 sa_band71_106prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --sa \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 # --rfsimulator.options chanmod --rfsimulator.modelname AWGN \
 # uncomment previous line to define a channel model
 # --telnetsrv 
@@ -225,7 +254,7 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURA
 phytest(){
 # only 1 slot assigned for downlink
 COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --phy-test --gNBs.[0].min_rxtxtime 6"
 }
 ############################################################################
@@ -241,7 +270,7 @@ phytestextended(){
 # and Bitmap of slots = 126 decimal = 01111110 binary that coresponds to slots 1,2,3,4,5 and 6
 # at the UE side we see the number of HACKs are 6 times greater than in 1st scenario
 COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --phy-test -m 27 -M 106 -D 126 --gNBs.[0].min_rxtxtime 6"
 }
 ############################################################################
@@ -251,8 +280,10 @@ COMMAND="LD_LIBRARY_PATH=. ./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURA
 band66_25prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
 --gNBs.[0].min_rxtxtime 6 --rfsim --sa \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ###############################################################################
 ############## SCENARIO 21 ##################################################
@@ -264,10 +295,11 @@ geo_sat_emulation(){
 # This scenario is for transparent GEO satellite
 # max MCS is set to 9 for both DL and UL (maximum modulation order of 2 - QPSK)
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --rfsim \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
 --rfsimulator.prop_delay 238.74 \
---MACRLCs.[0].ul_min_mcs 9 --MACRLCs.[0].dl_min_mcs 9 \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 # --gNBs.[0].um_on_default_drb 1 --MACRLCs.[0].ul_harq_round_max 1 --MACRLCs.[0].dl_harq_round_max 1
 #--ntn-koffset 478 --ntn-ta-common 477.48
@@ -277,9 +309,11 @@ COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SC
 #################### SA mode band 3 #######################################
 sa_band3_52prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
---rfsimulator.serveraddr server --rfsimulator.serverport 4043 \
+--rfsimulator.serveraddr server --rfsimulator.serverport 4043 --rfsimulator.wait_timeout 0  \
 --parallel-config PARALLEL_SINGLE_THREAD --rfsim --sa \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} \
+${NRSCOPE}"
 }
 ############################################################################
 
@@ -364,7 +398,7 @@ fi
             # goto home/openairinterface5g/common/utis/T/tracer and run make command to build all executables needed
             TRACER=1
             shift;;               
-        -l | --log)
+  -l | --log)
             LOG=1
             shift;;                    
 	-h | --help)

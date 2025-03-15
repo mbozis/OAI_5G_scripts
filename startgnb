@@ -17,7 +17,7 @@ source ${REL_PATH}/gnbconfig.ini              #
 print_help(){
 cat <<EOF
 UOP - DCS LAB author Manolis Bozis 2024
-Tool to start gnb softmodem for a particular scenorio using USRP N310 SDR device
+Tool to start gnb softmodem for a particular scenario using USRP N310 SDR device
 or 2 hosts running OAI nrUE and nrgNB respectively.
 the ethernet link between the host and SDR needs to be at least 10Gbps 
 
@@ -96,9 +96,10 @@ sa_band78_106prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} ${NRSCOPE}"
 }
-
+# --disable-harq
 ############################################################################
 
 ######## Scenario 4 SA mode band 78 133 prb SISO #########################
@@ -113,11 +114,12 @@ ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 
 ######### Scenario 5 SA mode band 78 162 prb  SISO ########################
 sa_band78_162prb(){
-COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
---sa --usrp-tx-thread-config 1 \
+COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} \
+--MACRLCs.[0].ul_min_mcs ${UL_MIN_MCS} --MACRLCs.[0].dl_min_mcs ${DL_MIN_MCS} ${NRSCOPE}"
+#
 }
 ############################################################################
 
@@ -134,10 +136,10 @@ ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 ######### Scenario 7 SA mode band 77 273 prb  SISO ########################
 sa_band77_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
---sa --usrp-tx-thread-config 1 \
+--sa --usrp-tx-thread-config 1 --disable-harq \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
@@ -147,7 +149,7 @@ sa_band78_106prb_TDD_1(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} --sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
---MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE} ${THREAD_POOL}"
+--MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
 }
 ############################################################################
 
@@ -391,10 +393,7 @@ fi
             CL=1
             shift;;         
         -l | --log)
-            # set LOG flag to 1 except in the case of running scenario 5
-            if [[ ${SELECTED_SCENARIO} -ne 5 ]] ; then
             LOG=1
-            fi
             shift;;                    
         *) 
             exit
@@ -406,7 +405,7 @@ fi
 ${SCENARIOS["$SELECTED_SCENARIO"-1]}  
 ##### write to log file ################################################### 
 if [[ ${LOG} -eq 1 ]] && [[ ${TRACER} -eq 0 ]]; then
-COMMAND="${COMMAND} 2>&1 |tee ${LOGS_FOLDER}/gnb_log_${LOG_FILE_TIMESTAMP}.txt"
+COMMAND="${COMMAND} 2>&1 | tee ${LOGS_FOLDER}/gnb_log_${LOG_FILE_TIMESTAMP}.txt"
 fi
 ##### use tracer tool ################################################### 
 if [[ ${TRACER} -eq 1 ]]; then

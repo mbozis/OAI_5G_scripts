@@ -14,10 +14,9 @@
 #sleep 2
 
 source gnbconfig.ini
-#IP=${CN_HOST_IP}
-IP=${CN_IP}
+IP=${CN_HOST_IP}
 #INTERFACE=${GNB_NIC_TO_CN}
-INTERFACE=${NICNAME_4}
+INTERFACE=${NICNAME_0}
 
 echo -e "setting up connection to core network"
 echo -e "UE Host IP: ${UE_HOST_IP}"
