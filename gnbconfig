@@ -14,7 +14,7 @@ source ${REL_PATH}/gnbconfig.ini              #
 START_EDITOR=0 # Flag (default value is 0 --> do not edit configuration file)
 if [ -z "${CN_IP}" ]; then
 # Core Network Ip set to gnb host ip in the following line
-CN_IP=$(hostname --ip-address | awk '{print $1}')
+CN_IP=$(hostname --ip-address | awk '{print $2}')
 # if you want to ran core network on a separate host. you must set CH_IP variable to the IP of the 
 # CN host in the config.ini file
 fi
@@ -111,8 +111,7 @@ echo -e "${G}-------------------  IP settings -------------${NOCOLOR}"
 echo "Router IP                    : $ROUTER_IP"
 echo "External Data Network IP     : $OAI_EXT_DN_IP"
 echo "UPF IP                       : $UPF_IP"
-echo "Router IP                    : $UE_HOST_IP"
-echo "UE Host IP                   : $ROUTER_IP"
+echo "UE Host IP                   : $UE_HOST_IP"
 echo "gNB host IP (CDR)            : $GNB_HOST_IP_CIDR"
 echo "---------------------------------------------"
 echo -e "${G}-------------------  MCS values --------------${NOCOLOR}"
@@ -309,8 +308,11 @@ echo -e "${Y}configuring ip addresses of hosts...${NOCOLOR}"
 sleep 1
 ping -c 1 -b ${LAN_B_ADDR} >/dev/null # ping broadcast address to update arp table
 UE_HOST_IP=$(arp -n | grep ${UE_HOST_MAC} | awk '{print $1}')
+############# if UE Host IP is found ################################
+if [ -n "$UE_HOST_IP" ]; then
 sed -i "/export UE_HOST_IP=/c\export UE_HOST_IP=\"${UE_HOST_IP}\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 echo -e "UE host ip set to: ${G}${UE_HOST_IP}${NOCOLOR}"
+
 GNB_HOST_IP=$(ip -br addr show | grep eno1 | awk '{print $3}' | cut -d'/' -f 1)
 sed -i "/export GNB_HOST_IP=/c\export GNB_HOST_IP=\"${GNB_HOST_IP}\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 echo -e "GNB host ip set to: ${G}${GNB_HOST_IP}${NOCOLOR}"
@@ -345,6 +347,11 @@ sed -i "/export OAI_EXT_DN_IP=/c\export OAI_EXT_DN_IP=\"192.168.70.131\"; # cont
 sed -i "/export AMF_IP=/c\export AMF_IP=\"192.168.70.134\"; # controlled by gnbconfig -a" ${USER_SCRIPTS_FOLDER}/gnbconfig.ini
 echo -e "UPF container ip set to ${G}192.168.70.133${NOCOLOR} in gnbconfig.ini file"
 echo -e "OAI_EXT_DN container ip set to ${G}192.168.70.131${NOCOLOR} in gnbconfig.ini file"
+fi
+##### UE_HOST_IP could not be discovered ################
+else
+echo -e "${R}UE host PC cannot be discovered. Is the UE_HOST_NIC connected to the same switch with gNB host?${NOCOLOR}"
+echo -e "${R}make necessary checks and rerun ./gnbconfig -a${NOCOLOR}"
 fi
 ####  find USRP device IP ###############################
 echo -e "${Y}trying to configure management IP of USRP N310 SDR device...${NOCOLOR}"

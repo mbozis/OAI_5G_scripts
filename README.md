@@ -124,6 +124,24 @@ There are 22 scenarios so far. To create a new scenario :
 2) Update print_scenarios function that contains the description of each scenario in gnbconfig.ini and ueconfig.ini files found in gNB and UE host respectively.
 3) write the new function that implemets your scenario and add it in startgnb, startgnbsim, startue and startuesim script files. 
 
+## An example of running with RF Siumulator for scenario 2 with CN version 1.51
+
+On gNB host:
+-Start by entering the network conffiguration for your setup, by editing **gnbconfig.ini** file..
+-run **./gnbconfig -a** to configure IPs for the two hosts
+-check your setup  by running **./gnbconfig -V** to view the current configuration. 
+- Start CN containers with **./5gcn -d -v 1 -p 1**
+- start gNB with **./startgnbsim -s 2 -p 1**
+- check connection to core network with **./oaitest -C**
+
+On UE host:
+- start UE with **./startuesim -s 2 -p 1**
+
+On gNB host:
+- check UE registration to core network with **./oaitest -c**
+- create a flow of 10mbps both in DL and UL with **./oaitest -d 10m -u 10m**
+
+
 ## Main scripts and their functionality
 
 The main scripts are the following (run them **without sudo** privilages, if sudo is needed script prompts for user password):

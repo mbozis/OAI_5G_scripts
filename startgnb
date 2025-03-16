@@ -136,7 +136,7 @@ ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 ######### Scenario 7 SA mode band 77 273 prb  SISO ########################
 sa_band77_273prb(){
 COMMAND="./nr-softmodem -O ${CONFIGURATION_FOLDER}/${CONFIGURATIONS[$SELECTED_SCENARIO-1]} \
---sa --usrp-tx-thread-config 1 --disable-harq \
+--sa --usrp-tx-thread-config 1 \
 ${MIN_RXTXTIME} ${OAI_RA_FIX} ${LDPC_DECODER_ITERATIONS} \
 --clock-source ${FREQUENCY_SOURCE} --time-source ${ONE_PPS_SOURCE} \
 --MACRLCs.[0].ul_max_mcs ${UL_MAX_MCS} --MACRLCs.[0].dl_max_mcs ${DL_MAX_MCS} ${NRSCOPE}"
