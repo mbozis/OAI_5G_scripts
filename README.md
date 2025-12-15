@@ -1,4 +1,4 @@
-# Scripts and configuration files for Open Air Interface SA testbed with two hosts.
+# Scripts for Open Air Interface SA testbed with two hosts.
 
 paper: "Enhancing 5G performance: A standalone system platform with customizable features"
 
